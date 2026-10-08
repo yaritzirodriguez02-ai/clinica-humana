@@ -66,11 +66,15 @@ public class ExpedientePediatrico {
     @Column(name = "saturacion_oxigeno")
     private Integer saturacionOxigeno;
 
-    // --- Evaluación clínica obligatoria ---
+    // Columna física 1 en MySQL (diagnostico_medico)
     @NotBlank(message = "El diagnóstico médico es obligatorio")
     @Size(min = 5, max = 1000, message = "El diagnóstico debe tener entre 5 y 1000 caracteres")
     @Column(name = "diagnostico_medico", columnDefinition = "TEXT", nullable = false)
     private String diagnostico;
+
+    // Columna física 2 en MySQL (diagnostico): Satisface la restricción NOT NULL de la base de datos
+    @Column(name = "diagnostico", columnDefinition = "TEXT", nullable = false)
+    private String diagnosticoCompatibilidad;
 
     @NotBlank(message = "El tratamiento indicado es obligatorio")
     @Column(name = "tratamiento", columnDefinition = "TEXT")
@@ -93,6 +97,10 @@ public class ExpedientePediatrico {
     @PrePersist
     protected void onCreate() {
         this.fechaAtencion = LocalDateTime.now();
+        // Garantiza que ambas columnas reciban el valor del diagnóstico antes del INSERT
+        if (this.diagnosticoCompatibilidad == null || this.diagnosticoCompatibilidad.isBlank()) {
+            this.diagnosticoCompatibilidad = this.diagnostico;
+        }
     }
 
     public ExpedientePediatrico() {
@@ -192,6 +200,25 @@ public class ExpedientePediatrico {
 
     public void setDiagnostico(String diagnostico) {
         this.diagnostico = diagnostico;
+        this.diagnosticoCompatibilidad = diagnostico;
+    }
+
+    // Compatibilidad para controladores antiguos o llamadas a getDiagnosticoMedico()
+    public String getDiagnosticoMedico() {
+        return diagnostico;
+    }
+
+    public void setDiagnosticoMedico(String diagnosticoMedico) {
+        this.diagnostico = diagnosticoMedico;
+        this.diagnosticoCompatibilidad = diagnosticoMedico;
+    }
+
+    public String getDiagnosticoCompatibilidad() {
+        return diagnosticoCompatibilidad;
+    }
+
+    public void setDiagnosticoCompatibilidad(String diagnosticoCompatibilidad) {
+        this.diagnosticoCompatibilidad = diagnosticoCompatibilidad;
     }
 
     public String getTratamiento() {
