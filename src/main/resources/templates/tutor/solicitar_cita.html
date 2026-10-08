@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Cita en Línea - Clínica Humana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+    <!-- Encabezado del Portal -->
+    <header class="bg-indigo-900 text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-700 rounded-lg flex items-center justify-center text-indigo-200">
+                    <i class="fa-solid fa-hospital-user text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold leading-tight">Clínica Humana</h1>
+                    <span class="text-xs text-indigo-300">Portal de Autoservicio para Padres y Tutores</span>
+                </div>
+            </div>
+            <a th:href="@{/login}" class="text-xs bg-indigo-800 hover:bg-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-600 transition">
+                <i class="fa-solid fa-user-lock"></i> Acceso Personal Médico
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 mt-8">
+
+        <!-- Mensajes Flash -->
+        <div th:if="${mensajeError}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 text-rose-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+            <span th:text="${mensajeError}"></span>
+        </div>
+
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+            <div class="mb-6 text-center border-b border-slate-100 pb-4">
+                <h2 class="text-2xl font-black text-slate-900">Agendar Cita Médica o Dental</h2>
+                <p class="text-xs text-slate-500 mt-1">Completa los datos del menor y el tutor para reservar tu turno en el consultorio.</p>
+            </div>
+
+            <form th:action="@{/portal-citas/solicitar}" method="post" class="space-y-6">
+
+                <!-- SECCIÓN 1: DATOS DEL PACIENTE (INFANTE) -->
+                <div>
+                    <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-child text-indigo-500"></i> 1. Datos del Paciente Infantil
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">CURP del Niño(a) *</label>
+                            <input type="text" name="curp" required maxlength="18" placeholder="Ej. AAAA000000HGRNNN00"
+                                   class="w-full uppercase font-mono px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nombre(s) *</label>
+                            <input type="text" name="nombrePaciente" required placeholder="Nombre del infante"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Apellidos *</label>
+                            <input type="text" name="apellidosPaciente" required placeholder="Apellidos"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fecha de Nacimiento</label>
+                            <input type="date" name="fechaNacimiento"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                     <div>
+    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Sexo *</label>
+    <select name="sexo" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+        <option value="M">Masculino</option>
+        <option value="F">Femenino</option>
+    </select>
+</div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: DATOS DEL TUTOR O PADRE -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield text-indigo-500"></i> 2. Datos del Padre o Tutor Responsable
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nombre del Tutor *</label>
+                            <input type="text" name="nombreTutor" required placeholder="Ej. Juan / María"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Apellidos del Tutor *</label>
+                            <input type="text" name="apellidosTutor" required placeholder="Apellidos completos"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Teléfono Móvil (10 dígitos) *</label>
+                            <input type="tel" name="telefonoTutor" required maxlength="10" placeholder="7471234567"
+                                   class="w-full font-mono px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Parentesco *</label>
+                            <select name="parentesco" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                                <option value="Mamá">Mamá</option>
+                                <option value="Papá">Papá</option>
+                                <option value="Tutor Legal">Tutor Legal</option>
+                                <option value="Abuelo/a">Abuelo/a</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 3: DETALLE DE LA CITA -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-indigo-500"></i> 3. Especialidad, Fecha y Horario
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Especialidad Requerida *</label>
+                            <select name="especialidad" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 font-semibold text-indigo-900">
+                                <option value="PEDIATRIA">Pediatría (Dra. Pilar Ríos)</option>
+                                <option value="ODONTOPEDIATRIA">Odontopediatría (Dra. Gloria González)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fecha Deseada *</label>
+                            <input type="date" name="fechaCita" required
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Horario *</label>
+                            <select name="horaCita" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 font-mono">
+                                <option value="09:00:00">09:00 hrs</option>
+                                <option value="10:00:00">10:00 hrs</option>
+                                <option value="11:00:00">11:00 hrs</option>
+                                <option value="12:00:00">12:00 hrs</option>
+                                <option value="16:00:00">16:00 hrs</option>
+                                <option value="17:00:00">17:00 hrs</option>
+                                <option value="18:00:00">18:00 hrs</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-3">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Motivo o Síntomas *</label>
+                            <textarea name="motivo" rows="2" required placeholder="Describe brevemente el motivo de la consulta..."
+                                      class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end">
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calendar-plus"></i> Confirmar y Reservar Cita
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+</body>
+</html>

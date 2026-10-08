@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Cobro - Clínica Humana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+    <!-- Barra de Navegación Global -->
+    <div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
+
+    <main class="max-w-2xl mx-auto px-4 mt-8">
+
+        <!-- Notificaciones de Error -->
+        <div th:if="${mensajeError}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 text-rose-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+            <span th:text="${mensajeError}"></span>
+        </div>
+
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center pb-4 mb-6 border-b border-slate-200">
+                <div>
+                    <h2 class="text-xl font-black text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-cash-register text-emerald-600"></i>
+                        Registro de Cobro en Ventanilla
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Emisión de comprobante de pago y cálculo de impuestos.</p>
+                </div>
+                <a th:href="@{/pagos}" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-bold transition">
+                    Volver a Caja
+                </a>
+            </div>
+
+            <form th:action="@{/pagos/guardar}" th:object="${pago}" method="post" class="space-y-6">
+                <!-- Campos ocultos de IDs requeridos -->
+                <input type="hidden" th:field="*{cita.idCita}" />
+                <input type="hidden" th:field="*{paciente.idPaciente}" />
+                <input type="hidden" th:field="*{medico.idUsuario}" />
+
+                <!-- Ficha del Paciente y Cita (Evaluación segura contra nulls) -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-1.5 text-slate-700">
+                    <div>
+                        <span class="font-bold text-slate-900">Paciente:</span>
+                        <span th:text="${pago.paciente != null ? (pago.paciente.nombre + ' ' + pago.paciente.apellidos) : 'Paciente no especificado'}">Nombre</span>
+                    </div>
+                    <div>
+                        <span class="font-bold text-slate-900">Tutor Responsable:</span>
+                        <span th:text="${pago.paciente != null and pago.paciente.tutor != null ? (pago.paciente.tutor.nombre + ' ' + pago.paciente.tutor.apellidos) : 'Sin tutor asignado'}">Nombre Tutor</span>
+                    </div>
+                    <div>
+                        <span class="font-bold text-slate-900">Médico Atendió:</span>
+                        <span th:text="${pago.medico != null ? pago.medico.nombreCompleto : 'Especialista'}">Médico</span>
+                    </div>
+                    <div>
+                        <span class="font-bold text-slate-900">Especialidad:</span>
+                        <span class="uppercase font-semibold text-indigo-700" th:text="${pago.cita != null ? pago.cita.especialidad : 'CLÍNICA'}">PEDIATRIA</span>
+                    </div>
+                </div>
+
+                <!-- Concepto -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Concepto de Cobro *</label>
+                    <input type="text" th:field="*{concepto}" required placeholder="Ej. Consulta Pediátrica de Control / Profilaxis Dental"
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <!-- Método de Pago -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Método de Pago *</label>
+                    <select th:field="*{metodoPago}" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 font-semibold">
+                        <option value="EFECTIVO">Efectivo en Caja</option>
+                        <option value="TARJETA">Terminal Bancaria (Tarjeta Débito/Crédito)</option>
+                        <option value="TRANSFERENCIA">Transferencia SPEI</option>
+                    </select>
+                </div>
+
+                <!-- Monto Base e IVA -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Monto Base ($ MXN) *</label>
+                        <input type="number" step="0.01" min="1" id="montoBase" th:field="*{montoBase}" required placeholder="500.00"
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono font-bold focus:ring-2 focus:ring-indigo-500"
+                               oninput="calcularTotales()">
+                    </div>
+                    <div class="pt-4 sm:pt-6">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="aplicaIva" th:field="*{aplicaIva}" class="w-4 h-4 text-indigo-600 rounded" onchange="calcularTotales()">
+                            <span class="text-xs font-bold text-slate-700 uppercase">Aplica IVA (16% Fiscal)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Previsualización de Totales en Tiempo Real -->
+                <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-200 text-xs space-y-1.5">
+                    <div class="flex justify-between text-slate-600">
+                        <span>Subtotal:</span>
+                        <span id="txtSubtotal" class="font-mono font-bold">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>IVA (16%):</span>
+                        <span id="txtIva" class="font-mono font-bold">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-indigo-950 font-black text-sm pt-2 border-t border-indigo-200">
+                        <span>Total a Cobrar:</span>
+                        <span id="txtTotal" class="font-mono">$0.00 MXN</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                    <a th:href="@{/pagos}" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-check"></i> Confirmar y Guardar Cobro
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </main>
+
+    <script>
+        function calcularTotales() {
+            const baseInput = document.getElementById('montoBase');
+            const ivaCheck = document.getElementById('aplicaIva');
+            let base = parseFloat(baseInput.value) || 0;
+            let iva = 0;
+
+            if (ivaCheck.checked) {
+                iva = base * 0.16;
+            }
+
+            let total = base + iva;
+
+            document.getElementById('txtSubtotal').textContent = '$' + base.toFixed(2);
+            document.getElementById('txtIva').textContent = '$' + iva.toFixed(2);
+            document.getElementById('txtTotal').textContent = '$' + total.toFixed(2) + ' MXN';
+        }
+        document.addEventListener('DOMContentLoaded', calcularTotales);
+    </script>
+</body>
+</html>

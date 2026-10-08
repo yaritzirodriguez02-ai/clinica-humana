@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Citas Médicas y Dentales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+    <!-- Barra de Navegación Global Unificada -->
+    <div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Notificaciones Flash -->
+        <div th:if="${mensajeExito}" class="mb-6 p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600"></i>
+            <span th:text="${mensajeExito}"></span>
+        </div>
+        <div th:if="${mensajeError}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 text-rose-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+            <span th:text="${mensajeError}"></span>
+        </div>
+
+        <!-- Encabezado adaptable según el rol del usuario conectado -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <!-- Vista para Dra. Pilar -->
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'PEDIATRA'}">
+                    <h2 class="text-2xl font-bold text-slate-900">Consultorio Pediátrico - Dra. Pilar Ríos</h2>
+                    <p class="text-sm text-slate-500">Gestión de consultas médicas, signos vitales y control de citas pediátricas.</p>
+                </div>
+                <!-- Vista para Dra. Gloria -->
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOPEDIATRA'}">
+                    <h2 class="text-2xl font-bold text-slate-900">Consultorio Dental - Dra. Gloria González</h2>
+                    <p class="text-sm text-slate-500">Atención bucodental, procedimientos y registro de tratamientos odontopediátricos.</p>
+                </div>
+                <!-- Vista para Recepción / Admin -->
+                <div th:if="${usuarioActual != null and (usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}">
+                    <h2 class="text-2xl font-bold text-slate-900">Agenda General de Consultas y Recepción</h2>
+                    <p class="text-sm text-slate-500">Coordinación de citas para especialistas, asignación de turnos y caja general.</p>
+                </div>
+            </div>
+
+            <!-- Botón Agendar Cita -->
+            <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
+               th:href="@{/citas/nueva}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow font-medium flex items-center gap-2 transition text-sm">
+                <i class="fa-solid fa-calendar-plus"></i> Agendar Cita
+            </a>
+        </div>
+
+        <!-- Tabla de Citas -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-4 font-semibold">Horario</th>
+                            <th class="py-3.5 px-4 font-semibold">Paciente Infantil</th>
+                            <th class="py-3.5 px-4 font-semibold">Especialidad</th>
+                            <th class="py-3.5 px-4 font-semibold">Médico Asignado</th>
+                            <th class="py-3.5 px-4 font-semibold">Motivo</th>
+                            <th class="py-3.5 px-4 font-semibold">Estado</th>
+                            <th class="py-3.5 px-4 font-semibold text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-sm">
+                        <tr th:if="${#lists.isEmpty(citas)}">
+                            <td colspan="7" class="py-8 text-center text-slate-400">
+                                <i class="fa-solid fa-calendar-xmark text-3xl mb-2 block"></i>
+                                No hay citas registradas en la agenda para este criterio.
+                            </td>
+                        </tr>
+                        <tr th:each="c : ${citas}" class="hover:bg-slate-50 transition">
+                            <td class="py-3 px-4">
+                                <div class="font-semibold text-slate-900" th:text="${c.fecha}">2026-09-25</div>
+                                <span class="text-xs font-mono text-indigo-600" th:text="${c.hora}">10:00</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="font-medium text-slate-900" th:text="${c.paciente.nombre + ' ' + c.paciente.apellidos}">Nombre Niño</div>
+                                <span class="text-xs text-slate-400" th:text="'CURP: ' + ${c.paciente.curp}"></span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="px-2.5 py-1 text-xs font-semibold rounded-full"
+                                      th:classappend="${c.especialidad == 'PEDIATRIA'} ? 'bg-amber-100 text-amber-800' : 'bg-teal-100 text-teal-800'"
+                                      th:text="${c.especialidad}"></span>
+                            </td>
+                            <td class="py-3 px-4 text-slate-700" th:text="${c.medico.nombreCompleto}">Dra. Asignada</td>
+                            <td class="py-3 px-4 text-slate-600 max-w-xs truncate" th:text="${c.motivo}">Motivo de consulta</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-0.5 text-xs font-semibold rounded"
+                                      th:classappend="${c.estado == 'PROGRAMADA'} ? 'bg-sky-100 text-sky-700' : (${c.estado == 'COMPLETADA'} ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700')"
+                                      th:text="${c.estado}">PROGRAMADA</span>
+                            </td>
+                            <td class="py-3 px-4 text-center space-x-1">
+                                <!-- Botón Atender: visible para especialistas cuando la cita está PROGRAMADA -->
+                                <a th:if="${c.estado == 'PROGRAMADA' and usuarioActual != null and usuarioActual.rol != 'RECEPCIONISTA'}"
+                                   th:href="@{/consultas/atender/{id}(id=${c.idCita})}"
+                                   class="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-stethoscope"></i> Atender
+                                </a>
+
+                                <!-- Botón Cancelar -->
+                                <form th:if="${c.estado == 'PROGRAMADA'}" th:action="@{/citas/cancelar}" method="post" class="inline"
+                                      onsubmit="return confirm('¿Seguro que deseas cancelar esta cita?');">
+                                    <input type="hidden" name="idCita" th:value="${c.idCita}">
+                                    <input type="hidden" name="motivoCancelacion" value="Cancelado a solicitud del paciente/tutor">
+                                    <button type="submit" class="text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded text-xs font-medium transition">
+                                        Cancelar
+                                    </button>
+                                </form>
+
+                                <div th:if="${c.estado == 'COMPLETADA'}" class="flex items-center justify-center gap-1">
+                                    <span class="text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Atendida</span>
+                                    <a th:href="@{/recetas/nueva/{id}(id=${c.idCita})}"
+                                       class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded text-xs font-semibold inline-flex items-center gap-1 transition"
+                                       title="Ver / Emitir Receta Médica">
+                                        <i class="fa-solid fa-file-prescription"></i> Receta
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

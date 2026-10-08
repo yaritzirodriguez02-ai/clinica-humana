@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pacientes - Clínica Médica y Odontopediátrica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+    <!-- Barra de Navegación Global Unificada -->
+    <div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Notificaciones Flash -->
+        <div th:if="${mensajeExito}" class="mb-6 p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 rounded shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                <span th:text="${mensajeExito}"></span>
+            </div>
+        </div>
+        <div th:if="${mensajeError}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 text-rose-800 rounded shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+                <span th:text="${mensajeError}"></span>
+            </div>
+        </div>
+
+        <!-- Encabezado de la Sección -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Directorio de Pacientes Infantiles</h2>
+                <p class="text-sm text-slate-500">Consulta, búsqueda y registro de infantes y sus tutores legales.</p>
+            </div>
+            <a th:href="@{/pacientes/nuevo}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow font-medium flex items-center gap-2 transition text-sm">
+                <i class="fa-solid fa-user-plus"></i> Registrar Nuevo Paciente
+            </a>
+        </div>
+
+        <!-- Barra de Búsqueda -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
+            <form th:action="@{/pacientes}" method="get" class="flex gap-3">
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" name="buscar" th:value="${buscar}" placeholder="Buscar por nombre o apellidos del paciente..."
+                           class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                </div>
+                <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2 rounded-lg text-sm font-medium transition">
+                    Buscar
+                </button>
+                <a th:if="${buscar != null and !buscar.isEmpty()}" th:href="@{/pacientes}" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center">
+                    Limpiar
+                </a>
+            </form>
+        </div>
+
+        <!-- Tabla de Datos -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-4 font-semibold">ID</th>
+                            <th class="py-3.5 px-4 font-semibold">Paciente</th>
+                            <th class="py-3.5 px-4 font-semibold">CURP</th>
+                            <th class="py-3.5 px-4 font-semibold">Nacimiento / Sexo</th>
+                            <th class="py-3.5 px-4 font-semibold">Tutor Responsable</th>
+                            <th class="py-3.5 px-4 font-semibold">Teléfono Contacto</th>
+                            <th class="py-3.5 px-4 font-semibold text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-sm">
+                        <tr th:if="${#lists.isEmpty(pacientes)}">
+                            <td colspan="7" class="py-8 text-center text-slate-400">
+                                <i class="fa-solid fa-folder-open text-3xl mb-2 block"></i>
+                                No se encontraron pacientes registrados.
+                            </td>
+                        </tr>
+                        <tr th:each="p : ${pacientes}" class="hover:bg-slate-50 transition">
+                            <td class="py-3 px-4 font-medium text-slate-500" th:text="${p.idPaciente}">1</td>
+                            <td class="py-3 px-4">
+                                <div class="font-semibold text-slate-900" th:text="${p.nombre + ' ' + p.apellidos}">Nombre Niño</div>
+                                <span class="text-xs text-slate-400" th:text="'Sangre: ' + (${p.tipoSangre != null ? p.tipoSangre : 'N/E'})">Sangre: O+</span>
+                            </td>
+                            <td class="py-3 px-4 font-mono text-xs text-indigo-700 font-semibold" th:text="${p.curp}">CURP123456HDFR00</td>
+                            <td class="py-3 px-4 text-slate-600">
+                                <div th:text="${p.fechaNacimiento}">2020-05-10</div>
+                                <span class="inline-block px-2 py-0.5 text-xs font-semibold rounded"
+                                      th:classappend="${p.sexo == 'M'} ? 'bg-sky-100 text-sky-700' : 'bg-pink-100 text-pink-700'"
+                                      th:text="${p.sexo == 'M' ? 'Masculino' : 'Femenino'}">M</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="font-medium text-slate-800" th:text="${p.tutor.nombre + ' ' + p.tutor.apellidos}">Nombre Mamá</div>
+                                <span class="text-xs text-slate-500" th:text="'(' + ${p.tutor.parentesco} + ')'">(Madre)</span>
+                            </td>
+                            <td class="py-3 px-4 font-mono text-slate-700" th:text="${p.tutor.telefono}">7471234567</td>
+                            <td class="py-3 px-4 text-center">
+                                <a th:href="@{/pacientes/editar/{id}(id=${p.idPaciente})}" 
+                                   class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-pen-to-square"></i> Editar
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

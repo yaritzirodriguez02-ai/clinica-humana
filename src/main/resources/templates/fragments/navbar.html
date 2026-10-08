@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head><meta charset="UTF-8"></head>
+<body>
+
+<header th:fragment="barraNavegacion" class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+            
+            <!-- Logo y Nombre Clínico -->
+            <a th:href="@{/citas}" class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-700 rounded-lg flex items-center justify-center text-indigo-200">
+                    <i class="fa-solid fa-hospital-user text-xl"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-base tracking-wide block leading-tight">Clínica Humana</span>
+                    <span class="text-[11px] text-indigo-300 block">Pediatría & Odontopediatría</span>
+                </div>
+            </a>
+
+            <!-- Menú central condicionado por rol -->
+            <nav class="hidden md:flex items-center gap-1">
+                
+                <!-- 0. PANEL ADMIN (Solo Administrador) -->
+                <a sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')" 
+                   th:href="@{/admin/dashboard}" 
+                   class="px-3 py-2 rounded-lg text-xs font-bold hover:bg-indigo-800 transition flex items-center gap-1.5 text-amber-300 bg-amber-950/30 border border-amber-500/30">
+                    <i class="fa-solid fa-gauge-high"></i> Panel Admin
+                </a>
+
+                <!-- 1. PERSONAL / EMPLEADOS (Solo Administrador) -->
+                <a sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')" 
+                   th:href="@{/empleados}" 
+                   class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
+                    <i class="fa-solid fa-user-doctor text-indigo-300"></i> Personal
+                </a>
+
+                <!-- 2. AGENDA / CITAS (Todos la ven, pero filtrada a su rol) -->
+                <a th:href="@{/citas}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
+                    <i class="fa-solid fa-calendar-days text-indigo-300"></i> Mi Agenda
+                </a>
+
+                <!-- 3. PACIENTES Y TUTORES -->
+                <a th:href="@{/pacientes}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
+                    <i class="fa-solid fa-children text-indigo-300"></i> Pacientes y Tutores
+                </a>
+
+                <!-- 4. AGENDAR NUEVA CITA -->
+                <a sec:authorize="hasAnyRole('PEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+                   th:href="@{/citas/nueva}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
+                    <i class="fa-solid fa-calendar-plus text-indigo-300"></i> Agendar Cita
+                </a>
+
+                <!-- 5. CONTROL DE CAJA Y COBROS -->
+                <a th:href="@{/pagos}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-emerald-300 bg-indigo-950/40 border border-emerald-500/30">
+                    <i class="fa-solid fa-cash-register"></i> Caja y Cobros
+                </a>
+
+                <!-- 6. CORTE DIARIO / REPORTES FINANCIEROS -->
+                <a th:href="@{/pagos/corte}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
+                    <i class="fa-solid fa-chart-line text-indigo-300"></i> Corte de Caja
+                </a>
+            </nav>
+
+            <!-- Perfil de Usuario y Logout -->
+            <div class="flex items-center gap-3">
+                <div class="text-right">
+                    <span class="block text-xs font-bold text-white leading-tight" sec:authentication="name">Usuario</span>
+                    <span sec:authorize="hasRole('PEDIATRA')" class="bg-amber-100 text-amber-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Dra. Pediatra (Autónoma)</span>
+                    <span sec:authorize="hasRole('ODONTOPEDIATRA')" class="bg-teal-100 text-teal-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Dra. Odontopediatra</span>
+                    <span sec:authorize="hasRole('RECEPCIONISTA')" class="bg-sky-100 text-sky-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Recepción y Caja</span>
+                    <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')" class="bg-purple-100 text-purple-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Administrador General</span>
+                </div>
+
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" title="Cerrar sesión" class="w-8 h-8 rounded-lg bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center transition text-xs">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</header>
+
+</body>
+</html>

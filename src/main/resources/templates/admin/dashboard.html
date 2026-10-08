@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Clínica Humana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+    <!-- Barra de Navegación Global Unificada -->
+    <div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <div class="mb-8">
+            <h2 class="text-2xl font-black text-slate-900">Bienvenido al Panel de Control Central</h2>
+            <p class="text-xs text-slate-500">Métricas operativas en tiempo real de la clínica médica y odontopediátrica.</p>
+        </div>
+
+        <!-- Indicadores Clave -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center text-2xl">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase">Personal Activo</span>
+                    <h3 class="text-2xl font-black text-slate-900" th:text="${totalEmpleados}">3</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center text-2xl">
+                    <i class="fa-solid fa-children"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase">Pacientes Registrados</span>
+                    <h3 class="text-2xl font-black text-slate-900" th:text="${totalPacientes}">12</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-2xl">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase">Citas para Hoy</span>
+                    <h3 class="text-2xl font-black text-slate-900" th:text="${citasHoy}">4</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-2xl">
+                    <i class="fa-solid fa-sack-dollar"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase">Ingresos de Hoy</span>
+                    <h3 class="text-2xl font-black text-emerald-600" th:text="'$' + ${#numbers.formatDecimal(ingresosHoy, 1, 'COMMA', 2, 'POINT')}">$0.00</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones Directas de Administración -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h4 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-indigo-600"></i> Gestión de Personal
+                </h4>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Crea nuevas cuentas para recepcionistas o especialistas y gestiona sus credenciales de acceso.</p>
+                <a th:href="@{/empleados/nuevo}" class="inline-block px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">
+                    + Registrar Colaborador
+                </a>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h4 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice-dollar text-emerald-600"></i> Arqueo Financiero
+                </h4>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Supervisa el balance de cobros diarios dividido por efectivo, terminal bancaria y transferencias SPEI.</p>
+                <a th:href="@{/pagos/corte}" class="inline-block px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition">
+                    Auditar Corte Diario
+                </a>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <h4 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-hospital-user text-sky-600"></i> Agenda Médica
+                </h4>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Consulta el estado global de citas médicas de Pediatría y Odontopediatría de la clínica.</p>
+                <a th:href="@{/citas}" class="inline-block px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-xs font-bold transition">
+                    Ver Agenda General
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>
