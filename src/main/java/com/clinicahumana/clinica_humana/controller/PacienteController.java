@@ -31,7 +31,7 @@ public class PacienteController {
         }
         model.addAttribute("pacientes", lista);
         model.addAttribute("buscar", buscar);
-        return "pacientes/lista";
+        return "pacientes/lista_pacientes";
     }
 
     // Mostrar formulario de nuevo paciente (RF01, RF03)
