@@ -51,6 +51,27 @@
             </a>
         </div>
 
+        <!-- Filtros de Agenda -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-wrap justify-between items-center gap-4">
+            <p class="text-xs text-slate-500">
+                <i class="fa-solid fa-filter text-indigo-500"></i>
+                <span th:if="${vistaFutura}" class="font-semibold text-indigo-700">Mostrando próximas citas (de hoy en adelante).</span>
+                <span th:unless="${vistaFutura}" class="font-semibold text-amber-700">Mostrando citas del día <span th:text="${filtroFecha}">2026-01-01</span>.</span>
+            </p>
+            <form th:action="@{/citas}" method="get" class="flex flex-wrap items-center gap-3">
+                <input type="date" name="fecha" th:value="${filtroFecha}"
+                       class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                <select th:if="${esAdmin}" name="especialidad"
+                        class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    <option value="">Todas las especialidades</option>
+                    <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>
+                    <option value="ODONTOPEDIATRIA" th:selected="${filtroEspecialidad == 'ODONTOPEDIATRIA'}">Odontopediatría</option>
+                </select>
+                <button type="submit" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow">Buscar</button>
+                <a th:href="@{/citas}" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold">Ver próximas</a>
+            </form>
+        </div>
+
         <!-- Tabla de Citas -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="overflow-x-auto">
@@ -100,16 +121,17 @@
                                 <!-- Si la cita está PROGRAMADA: Acciones activas -->
                                 <div th:if="${c.estado == 'PROGRAMADA'}" class="inline-flex items-center gap-1.5 flex-wrap justify-center">
                                     
-                                    <!-- 1. Atender: Exclusivo para el médico asignado o admin -->
-                                    <a th:if="${usuarioActual != null and usuarioActual.rol != 'RECEPCIONISTA'}"
+                                    <!-- 1. Atender: Exclusivo para la especialista ASIGNADA o el administrador -->
+                                    <a th:if="${usuarioActual != null and (usuarioActual.rol == 'ADMIN' or (c.medico != null and c.medico.idUsuario != null and c.medico.idUsuario == usuarioActual.idUsuario))}"
                                        th:href="@{/consultas/atender/{id}(id=${c.idCita})}"
                                        class="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
                                         <i class="fa-solid fa-stethoscope"></i> Atender
                                     </a>
 
                                     <!-- 2. Reprogramar (Abre modal) -->
-                                    <button type="button" 
-                                            th:onclick="'abrirModalReprogramar(' + ${c.idCita} + ', \'' + ${c.fecha} + '\', \'' +${c.hora} + '\')'"
+                                    <button type="button"
+                                            th:attr="data-id=${c.idCita},data-fecha=${c.fecha},data-hora=${c.hora}"
+                                            onclick="abrirModalReprogramarDesde(this)"
                                             class="text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
                                         <i class="fa-solid fa-calendar-days"></i> Reagendar
                                     </button>
@@ -125,8 +147,9 @@
                                     </form>
 
                                     <!-- 4. Cancelar (Abre modal para capturar motivo obligatorio) -->
-                                    <button type="button" 
-                                            th:onclick="'abrirModalCancelar(' + ${c.idCita} + ')'"
+                                    <button type="button"
+                                            th:attr="data-id=${c.idCita}"
+                                            onclick="abrirModalCancelarDesde(this)"
                                             class="text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
                                         <i class="fa-solid fa-ban"></i> Cancelar
                                     </button>
@@ -252,6 +275,12 @@
             document.getElementById('modalReprogramar').classList.remove('hidden');
         }
 
+        // Variantes seguras: leen los datos desde atributos data-* (evitan expresiones
+        // no confiables en th:onclick con objetos LocalDate/LocalTime)
+        function abrirModalReprogramarDesde(btn) {
+            abrirModalReprogramar(btn.dataset.id, btn.dataset.fecha, btn.dataset.hora);
+        }
+
         function cerrarModalReprogramar() {
             document.getElementById('modalReprogramar').classList.add('hidden');
         }
@@ -259,6 +288,10 @@
         function abrirModalCancelar(id) {
             document.getElementById('idCitaCancelar').value = id;
             document.getElementById('modalCancelar').classList.remove('hidden');
+        }
+
+        function abrirModalCancelarDesde(btn) {
+            abrirModalCancelar(btn.dataset.id);
         }
 
         function cerrarModalCancelar() {

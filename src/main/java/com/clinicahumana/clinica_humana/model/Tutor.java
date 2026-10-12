@@ -17,11 +17,13 @@ public class Tutor {
     private Long idTutor;
 
     @NotBlank(message = "El nombre es obligatorio")
+    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,100}$", message = "El nombre del tutor solo debe contener letras y espacios (sin números ni símbolos)")
     @Size(max = 100)
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
     @NotBlank(message = "Los apellidos son obligatorios")
+    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,100}$", message = "Los apellidos del tutor solo deben contener letras y espacios (sin números ni símbolos)")
     @Size(max = 100)
     @Column(name = "apellidos", nullable = false, length = 100)
     private String apellidos;

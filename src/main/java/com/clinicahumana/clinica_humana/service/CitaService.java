@@ -41,6 +41,24 @@ public class CitaService {
         return citaRepository.findByPacienteIdPaciente(idPaciente);
     }
 
+    // ============ Listados de agenda (próximas citas a partir de hoy) ============
+
+    public List<Cita> listarProximas(LocalDate fechaDesde) {
+        return citaRepository.findByFechaGreaterThanEqualOrderByFechaAscHoraAsc(fechaDesde);
+    }
+
+    public List<Cita> listarProximasPorMedico(Long idMedico, LocalDate fechaDesde) {
+        return citaRepository.findByMedicoIdUsuarioAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(idMedico, fechaDesde);
+    }
+
+    public List<Cita> listarProximasPorEspecialidad(String especialidad, LocalDate fechaDesde) {
+        return citaRepository.findByEspecialidadAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(especialidad, fechaDesde);
+    }
+
+    public List<Cita> listarPorFecha(LocalDate fecha) {
+        return citaRepository.findByFechaOrderByHoraAsc(fecha);
+    }
+
     @Transactional
     public Cita agendarCita(Cita cita) {
         // Regla de Negocio: Validar que no exista choque de citas en la misma fecha y hora con el mismo médico
@@ -78,6 +96,15 @@ public class CitaService {
         cita.setFecha(nuevaFecha);
         cita.setHora(nuevaHora);
         cita.setEstado("PROGRAMADA");
+        return citaRepository.save(cita);
+    }
+
+    // Marca la cita como NO_ASISTIO sin pasar por agendarCita (que fuerza estado PROGRAMADA)
+    @Transactional
+    public Cita marcarNoAsistio(Long idCita) {
+        Cita cita = citaRepository.findById(idCita)
+                .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada con ID: " + idCita));
+        cita.setEstado("NO_ASISTIO");
         return citaRepository.save(cita);
     }
 

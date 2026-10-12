@@ -56,15 +56,10 @@ public class PagoController {
                 .filter(c -> !idsCitasPagadas.contains(c.getIdCita()))
                 .collect(Collectors.toList());
 
-        // Si es médico, filtrar para mostrar solo su actividad
-        if (usuarioActual != null && "PEDIATRA".equals(usuarioActual.getRol())) {
-            todosLosPagos = todosLosPagos.stream()
-                    .filter(p -> p.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
-                    .toList();
-            citasPendientesCobro = citasPendientesCobro.stream()
-                    .filter(c -> c.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
-                    .toList();
-        } else if (usuarioActual != null && "ODONTOPEDIATRA".equals(usuarioActual.getRol())) {
+        String rolActual = usuarioActual != null ? usuarioActual.getRol() : "";
+
+        // MÉDICOS (Pediatra/Odontopediatra): consultan únicamente su propia actividad
+        if ("PEDIATRA".equals(rolActual) || "ODONTOPEDIATRA".equals(rolActual)) {
             todosLosPagos = todosLosPagos.stream()
                     .filter(p -> p.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
                     .toList();
@@ -72,6 +67,16 @@ public class PagoController {
                     .filter(c -> c.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
                     .toList();
         }
+        // RECEPCIÓN: trabaja exclusivamente con citas y cobros de ODONTOPEDIATRÍA
+        else if ("RECEPCIONISTA".equals(rolActual)) {
+            todosLosPagos = todosLosPagos.stream()
+                    .filter(p -> p.getCita() != null && "ODONTOPEDIATRIA".equalsIgnoreCase(p.getCita().getEspecialidad()))
+                    .toList();
+            citasPendientesCobro = citasPendientesCobro.stream()
+                    .filter(c -> "ODONTOPEDIATRIA".equalsIgnoreCase(c.getEspecialidad()))
+                    .toList();
+        }
+        // ADMIN: vista global sin filtros
 
         BigDecimal totalRecaudado = todosLosPagos.stream()
                 .map(Pago::getMontoTotal)
@@ -185,6 +190,12 @@ public class PagoController {
         if (usuarioActual != null && ("PEDIATRA".equals(usuarioActual.getRol()) || "ODONTOPEDIATRA".equals(usuarioActual.getRol()))) {
             pagosDia = pagosDia.stream()
                     .filter(p -> p.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
+                    .toList();
+        }
+        // Recepción: el corte se limita a la especialidad de Odontopediatría
+        else if (usuarioActual != null && "RECEPCIONISTA".equals(usuarioActual.getRol())) {
+            pagosDia = pagosDia.stream()
+                    .filter(p -> p.getCita() != null && "ODONTOPEDIATRIA".equalsIgnoreCase(p.getCita().getEspecialidad()))
                     .toList();
         }
 

@@ -3,6 +3,7 @@ package com.clinicahumana.clinica_humana.controller;
 import com.clinicahumana.clinica_humana.model.*;
 import com.clinicahumana.clinica_humana.repository.ExpedienteOdontopediatricoRepository;
 import com.clinicahumana.clinica_humana.repository.ExpedientePediatricoRepository;
+import com.clinicahumana.clinica_humana.repository.MedicamentoRepository;
 import com.clinicahumana.clinica_humana.repository.RecetaRepository;
 import com.clinicahumana.clinica_humana.service.CitaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class RecetaController {
 
     @Autowired
     private ExpedienteOdontopediatricoRepository expOdontoRepo;
+
+    @Autowired
+    private MedicamentoRepository medicamentoRepo;
 
     // Formulario interactivo para capturar la receta con renglones de medicamentos
     @GetMapping("/nueva/{idCita}")
@@ -75,6 +79,11 @@ if (!recetasExistentes.isEmpty()) {
             Period edad = Period.between(cita.getPaciente().getFechaNacimiento(), LocalDate.now());
             model.addAttribute("edadTexto", edad.getYears() + " años " + edad.getMonths() + " meses");
         }
+
+        // Catálogo de fármacos para el autocompletado (según especialidad de la cita)
+        String categoriaCatalogo = "PEDIATRIA".equalsIgnoreCase(cita.getEspecialidad()) ? "PEDIATRIA" : "ODONTOPEDIATRIA";
+        model.addAttribute("medicamentosCatalogo",
+                medicamentoRepo.findByCategoriaInOrderByNombreComercialAsc(List.of("GENERAL", categoriaCatalogo)));
 
         model.addAttribute("receta", receta);
         return "recetas/captura_receta";

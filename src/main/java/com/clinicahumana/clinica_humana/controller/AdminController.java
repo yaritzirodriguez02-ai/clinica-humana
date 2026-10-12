@@ -33,15 +33,12 @@ public class AdminController {
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
+        LocalDate hoy = LocalDate.now();
         long totalEmpleados = empleadoRepo.count();
         long totalPacientes = pacienteRepo.count();
-        long citasHoy = citaRepo.findAll().stream()
-                .filter(c -> c.getFecha() != null && c.getFecha().isEqual(LocalDate.now()))
-                .count();
+        long citasHoy = citaRepo.countByFecha(hoy);
 
-        List<Pago> pagosHoy = pagoRepo.findAll().stream()
-                .filter(p -> p.getFechaPago() != null && p.getFechaPago().toLocalDate().isEqual(LocalDate.now()))
-                .toList();
+        List<Pago> pagosHoy = pagoRepo.findByFechaPagoBetween(hoy.atStartOfDay(), hoy.atTime(23, 59, 59));
 
         BigDecimal ingresosHoy = pagosHoy.stream()
                 .map(Pago::getMontoTotal)
@@ -52,6 +49,12 @@ public class AdminController {
         model.addAttribute("citasHoy", citasHoy);
         model.addAttribute("ingresosHoy", ingresosHoy);
         model.addAttribute("empleados", empleadoRepo.findAll());
+
+        // Auditoría de agenda: citas de hoy y próximas citas de la clínica
+        model.addAttribute("fechaHoy", hoy);
+        model.addAttribute("citasHoyLista", citaRepo.findByFechaOrderByHoraAsc(hoy));
+        model.addAttribute("proximasCitas",
+                citaRepo.findByFechaGreaterThanEqualOrderByFechaAscHoraAsc(hoy).stream().limit(10).toList());
 
         return "admin/dashboard";
     }

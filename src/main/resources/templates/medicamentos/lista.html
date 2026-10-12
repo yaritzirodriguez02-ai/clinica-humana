@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Medicamentos - Clínica Humana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+    <!-- Barra de Navegación Global Unificada -->
+    <div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+
+        <!-- Alertas -->
+        <div th:if="${mensajeExito}" class="mb-6 p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-circle-check"></i>
+            <span th:text="${mensajeExito}"></span>
+        </div>
+        <div th:if="${mensajeError}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 text-rose-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span th:text="${mensajeError}"></span>
+        </div>
+
+        <!-- Encabezado + Búsqueda + Alta -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-pills text-indigo-600"></i> Catálogo de Medicamentos
+                </h2>
+                <p class="text-xs text-slate-500">Vademécum interno: fármacos disponibles para recetas pediátricas y odontopediátricas.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <form th:action="@{/medicamentos}" method="get" class="flex items-center gap-2">
+                    <input type="text" name="buscar" th:value="${buscar}" placeholder="Buscar por nombre..."
+                           class="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    <button type="submit" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </form>
+                <a th:href="@{/medicamentos/nuevo}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Nuevo Medicamento
+                </a>
+            </div>
+        </div>
+
+        <!-- Tabla del Catálogo -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3 px-4 font-semibold">Nombre Comercial</th>
+                            <th class="py-3 px-4 font-semibold">Sustancia Activa</th>
+                            <th class="py-3 px-4 font-semibold">Presentación</th>
+                            <th class="py-3 px-4 font-semibold">Concentración</th>
+                            <th class="py-3 px-4 font-semibold">Categoría</th>
+                            <th class="py-3 px-4 font-semibold text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr th:if="${#lists.isEmpty(medicamentos)}">
+                            <td colspan="6" class="py-8 text-center text-slate-400">
+                                <i class="fa-solid fa-pills text-2xl block mb-1"></i>
+                                El catálogo está vacío. Registra el primer medicamento.
+                            </td>
+                        </tr>
+                        <tr th:each="m : ${medicamentos}" class="hover:bg-slate-50 transition">
+                            <td class="py-3 px-4 font-semibold text-slate-900" th:text="${m.nombreComercial}">Paracetamol</td>
+                            <td class="py-3 px-4 text-slate-600" th:text="${m.sustanciaActiva}">Paracetamol</td>
+                            <td class="py-3 px-4 text-slate-600" th:text="${m.presentacion}">Solución oral</td>
+                            <td class="py-3 px-4 font-mono text-slate-700" th:text="${m.concentracion}">120 mg/5 ml</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-0.5 text-xs font-semibold rounded"
+                                      th:classappend="${m.categoria == 'PEDIATRIA'} ? 'bg-amber-100 text-amber-800' : (${m.categoria == 'ODONTOPEDIATRIA'} ? 'bg-teal-100 text-teal-800' : 'bg-slate-200 text-slate-700')"
+                                      th:text="${m.categoria}">GENERAL</span>
+                            </td>
+                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                                <a th:href="@{/medicamentos/editar/{id}(id=${m.idMedicamento})}"
+                                   class="text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-pen"></i> Editar
+                                </a>
+                                <form th:action="@{/medicamentos/eliminar}" method="post" class="inline"
+                                      onsubmit="return confirm('¿Eliminar este medicamento del catálogo?');">
+                                    <input type="hidden" name="id" th:value="${m.idMedicamento}">
+                                    <button type="submit"
+                                            class="text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>

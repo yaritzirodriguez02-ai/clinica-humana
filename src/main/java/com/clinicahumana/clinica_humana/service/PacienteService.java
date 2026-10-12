@@ -43,8 +43,10 @@ public class PacienteService {
             throw new IllegalArgumentException("Ya existe un paciente registrado con la CURP: " + paciente.getCurp());
         }
 
-        // Si el tutor no ha sido persistido, se guarda primero
-        if (paciente.getTutor() != null && paciente.getTutor().getIdTutor() == null) {
+        // El tutor SIEMPRE se guarda primero: si ya tiene id, save() fusiona (merge)
+        // los cambios editados desde el formulario. Corrige la persistencia al
+        // editar datos del tutor desde el formulario del paciente.
+        if (paciente.getTutor() != null) {
             Tutor tutorGuardado = tutorRepository.save(paciente.getTutor());
             paciente.setTutor(tutorGuardado);
         }

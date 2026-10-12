@@ -77,19 +77,48 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo de Sangre</label>
-                        <input type="text" th:field="*{tipoSangre}" placeholder="Ej: O+, A+, B-"
-                               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        <select th:field="*{tipoSangre}" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                            <option value="">-- Sin especificar --</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Alergias Conocidas</label>
-                        <textarea th:field="*{alergias}" rows="2" placeholder="Penicilina, polen, etc."
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">¿El paciente presenta Alergias Conocidas?</label>
+                        <div class="flex items-center gap-6 mb-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-700 font-semibold cursor-pointer">
+                                <input type="radio" name="tieneAlergias" id="alergiasSi" value="S"
+                                       th:checked="${paciente.alergias != null and !paciente.alergias.isEmpty()}" required> Sí
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-700 font-semibold cursor-pointer">
+                                <input type="radio" name="tieneAlergias" id="alergiasNo" value="N"
+                                       th:checked="${paciente.alergias == null or paciente.alergias.isEmpty()}"> No
+                            </label>
+                        </div>
+                        <textarea id="campoAlergias" th:field="*{alergias}" rows="2" placeholder="Detalle: Penicilina, polen, mariscos, etc."
                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm"></textarea>
                     </div>
 
                     <div class="sm:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Antecedentes Médicos Relevantes</label>
-                        <textarea th:field="*{antecedentes}" rows="2" placeholder="Enfermedades crónicas, cirugías previas, etc."
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">¿Cuenta con Antecedentes Médicos Relevantes?</label>
+                        <div class="flex items-center gap-6 mb-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-700 font-semibold cursor-pointer">
+                                <input type="radio" name="tieneAntecedentes" id="antecedentesSi" value="S"
+                                       th:checked="${paciente.antecedentes != null and !paciente.antecedentes.isEmpty()}" required> Sí
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-700 font-semibold cursor-pointer">
+                                <input type="radio" name="tieneAntecedentes" id="antecedentesNo" value="N"
+                                       th:checked="${paciente.antecedentes == null or paciente.antecedentes.isEmpty()}"> No
+                            </label>
+                        </div>
+                        <textarea id="campoAntecedentes" th:field="*{antecedentes}" rows="2" placeholder="Detalle: Enfermedades crónicas, cirugías previas, hospitalizaciones..."
                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm"></textarea>
                     </div>
                 </div>
@@ -156,6 +185,31 @@
             </div>
         </form>
     </main>
+
+    <script>
+        // Condicionales Sí/No: muestra el detalle solo cuando la respuesta es "Sí"
+        function configurarCondicional(radioSi, radioNo, campo) {
+            function actualizar() {
+                const activo = radioSi.checked;
+                campo.classList.toggle('hidden', !activo);
+                if (!activo) { campo.value = ''; }
+            }
+            radioSi.addEventListener('change', actualizar);
+            radioNo.addEventListener('change', actualizar);
+            actualizar();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            configurarCondicional(
+                document.getElementById('alergiasSi'),
+                document.getElementById('alergiasNo'),
+                document.getElementById('campoAlergias'));
+            configurarCondicional(
+                document.getElementById('antecedentesSi'),
+                document.getElementById('antecedentesNo'),
+                document.getElementById('campoAntecedentes'));
+        });
+    </script>
 
 </body>
 </html>

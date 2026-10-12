@@ -130,11 +130,12 @@
                             <th class="py-3 px-4 font-semibold text-right">Subtotal</th>
                             <th class="py-3 px-4 font-semibold text-right">IVA (16%)</th>
                             <th class="py-3 px-4 font-semibold text-right">Total Cobrado</th>
+                            <th class="py-3 px-4 font-semibold text-center">Comprobante</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
                         <tr th:if="${#lists.isEmpty(pagos)}">
-                            <td colspan="8" class="py-6 text-center text-slate-400">
+                            <td colspan="9" class="py-6 text-center text-slate-400">
                                 Aún no se han registrado cobros.
                             </td>
                         </tr>
@@ -151,6 +152,12 @@
                             <td class="py-3 px-4 text-right font-mono text-slate-600" th:text="'$' + ${p.montoBase}">$0.00</td>
                             <td class="py-3 px-4 text-right font-mono text-slate-500" th:text="'$' + ${p.montoIva}">$0.00</td>
                             <td class="py-3 px-4 text-right font-mono font-bold text-slate-900" th:text="'$' + ${p.montoTotal}">$0.00</td>
+                            <td class="py-3 px-4 text-center">
+                                <a th:href="@{/pagos/comprobante/{id}(id=${p.idPago})}" target="_blank"
+                                   class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-print"></i> Reimprimir
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

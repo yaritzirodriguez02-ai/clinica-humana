@@ -23,11 +23,13 @@ public class Paciente {
     private Tutor tutor;
 
     @NotBlank(message = "El nombre del paciente es obligatorio")
+    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,100}$", message = "El nombre solo debe contener letras y espacios (sin números ni símbolos)")
     @Size(max = 100)
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
     @NotBlank(message = "Los apellidos son obligatorios")
+    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,100}$", message = "Los apellidos solo deben contener letras y espacios (sin números ni símbolos)")
     @Size(max = 100)
     @Column(name = "apellidos", nullable = false, length = 100)
     private String apellidos;

@@ -6,16 +6,25 @@
     <title>Corte Diario de Caja - Clínica Humana</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Impresión limpia del Corte de Caja: oculta navegación y botones */
+        @media print {
+            .no-impresion { display: none !important; }
+            body { background: #fff !important; }
+            main { padding: 0 !important; margin: 0 !important; }
+            table { font-size: 11px; }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
 
     <!-- Barra de Navegación Global Unificada -->
-    <div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
+    <div class="no-impresion" th:replace="~{fragments/navbar :: barraNavegacion}"></div>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
         
         <!-- Filtro de Fecha -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-wrap justify-between items-center gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-wrap justify-between items-center gap-4 no-impresion">
             <div>
                 <h2 class="text-xl font-bold text-slate-900">Arqueo y Cierre de Caja</h2>
                 <p class="text-xs text-slate-500">Desglose de ingresos por método de pago y especialista.</p>
@@ -61,7 +70,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
                 <h3 class="font-bold text-slate-900 text-sm">Transacciones Registradas el día de hoy</h3>
-                <button onclick="window.print()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-semibold transition">
+                <button onclick="window.print()" class="no-impresion text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-semibold transition">
                     <i class="fa-solid fa-print"></i> Imprimir Corte
                 </button>
             </div>

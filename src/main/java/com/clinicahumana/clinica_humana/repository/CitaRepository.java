@@ -16,4 +16,15 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     List<Cita> findByMedicoIdUsuarioAndFecha(Long idUsuarioMedico, LocalDate fecha);
     List<Cita> findByPacienteIdPaciente(Long idPaciente);
     List<Cita> findByEstado(String estado);
+
+    // Listados ordenados para la agenda (a partir de una fecha)
+    List<Cita> findByFechaGreaterThanEqualOrderByFechaAscHoraAsc(java.time.LocalDate fechaDesde);
+
+    List<Cita> findByMedicoIdUsuarioAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(Long idUsuarioMedico, java.time.LocalDate fechaDesde);
+
+    List<Cita> findByEspecialidadAndFechaGreaterThanEqualOrderByFechaAscHoraAsc(String especialidad, java.time.LocalDate fechaDesde);
+
+    List<Cita> findByFechaOrderByHoraAsc(java.time.LocalDate fecha);
+
+    long countByFecha(java.time.LocalDate fecha);
 }

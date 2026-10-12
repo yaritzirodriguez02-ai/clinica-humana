@@ -81,7 +81,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Monto Base ($ MXN) *</label>
-                        <input type="number" step="0.01" min="1" id="montoBase" th:field="*{montoBase}" required placeholder="500.00"
+                        <input type="number" step="any" min="1" id="montoBase" th:field="*{montoBase}" required placeholder="500"
                                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono font-bold focus:ring-2 focus:ring-indigo-500"
                                oninput="calcularTotales()">
                     </div>

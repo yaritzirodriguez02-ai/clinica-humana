@@ -44,40 +44,36 @@ public class CitaController {
         Usuario usuarioConectado = usuarioService.buscarPorUsername(username).orElse(null);
         String rol = usuarioConectado != null ? usuarioConectado.getRol() : "";
 
-        // 1. PEDIATRA: Solo ve citas pediátricas de ella misma
+        LocalDate hoy = LocalDate.now();
+
+        // 1. PEDIATRA (autónoma): sus propias citas — próximas por defecto, o de una fecha específica
         if ("PEDIATRA".equals(rol)) {
-            lista = citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha != null ? fecha : LocalDate.now());
-            if (lista.isEmpty() && fecha == null) {
-                lista = citaService.listarTodas().stream()
-                        .filter(c -> c.getMedico() != null && c.getMedico().getIdUsuario().equals(usuarioConectado.getIdUsuario()))
-                        .toList();
-            }
+            lista = (fecha != null)
+                    ? citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha)
+                    : citaService.listarProximasPorMedico(usuarioConectado.getIdUsuario(), hoy);
         }
-        // 2. ODONTOPEDIATRA: Solo ve citas odontopediátricas de ella misma
+        // 2. ODONTOPEDIATRA: sus propias citas — próximas por defecto
         else if ("ODONTOPEDIATRA".equals(rol)) {
-            lista = citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha != null ? fecha : LocalDate.now());
-            if (lista.isEmpty() && fecha == null) {
-                lista = citaService.listarTodas().stream()
-                        .filter(c -> c.getMedico() != null && c.getMedico().getIdUsuario().equals(usuarioConectado.getIdUsuario()))
-                        .toList();
-            }
+            lista = (fecha != null)
+                    ? citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha)
+                    : citaService.listarProximasPorMedico(usuarioConectado.getIdUsuario(), hoy);
         }
-        // 3. RECEPCIONISTA: Trabaja exclusivamente con Odontopediatría
+        // 3. RECEPCIONISTA: exclusivamente agenda de ODONTOPEDIATRÍA — próximas por defecto
         else if ("RECEPCIONISTA".equals(rol)) {
-            LocalDate fechaConsulta = fecha != null ? fecha : LocalDate.now();
-            lista = citaService.listarPorEspecialidadYFecha("ODONTOPEDIATRIA", fechaConsulta);
-            if (lista.isEmpty() && fecha == null) {
-                lista = citaService.listarTodas().stream()
-                        .filter(c -> "ODONTOPEDIATRIA".equalsIgnoreCase(c.getEspecialidad()))
-                        .toList();
-            }
+            lista = (fecha != null)
+                    ? citaService.listarPorEspecialidadYFecha("ODONTOPEDIATRIA", fecha)
+                    : citaService.listarProximasPorEspecialidad("ODONTOPEDIATRIA", hoy);
         }
-        // 4. ADMIN: Control global
+        // 4. ADMIN: vista global — próximas por defecto, con filtros opcionales de fecha y especialidad
         else {
-            if (especialidad != null && !especialidad.isEmpty() && fecha != null) {
+            if (fecha != null && especialidad != null && !especialidad.isEmpty()) {
                 lista = citaService.listarPorEspecialidadYFecha(especialidad, fecha);
+            } else if (fecha != null) {
+                lista = citaService.listarPorFecha(fecha);
+            } else if (especialidad != null && !especialidad.isEmpty()) {
+                lista = citaService.listarProximasPorEspecialidad(especialidad, hoy);
             } else {
-                lista = citaService.listarTodas();
+                lista = citaService.listarProximas(hoy);
             }
         }
 
@@ -85,6 +81,8 @@ public class CitaController {
         model.addAttribute("usuarioActual", usuarioConectado);
         model.addAttribute("filtroEspecialidad", especialidad);
         model.addAttribute("filtroFecha", fecha);
+        model.addAttribute("vistaFutura", fecha == null);
+        model.addAttribute("esAdmin", "ADMIN".equals(rol));
         return "citas/agenda";
     }
 
@@ -264,12 +262,9 @@ public class CitaController {
     public String marcarNoAsistio(@RequestParam("idCita") Long idCita,
                                   RedirectAttributes redirectAttributes) {
         try {
-            Cita cita = citaService.buscarPorId(idCita).orElse(null);
-            if (cita != null) {
-                cita.setEstado("NO_ASISTIO");
-                citaService.agendarCita(cita);
-                redirectAttributes.addFlashAttribute("mensajeExito", "La cita se registró como 'No Asistió'.");
-            }
+            // Se marca directamente como NO_ASISTIO (agendarCita forzaría estado PROGRAMADA)
+            citaService.marcarNoAsistio(idCita);
+            redirectAttributes.addFlashAttribute("mensajeExito", "La cita se registró como 'No Asistió'.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError", "Error al actualizar la cita: " + e.getMessage());
         }

@@ -3,8 +3,10 @@ package com.clinicahumana.clinica_humana.controller;
 import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
 import com.clinicahumana.clinica_humana.model.ExpedientePediatrico;
+import com.clinicahumana.clinica_humana.model.Usuario;
 import com.clinicahumana.clinica_humana.service.CitaService;
 import com.clinicahumana.clinica_humana.service.ClinicoYPagosService;
+import com.clinicahumana.clinica_humana.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,9 +25,14 @@ public class ConsultaController {
     @Autowired
     private ClinicoYPagosService clinicoService;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
     // Atender Cita (redirige a Pediatría u Odontopediatría según la especialidad)
     @GetMapping("/atender/{idCita}")
-    public String atenderCita(@PathVariable("idCita") Long idCita, Model model, RedirectAttributes redirectAttributes) {
+    public String atenderCita(@PathVariable("idCita") Long idCita,
+                              java.security.Principal principal,
+                              Model model, RedirectAttributes redirectAttributes) {
         Cita cita = citaService.buscarPorId(idCita).orElse(null);
 
         if (cita == null) {
@@ -35,6 +42,23 @@ public class ConsultaController {
 
         if ("COMPLETADA".equals(cita.getEstado())) {
             redirectAttributes.addFlashAttribute("mensajeError", "Esta cita ya fue atendida previamente.");
+            return "redirect:/citas";
+        }
+
+        if ("CANCELADA".equals(cita.getEstado()) || "NO_ASISTIO".equals(cita.getEstado())) {
+            redirectAttributes.addFlashAttribute("mensajeError",
+                    "Esta cita está en estado " + cita.getEstado() + " y no puede atenderse.");
+            return "redirect:/citas";
+        }
+
+        // Seguridad: solo la especialista ASIGNADA a la cita o el administrador pueden abrir la consulta
+        Usuario usuarioActual = usuarioService.buscarPorUsername(principal.getName()).orElse(null);
+        boolean esAdmin = usuarioActual != null && "ADMIN".equals(usuarioActual.getRol());
+        boolean esAsignada = usuarioActual != null && cita.getMedico() != null
+                && usuarioActual.getIdUsuario().equals(cita.getMedico().getIdUsuario());
+        if (!esAdmin && !esAsignada) {
+            redirectAttributes.addFlashAttribute("mensajeError",
+                    "Solo la especialista asignada a esta cita (o el administrador) puede atenderla.");
             return "redirect:/citas";
         }
 

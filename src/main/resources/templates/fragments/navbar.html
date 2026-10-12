@@ -45,6 +45,13 @@
                     <i class="fa-solid fa-children text-indigo-300"></i> Pacientes y Tutores
                 </a>
 
+                <!-- 3b. CATÁLOGO DE MEDICAMENTOS (Personal médico y Admin) -->
+                <a sec:authorize="hasAnyRole('PEDIATRA', 'ODONTOPEDIATRA', 'ADMIN')"
+                   th:href="@{/medicamentos}"
+                   class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
+                    <i class="fa-solid fa-pills text-indigo-300"></i> Medicamentos
+                </a>
+
                 <!-- 4. AGENDAR NUEVA CITA -->
                 <a sec:authorize="hasAnyRole('PEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
                    th:href="@{/citas/nueva}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">

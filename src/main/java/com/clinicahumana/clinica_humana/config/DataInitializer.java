@@ -1,6 +1,8 @@
 package com.clinicahumana.clinica_humana.config;
 
+import com.clinicahumana.clinica_humana.model.Medicamento;
 import com.clinicahumana.clinica_humana.model.Usuario;
+import com.clinicahumana.clinica_humana.repository.MedicamentoRepository;
 import com.clinicahumana.clinica_humana.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +32,14 @@ public class DataInitializer implements CommandLineRunner {
     private static final String CLAVE_ADMIN = "Admin@2026";
 
     private final UsuarioRepository usuarioRepository;
+    private final MedicamentoRepository medicamentoRepo;
     private final PasswordEncoder passwordEncoder;
 
-    public DataInitializer(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
+    public DataInitializer(UsuarioRepository usuarioRepository,
+                           MedicamentoRepository medicamentoRepo,
+                           PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.medicamentoRepo = medicamentoRepo;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -57,6 +63,63 @@ public class DataInitializer implements CommandLineRunner {
 
         log.info("=== Usuarios iniciales listos | admin: '{}' | cuentas demo: '{}' ===",
                 CLAVE_ADMIN, CLAVE_DEMO);
+
+        // Catálogo base de medicamentos (Vademécum interno)
+        sembrarMedicamentos();
+    }
+
+    /**
+     * Siembra el catálogo inicial de fármacos (Pediatría, Odontopediatría y uso general).
+     * Idempotente: omite fármacos cuyo nombre comercial ya existe.
+     * Se puede ampliar desde el módulo /medicamentos o importando el Excel de la clínica.
+     */
+    private void sembrarMedicamentos() {
+        // {nombreComercial, sustanciaActiva, presentacion, concentracion, categoria}
+        String[][] catalogo = {
+            // De uso general (ambas especialidades)
+            {"Paracetamol", "Paracetamol", "Solución oral", "120 mg/5 ml", "GENERAL"},
+            {"Ibuprofeno", "Ibuprofeno", "Suspensión oral", "100 mg/5 ml", "GENERAL"},
+            // Pediatría
+            {"Amoxicilina", "Amoxicilina", "Suspensión oral", "250 mg/5 ml", "PEDIATRIA"},
+            {"Azitromicina", "Azitromicina", "Suspensión oral", "200 mg/5 ml", "PEDIATRIA"},
+            {"Cefalexina", "Cefalexina", "Suspensión oral", "250 mg/5 ml", "PEDIATRIA"},
+            {"Loratadina", "Loratadina", "Solución oral", "5 mg/5 ml", "PEDIATRIA"},
+            {"Prednisolona", "Prednisolona", "Solución oral", "3 mg/ml", "PEDIATRIA"},
+            {"Omeprazol", "Omeprazol", "Cápsula", "20 mg", "PEDIATRIA"},
+            {"Nistatina", "Nistatina", "Suspensión oral", "100,000 UI/ml", "PEDIATRIA"},
+            {"Salbutamol", "Salbutamol", "Solución para inhalación", "5 mg/ml", "PEDIATRIA"},
+            {"SRO (Suero Oral)", "Sales de rehidratación oral", "Polvo para solución", "26.4 g/L", "PEDIATRIA"},
+            // Odontopediatría
+            {"Lidocaína 2%", "Lidocaína con epinefrina", "Solución inyectable", "2% (1:80,000)", "ODONTOPEDIATRIA"},
+            {"Clorexidina 0.12%", "Clorexidina digluconato", "Enjuague bucal", "0.12%", "ODONTOPEDIATRIA"},
+            {"Flúor barniz", "Flúoruro de sodio", "Barniz tópico", "5%", "ODONTOPEDIATRIA"},
+            {"Flúor gel", "Flúoruro de sodio", "Gel tópico para aplicación", "1.23%", "ODONTOPEDIATRIA"},
+            {"Nitrato de plata", "Nitrato de plata", "Solución tópica", "25%", "ODONTOPEDIATRIA"},
+            {"Amoxicilina/clavulanato", "Amoxicilina + clavulanato de potasio", "Suspensión oral", "400/57 mg/5 ml", "ODONTOPEDIATRIA"},
+            {"Metronidazol", "Metronidazol", "Suspensión oral", "250 mg/5 ml", "ODONTOPEDIATRIA"},
+            {"Hidróxido de calcio", "Hidróxido de calcio", "Pasta pulpocida", "Uso profesional", "ODONTOPEDIATRIA"}
+        };
+
+        int creados = 0;
+        for (String[] f : catalogo) {
+            if (medicamentoRepo.findByNombreComercialIgnoreCase(f[0]).isPresent()) {
+                continue;
+            }
+            Medicamento m = new Medicamento();
+            m.setNombreComercial(f[0]);
+            m.setSustanciaActiva(f[1]);
+            m.setPresentacion(f[2]);
+            m.setConcentracion(f[3]);
+            m.setCategoria(f[4]);
+            medicamentoRepo.save(m);
+            creados++;
+        }
+
+        if (creados > 0) {
+            log.info("Catálogo de medicamentos: {} fármacos sembrados.", creados);
+        } else {
+            log.info("Catálogo de medicamentos: ya estaba poblado; nada que sembrar.");
+        }
     }
 
     private void crearUsuarioSiNoExiste(String username, String nombreCompleto, String rol, String passwordPlano) {

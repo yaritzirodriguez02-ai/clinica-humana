@@ -45,6 +45,9 @@ public class SecurityConfig {
                 // Recetas médicas: solo personal médico (Recepción no emite recetas)
                 .requestMatchers("/recetas/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
 
+                // Catálogo de medicamentos (Vademécum interno): personal médico y admin
+                .requestMatchers("/medicamentos/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
+
                 // Módulo CU06 (Cobros, Caja y Corte): RECEPCIÓN, ADMIN y MÉDICOS
                 .requestMatchers("/pagos/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOPEDIATRA")
                 

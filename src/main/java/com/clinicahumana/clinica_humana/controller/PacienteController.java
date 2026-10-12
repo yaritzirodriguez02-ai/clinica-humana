@@ -48,8 +48,23 @@ public class PacienteController {
     @PostMapping("/guardar")
     public String guardarPaciente(@Valid @ModelAttribute("paciente") Paciente paciente,
                                  BindingResult result,
+                                 @RequestParam(name = "tieneAlergias", required = false) String tieneAlergias,
+                                 @RequestParam(name = "tieneAntecedentes", required = false) String tieneAntecedentes,
                                  Model model,
                                  RedirectAttributes redirectAttributes) {
+        // Condicionales Sí/No del formulario: si la respuesta es "No", se limpia el detalle
+        if (!"S".equals(tieneAlergias)) {
+            paciente.setAlergias("");
+        } else if (paciente.getAlergias() != null) {
+            paciente.setAlergias(paciente.getAlergias().trim());
+        }
+
+        if (!"S".equals(tieneAntecedentes)) {
+            paciente.setAntecedentes("");
+        } else if (paciente.getAntecedentes() != null) {
+            paciente.setAntecedentes(paciente.getAntecedentes().trim());
+        }
+
         if (result.hasErrors()) {
             model.addAttribute("tutoresExistentes", pacienteService.listarTutores());
             return "pacientes/formulario";
