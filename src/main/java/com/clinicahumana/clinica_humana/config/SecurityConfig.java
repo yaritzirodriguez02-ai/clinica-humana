@@ -22,40 +22,40 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // Recursos estáticos públicos
-               .requestMatchers("/css/**", "/js/**", "/images/**", "/portal-citas/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/portal-citas/**").permitAll()
                 
-                // Módulo CU01 (Pacientes): Recepción, Admin y Especialistas
+                // Módulo CU01 (Pacientes y Tutores): Acceso para todos los roles autorizados
                 .requestMatchers("/pacientes/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOPEDIATRA")
                 
-                // Módulo CU02 (Citas / Agenda): Todos los roles autenticados
+                // Módulo CU02 (Citas / Agenda): Acceso para todos los roles autenticados
                 .requestMatchers("/citas/**").authenticated()
                 
-                // Módulo CU03 (Consulta Pediátrica): Exclusivo Pediatra y Admin
+                // Módulo CU03 (Consulta Pediátrica): Pediatra y Admin
                 .requestMatchers("/consultas/pediatria/**").hasAnyRole("PEDIATRA", "ADMIN")
                 
-                // Módulo CU04 (Consulta Odontopediátrica): Exclusivo Odontopediatra y Admin
+                // Módulo CU04 (Consulta Odontopediátrica): Odontopediatra y Admin
                 .requestMatchers("/consultas/odontopediatria/**").hasAnyRole("ODONTOPEDIATRA", "ADMIN")
                 
-                // Cobros / Caja (CU06): Recepción y Admin
-                .requestMatchers("/pagos/**").hasAnyRole("RECEPCIONISTA", "ADMIN")
+                // Módulo CU06 (Cobros, Caja y Corte): Habilitado para RECEPCIÓN, ADMIN y MÉDICOS (evita el 403)
+                .requestMatchers("/pagos/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOPEDIATRA")
                 
-                // El resto requiere estar autenticado
+                // El resto de rutas requiere sesión iniciada
                 .anyRequest().authenticated()
             )
             .formLogin(login -> login
-    .loginPage("/login")
-    .successHandler((request, response, authentication) -> {
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().replace("ROLE_", "").equalsIgnoreCase("ADMIN"));
-        
-        if (isAdmin) {
-            response.sendRedirect("/admin/dashboard");
-        } else {
-            response.sendRedirect("/citas");
-        }
-    })
-    .permitAll()
-)
+                .loginPage("/login")
+                .successHandler((request, response, authentication) -> {
+                    boolean isAdmin = authentication.getAuthorities().stream()
+                            .anyMatch(a -> a.getAuthority().replace("ROLE_", "").equalsIgnoreCase("ADMIN"));
+                    
+                    if (isAdmin) {
+                        response.sendRedirect("/admin/dashboard");
+                    } else {
+                        response.sendRedirect("/citas");
+                    }
+                })
+                .permitAll()
+            )
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")

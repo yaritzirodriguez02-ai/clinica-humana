@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -31,36 +32,47 @@ public class CitaController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Listado general de la agenda de citas
+    // Listado general de la agenda de citas filtrado por rol
     @GetMapping
     public String listarCitas(@RequestParam(name = "especialidad", required = false) String especialidad,
                               @RequestParam(name = "fecha", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
-                              java.security.Principal principal,
+                              Principal principal,
                               Model model) {
-        
+
         List<Cita> lista;
         String username = principal.getName();
         Usuario usuarioConectado = usuarioService.buscarPorUsername(username).orElse(null);
+        String rol = usuarioConectado != null ? usuarioConectado.getRol() : "";
 
-        // Si es PEDIATRA, filtra solo las citas de la Dra. Pilar
-        if (usuarioConectado != null && "PEDIATRA".equals(usuarioConectado.getRol())) {
+        // 1. PEDIATRA: Solo ve citas pediátricas de ella misma
+        if ("PEDIATRA".equals(rol)) {
             lista = citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha != null ? fecha : LocalDate.now());
             if (lista.isEmpty() && fecha == null) {
                 lista = citaService.listarTodas().stream()
-                        .filter(c -> c.getMedico().getIdUsuario().equals(usuarioConectado.getIdUsuario()))
+                        .filter(c -> c.getMedico() != null && c.getMedico().getIdUsuario().equals(usuarioConectado.getIdUsuario()))
                         .toList();
             }
-        } 
-        // Si es ODONTOPEDIATRA, filtra solo las citas de la Dra. Gloria
-        else if (usuarioConectado != null && "ODONTOPEDIATRA".equals(usuarioConectado.getRol())) {
+        }
+        // 2. ODONTOPEDIATRA: Solo ve citas odontopediátricas de ella misma
+        else if ("ODONTOPEDIATRA".equals(rol)) {
             lista = citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha != null ? fecha : LocalDate.now());
             if (lista.isEmpty() && fecha == null) {
                 lista = citaService.listarTodas().stream()
-                        .filter(c -> c.getMedico().getIdUsuario().equals(usuarioConectado.getIdUsuario()))
+                        .filter(c -> c.getMedico() != null && c.getMedico().getIdUsuario().equals(usuarioConectado.getIdUsuario()))
                         .toList();
             }
-        } 
-        // Si es RECEPCIONISTA o ADMIN, ve toda la agenda
+        }
+        // 3. RECEPCIONISTA: Trabaja exclusivamente con Odontopediatría
+        else if ("RECEPCIONISTA".equals(rol)) {
+            LocalDate fechaConsulta = fecha != null ? fecha : LocalDate.now();
+            lista = citaService.listarPorEspecialidadYFecha("ODONTOPEDIATRIA", fechaConsulta);
+            if (lista.isEmpty() && fecha == null) {
+                lista = citaService.listarTodas().stream()
+                        .filter(c -> "ODONTOPEDIATRIA".equalsIgnoreCase(c.getEspecialidad()))
+                        .toList();
+            }
+        }
+        // 4. ADMIN: Control global
         else {
             if (especialidad != null && !especialidad.isEmpty() && fecha != null) {
                 lista = citaService.listarPorEspecialidadYFecha(especialidad, fecha);
@@ -76,38 +88,101 @@ public class CitaController {
         return "citas/agenda";
     }
 
-    // Formulario para agendar nueva cita
+    // Formulario para agendar nueva cita con restricciones por rol
     @GetMapping("/nueva")
-    public String formularioNuevaCita(Model model) {
-        model.addAttribute("cita", new Cita());
+    public String formularioNuevaCita(Principal principal, Model model) {
+        String username = principal.getName();
+        Usuario usuarioConectado = usuarioService.buscarPorUsername(username).orElse(null);
+        String rol = usuarioConectado != null ? usuarioConectado.getRol() : "";
+
+        Cita cita = new Cita();
+        List<Usuario> medicosPermitidos;
+
+        // RECEPCIONISTA u ODONTOPEDIATRA: Solo Odontopediatría
+        if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
+            cita.setEspecialidad("ODONTOPEDIATRIA");
+            medicosPermitidos = usuarioService.listarTodos().stream()
+                    .filter(u -> "ODONTOPEDIATRA".equals(u.getRol()))
+                    .toList();
+            if ("ODONTOPEDIATRA".equals(rol)) {
+                cita.setMedico(usuarioConectado);
+            }
+        }
+        // PEDIATRA: Solo Pediatría asignada a ella misma
+        else if ("PEDIATRA".equals(rol)) {
+            cita.setEspecialidad("PEDIATRIA");
+            cita.setMedico(usuarioConectado);
+            medicosPermitidos = usuarioService.listarTodos().stream()
+                    .filter(u -> "PEDIATRA".equals(u.getRol()))
+                    .toList();
+        }
+        // ADMIN: Ambas especialidades disponibles
+        else {
+            medicosPermitidos = usuarioService.listarTodos().stream()
+                    .filter(u -> "PEDIATRA".equals(u.getRol()) || "ODONTOPEDIATRA".equals(u.getRol()))
+                    .toList();
+        }
+
+        model.addAttribute("cita", cita);
         model.addAttribute("pacientes", pacienteService.listarTodos());
-        
-        // Filtrar únicamente los especialistas médicos (PEDIATRA y ODONTOPEDIATRA)
-        List<Usuario> soloMedicos = usuarioService.listarTodos().stream()
-                .filter(u -> "PEDIATRA".equals(u.getRol()) || "ODONTOPEDIATRA".equals(u.getRol()))
-                .toList();
-        model.addAttribute("medicos", soloMedicos);
-        
+        model.addAttribute("medicos", medicosPermitidos);
+        model.addAttribute("rolUsuario", rol);
+
         return "citas/formulario";
     }
-
-    // Guardar la cita con validaciones de fecha, horario clínico y motivo
+// Guardar la cita con validaciones clínicas estrictas
     @PostMapping("/guardar")
     public String guardarCita(@Valid @ModelAttribute("cita") Cita cita,
                               BindingResult result,
+                              Principal principal,
                               Model model,
                               RedirectAttributes redirectAttributes) {
 
-        // Método auxiliar para recargar combos si hay error
+        String username = principal != null ? principal.getName() : "";
+        Usuario usuarioConectado = usuarioService.buscarPorUsername(username).orElse(null);
+        String rol = usuarioConectado != null ? usuarioConectado.getRol() : "";
+
+        // Asignación de seguridad según el rol
+        if ("RECEPCIONISTA".equals(rol)) {
+            cita.setEspecialidad("ODONTOPEDIATRIA");
+        } else if ("ODONTOPEDIATRA".equals(rol)) {
+            cita.setEspecialidad("ODONTOPEDIATRIA");
+            if (cita.getMedico() == null || cita.getMedico().getIdUsuario() == null) {
+                cita.setMedico(usuarioConectado);
+            }
+        } else if ("PEDIATRA".equals(rol)) {
+            cita.setEspecialidad("PEDIATRIA");
+            if (cita.getMedico() == null || cita.getMedico().getIdUsuario() == null) {
+                cita.setMedico(usuarioConectado);
+            }
+        }
+
         Runnable recargarCombos = () -> {
             model.addAttribute("pacientes", pacienteService.listarTodos());
-            model.addAttribute("medicos", usuarioService.listarTodos().stream()
-                    .filter(u -> "PEDIATRA".equals(u.getRol()) || "ODONTOPEDIATRA".equals(u.getRol()))
-                    .toList());
+            List<Usuario> medicos;
+            if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
+                medicos = usuarioService.listarTodos().stream()
+                        .filter(u -> "ODONTOPEDIATRA".equals(u.getRol()))
+                        .toList();
+            } else if ("PEDIATRA".equals(rol)) {
+                medicos = usuarioService.listarTodos().stream()
+                        .filter(u -> "PEDIATRA".equals(u.getRol()))
+                        .toList();
+            } else {
+                medicos = usuarioService.listarTodos().stream()
+                        .filter(u -> "PEDIATRA".equals(u.getRol()) || "ODONTOPEDIATRA".equals(u.getRol()))
+                        .toList();
+            }
+            model.addAttribute("medicos", medicos);
+            model.addAttribute("rolUsuario", rol);
         };
 
+        // Si hay errores de validación de Bean Validation (campos obligatorios)
         if (result.hasErrors()) {
             recargarCombos.run();
+            // Tomamos el primer mensaje de error para que la alerta roja diga exactamente qué falló
+            String primerError = result.getAllErrors().get(0).getDefaultMessage();
+            model.addAttribute("errorHorario", primerError != null ? primerError : "Por favor, complete todos los campos obligatorios.");
             return "citas/formulario";
         }
 
@@ -116,27 +191,47 @@ public class CitaController {
         LocalTime horaCita = cita.getHora();
         String motivo = cita.getMotivo() != null ? cita.getMotivo().trim() : "";
 
-        // 1. REGLA DE NEGOCIO: La fecha no puede ser anterior al día actual ni fechas irreales
+        // 1. REGLA: No permitir fechas pasadas
         if (fechaCita == null || fechaCita.isBefore(hoy)) {
             recargarCombos.run();
             model.addAttribute("errorHorario", "Fecha inválida: Las consultas deben programarse a partir de hoy (" + hoy + ") en adelante.");
             return "citas/formulario";
         }
 
-        // 2. REGLA DE NEGOCIO: Horario de atención clínica (09:00 a 19:00 hrs)
+        // 2. REGLA: Horario clínico oficial (09:00 a 19:00 hrs)
         LocalTime apertura = LocalTime.of(9, 0);
         LocalTime cierre = LocalTime.of(19, 0);
 
         if (horaCita == null || horaCita.isBefore(apertura) || horaCita.isAfter(cierre)) {
             recargarCombos.run();
-            model.addAttribute("errorHorario", "Horario no permitido: La atención médica es exclusivamente de 09:00 a 19:00 hrs.");
+            model.addAttribute("errorHorario", "Horario no permitido: La atención clínica es de 09:00 a 19:00 hrs.");
             return "citas/formulario";
         }
 
-        // 3. REGLA DE NEGOCIO: Motivo médico descriptivo (mínimo 10 caracteres)
+        // 3. REGLA: Motivo clínico coherente
         if (motivo.length() < 10) {
             recargarCombos.run();
-            model.addAttribute("errorHorario", "Motivo no válido: Especifique una descripción clínica real de al menos 10 caracteres.");
+            model.addAttribute("errorHorario", "Motivo no válido: Especifique una descripción clínica de al menos 10 caracteres.");
+            return "citas/formulario";
+        }
+
+        String[] palabras = motivo.split("\\s+");
+        boolean esTextoInvalido = false;
+
+        if (palabras.length < 2) {
+            esTextoInvalido = true;
+        } else {
+            for (String p : palabras) {
+                if (p.length() > 22 || p.matches(".*(.)\\1{3,}.*")) {
+                    esTextoInvalido = true;
+                    break;
+                }
+            }
+        }
+
+        if (esTextoInvalido) {
+            recargarCombos.run();
+            model.addAttribute("errorHorario", "Motivo no válido: Debe describir una causa clínica real con palabras coherentes (ej. 'Revisión por dolor dental', 'Control de niño sano').");
             return "citas/formulario";
         }
 
@@ -151,7 +246,7 @@ public class CitaController {
         }
     }
 
-    // Cancelar cita
+    // Cancelar cita con motivo
     @PostMapping("/cancelar")
     public String cancelarCita(@RequestParam("idCita") Long idCita,
                                @RequestParam("motivoCancelacion") String motivoCancelacion,
@@ -161,6 +256,55 @@ public class CitaController {
             redirectAttributes.addFlashAttribute("mensajeExito", "Cita cancelada correctamente.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError", "Error al cancelar la cita: " + e.getMessage());
+        }
+        return "redirect:/citas";
+    }
+    // Marcar Inasistencia (No Asistió)
+    @PostMapping("/no-asistio")
+    public String marcarNoAsistio(@RequestParam("idCita") Long idCita,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            Cita cita = citaService.buscarPorId(idCita).orElse(null);
+            if (cita != null) {
+                cita.setEstado("NO_ASISTIO");
+                citaService.agendarCita(cita);
+                redirectAttributes.addFlashAttribute("mensajeExito", "La cita se registró como 'No Asistió'.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al actualizar la cita: " + e.getMessage());
+        }
+        return "redirect:/citas";
+    }
+
+    // Reprogramar Fecha y Hora
+    @PostMapping("/reprogramar")
+    public String reprogramarCita(@RequestParam("idCita") Long idCita,
+                                  @RequestParam("nuevaFecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate nuevaFecha,
+                                  @RequestParam("nuevaHora") LocalTime nuevaHora,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            LocalDate hoy = LocalDate.now();
+            if (nuevaFecha.isBefore(hoy)) {
+                redirectAttributes.addFlashAttribute("mensajeError", "La fecha para reagendar debe ser a partir de hoy.");
+                return "redirect:/citas";
+            }
+            LocalTime apertura = LocalTime.of(9, 0);
+            LocalTime cierre = LocalTime.of(19, 0);
+            if (nuevaHora.isBefore(apertura) || nuevaHora.isAfter(cierre)) {
+                redirectAttributes.addFlashAttribute("mensajeError", "El horario clínico permitido es de 09:00 a 19:00 hrs.");
+                return "redirect:/citas";
+            }
+
+            Cita cita = citaService.buscarPorId(idCita).orElse(null);
+            if (cita != null) {
+                cita.setFecha(nuevaFecha);
+                cita.setHora(nuevaHora);
+                cita.setEstado("PROGRAMADA");
+                citaService.agendarCita(cita);
+                redirectAttributes.addFlashAttribute("mensajeExito", "Cita reagendada con éxito para el " + nuevaFecha + " a las " + nuevaHora + " hrs.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al reagendar la cita: " + e.getMessage());
         }
         return "redirect:/citas";
     }

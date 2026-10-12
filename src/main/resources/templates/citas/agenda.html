@@ -44,8 +44,8 @@
                 </div>
             </div>
 
-            <!-- Botón Agendar Cita -->
-            <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
+            <!-- Botón Agendar Cita (Habilitado para ODONTOPEDIATRA, PEDIATRA, RECEPCIONISTA y ADMIN) -->
+            <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'ODONTOPEDIATRA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
                th:href="@{/citas/nueva}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow font-medium flex items-center gap-2 transition text-sm">
                 <i class="fa-solid fa-calendar-plus"></i> Agendar Cita
             </a>
@@ -63,7 +63,7 @@
                             <th class="py-3.5 px-4 font-semibold">Médico Asignado</th>
                             <th class="py-3.5 px-4 font-semibold">Motivo</th>
                             <th class="py-3.5 px-4 font-semibold">Estado</th>
-                            <th class="py-3.5 px-4 font-semibold text-center">Acción</th>
+                            <th class="py-3.5 px-4 font-semibold text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 text-sm">
@@ -76,11 +76,11 @@
                         <tr th:each="c : ${citas}" class="hover:bg-slate-50 transition">
                             <td class="py-3 px-4">
                                 <div class="font-semibold text-slate-900" th:text="${c.fecha}">2026-09-25</div>
-                                <span class="text-xs font-mono text-indigo-600" th:text="${c.hora}">10:00</span>
+                                <span class="text-xs font-mono text-indigo-600 font-bold" th:text="${c.hora}">10:00</span>
                             </td>
                             <td class="py-3 px-4">
                                 <div class="font-medium text-slate-900" th:text="${c.paciente.nombre + ' ' + c.paciente.apellidos}">Nombre Niño</div>
-                                <span class="text-xs text-slate-400" th:text="'CURP: ' + ${c.paciente.curp}"></span>
+                                <span class="text-xs text-slate-400 font-mono" th:text="'CURP: ' + ${c.paciente.curp}"></span>
                             </td>
                             <td class="py-3 px-4">
                                 <span class="px-2.5 py-1 text-xs font-semibold rounded-full"
@@ -88,38 +88,69 @@
                                       th:text="${c.especialidad}"></span>
                             </td>
                             <td class="py-3 px-4 text-slate-700" th:text="${c.medico.nombreCompleto}">Dra. Asignada</td>
-                            <td class="py-3 px-4 text-slate-600 max-w-xs truncate" th:text="${c.motivo}">Motivo de consulta</td>
+                            <td class="py-3 px-4 text-slate-600 max-w-xs truncate" th:text="${c.motivo}" th:title="${c.motivo}">Motivo de consulta</td>
                             <td class="py-3 px-4">
                                 <span class="px-2 py-0.5 text-xs font-semibold rounded"
-                                      th:classappend="${c.estado == 'PROGRAMADA'} ? 'bg-sky-100 text-sky-700' : (${c.estado == 'COMPLETADA'} ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700')"
+                                      th:classappend="${c.estado == 'PROGRAMADA'} ? 'bg-sky-100 text-sky-700' : 
+                                                     (${c.estado == 'COMPLETADA'} ? 'bg-emerald-100 text-emerald-700' :                                                       (${c.estado == 'NO_ASISTIO'} ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'))"
                                       th:text="${c.estado}">PROGRAMADA</span>
                             </td>
-                            <td class="py-3 px-4 text-center space-x-1">
-                                <!-- Botón Atender: visible para especialistas cuando la cita está PROGRAMADA -->
-                                <a th:if="${c.estado == 'PROGRAMADA' and usuarioActual != null and usuarioActual.rol != 'RECEPCIONISTA'}"
-                                   th:href="@{/consultas/atender/{id}(id=${c.idCita})}"
-                                   class="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
-                                    <i class="fa-solid fa-stethoscope"></i> Atender
-                                </a>
+                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                                
+                                <!-- Si la cita está PROGRAMADA: Acciones activas -->
+                                <div th:if="${c.estado == 'PROGRAMADA'}" class="inline-flex items-center gap-1.5 flex-wrap justify-center">
+                                    
+                                    <!-- 1. Atender: Exclusivo para el médico asignado o admin -->
+                                    <a th:if="${usuarioActual != null and usuarioActual.rol != 'RECEPCIONISTA'}"
+                                       th:href="@{/consultas/atender/{id}(id=${c.idCita})}"
+                                       class="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-stethoscope"></i> Atender
+                                    </a>
 
-                                <!-- Botón Cancelar -->
-                                <form th:if="${c.estado == 'PROGRAMADA'}" th:action="@{/citas/cancelar}" method="post" class="inline"
-                                      onsubmit="return confirm('¿Seguro que deseas cancelar esta cita?');">
-                                    <input type="hidden" name="idCita" th:value="${c.idCita}">
-                                    <input type="hidden" name="motivoCancelacion" value="Cancelado a solicitud del paciente/tutor">
-                                    <button type="submit" class="text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded text-xs font-medium transition">
-                                        Cancelar
+                                    <!-- 2. Reprogramar (Abre modal) -->
+                                    <button type="button" 
+                                            th:onclick="'abrirModalReprogramar(' + ${c.idCita} + ', \'' + ${c.fecha} + '\', \'' +${c.hora} + '\')'"
+                                            class="text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-calendar-days"></i> Reagendar
                                     </button>
-                                </form>
 
-                                <div th:if="${c.estado == 'COMPLETADA'}" class="flex items-center justify-center gap-1">
-                                    <span class="text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded">Atendida</span>
+                                    <!-- 3. No Asistió -->
+                                    <form th:action="@{/citas/no-asistio}" method="post" class="inline"
+                                          onsubmit="return confirm('¿Confirmas que el paciente NO se presentó a su turno?');">
+                                        <input type="hidden" name="idCita" th:value="${c.idCita}">
+                                        <button type="submit" 
+                                                class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                            <i class="fa-solid fa-user-xmark"></i> No Asistió
+                                        </button>
+                                    </form>
+
+                                    <!-- 4. Cancelar (Abre modal para capturar motivo obligatorio) -->
+                                    <button type="button" 
+                                            th:onclick="'abrirModalCancelar(' + ${c.idCita} + ')'"
+                                            class="text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-ban"></i> Cancelar
+                                    </button>
+                                </div>
+
+                                <!-- Si la cita ya está COMPLETADA -->
+                                <div th:if="${c.estado == 'COMPLETADA'}" class="inline-flex items-center gap-1">
+                                    <span class="text-[11px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
+                                        <i class="fa-solid fa-check-double"></i> Atendida
+                                    </span>
                                     <a th:href="@{/recetas/nueva/{id}(id=${c.idCita})}"
-                                       class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded text-xs font-semibold inline-flex items-center gap-1 transition"
-                                       title="Ver / Emitir Receta Médica">
+                                       class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
                                         <i class="fa-solid fa-file-prescription"></i> Receta
                                     </a>
                                 </div>
+
+                                <!-- Si fue CANCELADA o NO ASISTIÓ: solo lectura con detalle -->
+                                <div th:if="${c.estado == 'CANCELADA'}" class="text-rose-600 text-xs italic" th:title="${c.motivoCancelacion != null ? c.motivoCancelacion : 'Cancelada'}">
+                                    <span th:text="${c.motivoCancelacion != null ? 'Motivo: ' + c.motivoCancelacion : 'Cancelada'}"></span>
+                                </div>
+                                <div th:if="${c.estado == 'NO_ASISTIO'}" class="text-amber-600 text-xs italic">
+                                    Inasistencia registrada
+                                </div>
+
                             </td>
                         </tr>
                     </tbody>
@@ -128,5 +159,111 @@
         </div>
     </main>
 
+    <!-- MODAL PARA REPROGRAMAR CITA -->
+    <div id="modalReprogramar" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-calendar-days text-blue-600"></i> Reagendar Consulta Médica
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">Selecciona el nuevo día y horario disponible para el paciente.</p>
+            
+            <form th:action="@{/citas/reprogramar}" method="post" class="space-y-4">
+                <input type="hidden" id="idCitaReprogramar" name="idCita">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nueva Fecha *</label>
+                    <input type="date" id="nuevaFecha" name="nuevaFecha" required
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nuevo Horario *</label>
+                    <select id="nuevaHora" name="nuevaHora" required
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono font-bold focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Seleccionar Turno --</option>
+                        <option value="09:00">09:00 AM</option>
+                        <option value="09:30">09:30 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="10:30">10:30 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="11:30">11:30 AM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="12:30">12:30 PM</option>
+                        <option value="13:00">01:00 PM</option>
+                        <option value="13:30">01:30 PM</option>
+                        <option value="14:00">02:00 PM</option>
+                        <option value="16:00">04:00 PM</option>
+                        <option value="16:30">04:30 PM</option>
+                        <option value="17:00">05:00 PM</option>
+                        <option value="17:30">05:30 PM</option>
+                        <option value="18:00">06:00 PM</option>
+                        <option value="18:30">06:30 PM</option>
+                        <option value="19:00">07:00 PM</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="cerrarModalReprogramar()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PARA CANCELAR CITA CON MOTIVO -->
+    <div id="modalCancelar" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2 mb-2">
+                <i class="fa-solid fa-ban text-rose-600"></i> Cancelación de Cita
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">Indica la causa por la cual se cancela la cita para mantener la trazabilidad clínica.</p>
+            
+            <form th:action="@{/citas/cancelar}" method="post" class="space-y-4">
+                <input type="hidden" id="idCitaCancelar" name="idCita">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Motivo de Cancelación *</label>
+                    <textarea name="motivoCancelacion" required minlength="5" rows="3"
+                              placeholder="Ej. Tutor avisó por emergencia familiar, paciente indispuesto de salud..."
+                              class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="cerrarModalCancelar()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold">Cerrar</button>
+                    <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow">Confirmar Cancelación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts para modales y restricciones de fecha -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const fechaInput = document.getElementById("nuevaFecha");
+            if (fechaInput) {
+                const hoy = new Date();
+                const a = hoy.getFullYear();
+                const m = String(hoy.getMonth() + 1).padStart(2, '0');
+                const d = String(hoy.getDate()).padStart(2, '0');
+                fechaInput.min = `${a}-${m}-${d}`;
+            }
+        });
+
+        function abrirModalReprogramar(id, fecha, hora) {
+            document.getElementById('idCitaReprogramar').value = id;
+            document.getElementById('nuevaFecha').value = fecha;
+            document.getElementById('nuevaHora').value = hora;
+            document.getElementById('modalReprogramar').classList.remove('hidden');
+        }
+
+        function cerrarModalReprogramar() {
+            document.getElementById('modalReprogramar').classList.add('hidden');
+        }
+
+        function abrirModalCancelar(id) {
+            document.getElementById('idCitaCancelar').value = id;
+            document.getElementById('modalCancelar').classList.remove('hidden');
+        }
+
+        function cerrarModalCancelar() {
+            document.getElementById('modalCancelar').classList.add('hidden');
+        }
+    </script>
+
 </body>
-</html>
+</html> 
