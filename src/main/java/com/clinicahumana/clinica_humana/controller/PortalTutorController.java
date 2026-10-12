@@ -104,7 +104,7 @@ paciente.setSexo(sexoNormalizado);
                     .anyMatch(c -> c.getHora().equals(h) && !"CANCELADA".equalsIgnoreCase(c.getEstado()));
 
             if (ocupado) {
-                redirectAttributes.addFlashAttribute("mensajeError", "El horario seleccionado (" + horaCita + " del " + fechaCita + ") ya se encuentra ocupado con la especialista. Por favor elige otro horario.");
+                redirectAttributes.addFlashAttribute("mensajeError", "El horario seleccionado ya se encuentra ocupado para este médico. Por favor, elija otra hora o fecha.");
                 return "redirect:/portal-citas";
             }
 

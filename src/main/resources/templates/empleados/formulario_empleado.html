@@ -13,7 +13,8 @@
         <div class="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-base font-bold flex items-center gap-2">
                 <i class="fa-solid fa-user-plus text-indigo-300"></i>
-                Alta de Personal Clínico o Administrativo
+                <span th:if="${esEdicion != null and esEdicion}">Editar Colaborador / Personal</span>
+                <span th:unless="${esEdicion != null and esEdicion}">Alta de Personal Clínico o Administrativo</span>
             </h1>
             <a th:href="@{/empleados}" class="text-xs bg-indigo-800 hover:bg-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-600 transition">
                 <i class="fa-solid fa-arrow-left"></i> Volver al Directorio
@@ -22,8 +23,17 @@
     </header>
 
     <main class="max-w-2xl mx-auto px-4 mt-8">
-        
+
+        <!-- Errores de negocio devueltos por el controlador -->
+        <div th:if="${errorFormulario}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 text-rose-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
+            <span th:text="${errorFormulario}"></span>
+        </div>
+
         <form th:action="@{/empleados/guardar}" th:object="${empleado}" method="post" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-6">
+
+            <!-- ID del colaborador: presente solo en modo edición -->
+            <input type="hidden" th:field="*{idEmpleado}" />
 
             <!-- Datos Generales -->
             <div>
@@ -63,15 +73,24 @@
 
             <!-- Credenciales de Inicio de Sesión -->
             <div class="pt-4 border-t border-slate-100">
-                <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3">2. Credenciales de Inicio de Sesión</h3>
+                <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3" th:text="${esEdicion != null and esEdicion} ? '2. Credenciales de Acceso (editar)' : '2. Credenciales de Inicio de Sesión'">2. Credenciales de Inicio de Sesión</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Usuario (Username) *</label>
-                        <input type="text" name="username" required placeholder="nombre.apellido" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" name="username" required placeholder="nombre.apellido"
+                               th:value="${empleado.usuario != null ? empleado.usuario.username : ''}"
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Contraseña *</label>
-                        <input type="password" name="password" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1"
+                               th:text="${esEdicion != null and esEdicion} ? 'Nueva Contraseña (opcional) *' : 'Contraseña *'">Contraseña *</label>
+                        <input type="password" name="password"
+                               th:required="${esEdicion == null or !esEdicion}"
+                               autocomplete="new-password"
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        <p th:if="${esEdicion != null and esEdicion}" class="text-[11px] text-slate-400 mt-1">
+                            Dejar en blanco para conservar la contraseña actual (se guarda encriptada en BCrypt).
+                        </p>
                     </div>
                 </div>
             </div>
@@ -81,7 +100,9 @@
                     Cancelar
                 </a>
                 <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow transition flex items-center gap-2">
-                    <i class="fa-solid fa-save"></i> Guardar Empleado y Crear Acceso
+                    <i class="fa-solid fa-save"></i>
+                    <span th:if="${esEdicion != null and esEdicion}">Guardar Cambios del Colaborador</span>
+                    <span th:unless="${esEdicion != null and esEdicion}">Guardar Empleado y Crear Acceso</span>
                 </button>
             </div>
         </form>

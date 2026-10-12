@@ -298,6 +298,8 @@ public class CitaController {
                 citaService.agendarCita(cita);
                 redirectAttributes.addFlashAttribute("mensajeExito", "Cita reagendada con éxito para el " + nuevaFecha + " a las " + nuevaHora + " hrs.");
             }
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("mensajeError", e.getMessage());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError", "Error al reagendar la cita: " + e.getMessage());
         }

@@ -45,6 +45,7 @@
                             <th class="py-3 px-4 font-semibold">Cédula Profesional</th>
                             <th class="py-3 px-4 font-semibold">Contacto</th>
                             <th class="py-3 px-4 font-semibold">Usuario del Sistema</th>
+                            <th class="py-3 px-4 font-semibold text-center">Acciones (Admin)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
@@ -62,6 +63,19 @@
                                 <div th:if="${emp.email}" class="text-slate-400" th:text="${emp.email}"></div>
                             </td>
                             <td class="py-3 px-4 font-mono text-xs text-indigo-700 font-bold" th:text="${emp.usuario != null ? emp.usuario.username : 'Sin Usuario'}">usuario</td>
+                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                                <a th:href="@{/empleados/editar/{id}(id=${emp.idEmpleado})}"
+                                   class="px-2.5 py-1 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-xs font-bold shadow transition inline-flex items-center gap-1">
+                                    <i class="fa-solid fa-pen"></i> Editar
+                                </a>
+                                <form th:action="@{/empleados/eliminar/{id}(id=${emp.idEmpleado})}" method="post" class="inline"
+                                      onsubmit="return confirm('¿Seguro que desea eliminar o dar de baja a este colaborador del sistema?');">
+                                    <button type="submit"
+                                            class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shadow transition inline-flex items-center gap-1">
+                                        <i class="fa-solid fa-user-slash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

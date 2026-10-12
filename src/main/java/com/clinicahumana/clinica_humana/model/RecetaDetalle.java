@@ -2,6 +2,8 @@ package com.clinicahumana.clinica_humana.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import com.clinicahumana.clinica_humana.validation.ValidacionesClinicas;
 
 @Entity
 @Table(name = "receta_detalles")
@@ -17,6 +19,7 @@ public class RecetaDetalle {
     private Receta receta;
 
     @NotBlank(message = "El medicamento es obligatorio")
+    @Pattern(regexp = ValidacionesClinicas.MEDICAMENTO_REGEX, message = "El medicamento debe ser un nombre de fármaco real (letras, números y signos básicos), sin texto aleatorio")
     @Column(nullable = false, length = 120)
     private String medicamento;
 
@@ -24,14 +27,17 @@ public class RecetaDetalle {
     private String presentacion;
 
     @NotBlank(message = "La dosis es obligatoria")
+    @Pattern(regexp = ValidacionesClinicas.DOSIS_REGEX, message = "La dosis debe ser un número seguido de su unidad (ej. 5 ml, 10 mg, 2 gotas)")
     @Column(nullable = false, length = 60)
     private String dosis;
 
     @NotBlank(message = "La frecuencia es obligatoria")
+    @Pattern(regexp = ValidacionesClinicas.FRECUENCIA_REGEX, message = "La frecuencia debe tener formato estructurado (ej. cada 8 horas, 8 hrs, c/8h)")
     @Column(nullable = false, length = 60)
     private String frecuencia;
 
     @NotBlank(message = "La duración es obligatoria")
+    @Pattern(regexp = ValidacionesClinicas.DURACION_REGEX, message = "La duración debe tener formato estructurado (ej. por 5 días)")
     @Column(nullable = false, length = 40)
     private String duracion;
 

@@ -9,13 +9,32 @@
 <body class="bg-slate-100 min-h-screen p-6 text-slate-800">
 
     <div class="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+
+        <!-- Errores de validación devueltos por el controlador -->
+        <div th:if="${errorValidacion != null}" class="mb-6 p-4 bg-rose-50 border border-rose-300 rounded-xl">
+            <p class="font-bold text-rose-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation"></i> No se pudo generar la receta:
+            </p>
+            <ul class="list-disc list-inside text-xs text-rose-700 mt-1">
+                <li th:each="err : ${errorValidacion}" th:text="${err}"></li>
+            </ul>
+        </div>
+
+        <!-- Errores detectados por el validador del navegador (JavaScript) -->
+        <div id="erroresCaptura" class="hidden mb-6 p-4 bg-rose-50 border border-rose-300 rounded-xl">
+            <p class="font-bold text-rose-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation"></i> Revise los siguientes renglones antes de guardar:
+            </p>
+            <ul id="listaErroresCaptura" class="list-disc list-inside text-xs text-rose-700 mt-1"></ul>
+        </div>
+
         <div class="flex justify-between items-center pb-4 mb-6 border-b border-slate-200">
             <div>
                 <h1 class="text-xl font-black text-indigo-900 flex items-center gap-2">
                     <i class="fa-solid fa-file-prescription text-indigo-600"></i>
                     Emisión de Receta Oficial
                 </h1>
-                <p class="text-xs text-slate-500" th:text="'Paciente: ' + ${receta.paciente.nombre + ' ' + receta.paciente.apellidos} + ' \vert{} Especialidad: ' +${receta.cita.especialidad}"></p>
+                <p class="text-xs text-slate-500" th:text="'Paciente: ' + ${receta.paciente.nombre + ' ' + receta.paciente.apellidos} + ' | Especialidad: ' + ${receta.cita.especialidad}"></p>
             </div>
             <div class="flex gap-2">
                 <a href="https://www.google.com/search?q=vademecum+mexico+medicamentos" target="_blank" rel="noopener"
@@ -28,7 +47,7 @@
             </div>
         </div>
 
-        <form th:action="@{/recetas/guardar}" th:object="${receta}" method="post" class="space-y-6">
+        <form id="formReceta" th:action="@{/recetas/guardar}" th:object="${receta}" method="post" class="space-y-6">
             <input type="hidden" th:field="*{cita.idCita}">
             <input type="hidden" th:field="*{diagnosticoResumen}">
             <input type="hidden" th:field="*{firmaBase64}">
@@ -50,8 +69,8 @@
                 </div>
 
                 <div id="contenedorMedicamentos" class="space-y-3">
-                    <!-- Renglón 1 inicial -->
-                    <div class="grid grid-cols-12 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 items-center renglon-med">
+                    <!-- Renglón 1 inicial (solo cuando no se recuperó ningún renglón tras un error) -->
+                    <div th:if="${renglones == null}" class="grid grid-cols-12 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 items-center renglon-med">
                         <div class="col-span-3">
                             <input type="text" name="medicamento[]" list="listaMedicamentos" oninput="autoCompletarPresentacion(this)"
                                    placeholder="Del catálogo o escribir libre" required
@@ -77,6 +96,40 @@
                         </div>
                         <div class="col-span-2 flex items-center gap-1">
                             <input type="text" name="duracion[]" placeholder="Por (Ej. 5 días)" required
+                                   class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
+                            <button type="button" onclick="eliminarRenglon(this)" class="text-rose-500 hover:text-rose-700 p-1 text-sm">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Renglones recuperados tras un error de validación del servidor -->
+                    <div th:each="r : ${renglones}" class="grid grid-cols-12 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 items-center renglon-med">
+                        <div class="col-span-3">
+                            <input type="text" name="medicamento[]" list="listaMedicamentos" oninput="autoCompletarPresentacion(this)"
+                                   th:value="${r.medicamento}" placeholder="Del catálogo o escribir libre" required
+                                   class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="col-span-1">
+                            <a href="#" onclick="buscarVademecum(this); return false;" title="Consultar en Vademécum / PLM (abre pestaña nueva)"
+                               class="w-full py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-xs flex items-center justify-center shadow">
+                                <i class="fa-solid fa-up-right-from-square"></i>
+                            </a>
+                        </div>
+                        <div class="col-span-2">
+                            <input type="text" name="presentacion[]" th:value="${r.presentacion}" placeholder="Presentación (Ej. Jbe 120mg)"
+                                   class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
+                        </div>
+                        <div class="col-span-2">
+                            <input type="text" name="dosis[]" th:value="${r.dosis}" placeholder="Dosis (Ej. 5 ml)" required
+                                   class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
+                        </div>
+                        <div class="col-span-2">
+                            <input type="text" name="frecuencia[]" th:value="${r.frecuencia}" placeholder="Cada (Ej. 8 hrs)" required
+                                   class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
+                        </div>
+                        <div class="col-span-2 flex items-center gap-1">
+                            <input type="text" name="duracion[]" th:value="${r.duracion}" placeholder="Por (Ej. 5 días)" required
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                             <button type="button" onclick="eliminarRenglon(this)" class="text-rose-500 hover:text-rose-700 p-1 text-sm">
                                 <i class="fa-solid fa-trash"></i>
@@ -164,6 +217,114 @@
                 campoPresentacion.value = partes.join(' ');
             }
         }
+
+        // =================== CANDADAS DE VALIDACIÓN DE LA RECETA ===================
+        const RE_DOSIS = /^(?:\d{1,3}(?:[.,]\d{1,2})?|\d{1,3}\s*\/\s*\d{1,2})\s*(?:ml\/kg|mg\/kg|mcg\/kg|gotas?|gts?|comprimidos?|capsulas?|cucharaditas?|cucharadas?|sobres?|parches?|unidad(?:es)?|ml|mg|mcg|g|cg|ui|comp\.?|caps\.?|cda\.?)$/i;
+        const RE_FRECUENCIA = /^(?:cada\s+|c\/\s*|q)?\d{1,3}(?:\s*-\s*\d{1,3})?\s*(?:horas?|hrs?|h|d[ií]as?|d|semanas?|minutos?|min)$/i;
+        const RE_DURACION = /^(?:por\s+)?\d{1,3}(?:\s*-\s*\d{1,3})?\s*(?:d[ií]as?|d|semanas?|meses)$/i;
+        const RE_MEDICAMENTO = /^[\p{L}\d][\p{L}\d \-().,%'\/]{2,119}$/u;
+        const RE_BASE = /([a-záéíóúüñ]{2,5})\1{3,}/i;
+
+        function medicamentoValido(m) {
+            const v = (m || '').trim();
+            if (!RE_MEDICAMENTO.test(v)) return false;
+            if (RE_BASE.test(v)) return false;
+            let letras = 0;
+            for (const p of v.split(/\s+/)) {
+                if (p.length > 30) return false;
+                const solo = p.replace(/[^\p{L}]/gu, '');
+                letras += solo.length;
+                if (solo.length >= 4 && !/[aeiouáéíóúü]/i.test(solo)) return false;
+            }
+            return letras >= 4;
+        }
+
+        function recomendacionValida(txt) {
+            const v = (txt || '').trim();
+            if (v.length < 15) return false;
+            const palabras = v.split(/\s+/);
+            if (palabras.length < 3) return false;
+            if (palabras.some(p => p.length > 22)) return false;
+            if (RE_BASE.test(v)) return false;
+            let letras = 0;
+            for (const p of palabras) {
+                const solo = p.replace(/[^\p{L}]/gu, '');
+                letras += solo.length;
+                if (solo.length >= 4 && !/[aeiouáéíóúü]/i.test(solo)) return false;
+            }
+            return letras >= 8;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const catalogo = new Set(Array.from(document.querySelectorAll('#listaMedicamentos option'))
+                .map(o => o.value.trim().toLowerCase()));
+            const form = document.getElementById('formReceta');
+            form.addEventListener('submit', function (ev) {
+                const errores = [];
+                let indice = 0;
+                document.querySelectorAll('.renglon-med').forEach(fila => {
+                    indice++;
+                    const med = fila.querySelector('input[name="medicamento[]"]');
+                    const dosis = fila.querySelector('input[name="dosis[]"]');
+                    const frec = fila.querySelector('input[name="frecuencia[]"]');
+                    const dur = fila.querySelector('input[name="duracion[]"]');
+                    [med, dosis, frec, dur].forEach(c => c && c.classList.remove('border-rose-500'));
+
+                    const nombre = med ? med.value.trim() : '';
+                    if (!nombre) {
+                        errores.push('Renglón ' + indice + ': debe indicar el medicamento.');
+                        if (med) med.classList.add('border-rose-500');
+                    } else if (!medicamentoValido(nombre)) {
+                        errores.push('Renglón ' + indice + ': "' + nombre + '" no es un nombre de fármaco válido. Use el catálogo o un nombre real del vademécum, sin texto aleatorio.');
+                        med.classList.add('border-rose-500');
+                    } else if (!catalogo.has(nombre.toLowerCase())) {
+                        const continuar = confirm('El medicamento "' + nombre + '" no está en el catálogo interno de la clínica.\n\n¿Desea prescribirlo de todos modos?');
+                        if (!continuar) {
+                            errores.push('Renglón ' + indice + ': "' + nombre + '" fue rechazado (no pertenece al catálogo de medicamentos).');
+                            med.classList.add('border-rose-500');
+                        }
+                    }
+
+                    if (dosis && !RE_DOSIS.test(dosis.value.trim())) {
+                        errores.push('Renglón ' + indice + ': la dosis "' + dosis.value.trim() + '" no tiene formato coherente (ej. 5 ml, 10 mg, 2 gotas).');
+                        dosis.classList.add('border-rose-500');
+                    }
+                    if (frec && !RE_FRECUENCIA.test(frec.value.trim())) {
+                        errores.push('Renglón ' + indice + ': la frecuencia "' + frec.value.trim() + '" no tiene formato coherente (ej. cada 8 horas, 8 hrs, c/8h).');
+                        frec.classList.add('border-rose-500');
+                    }
+                    if (dur && !RE_DURACION.test(dur.value.trim())) {
+                        errores.push('Renglón ' + indice + ': la duración "' + dur.value.trim() + '" no tiene formato coherente (ej. por 5 días).');
+                        dur.classList.add('border-rose-500');
+                    }
+                });
+
+                const ind = document.getElementById('indicacionesGenerales');
+                if (ind) {
+                    ind.classList.remove('border-rose-500');
+                    if (ind.value.trim() && !recomendacionValida(ind.value)) {
+                        errores.push('Las Recomendaciones e Indicaciones Generales deben ser texto descriptivo real (mínimo 3 palabras coherentes, sin letras repetidas ni cadenas aleatorias).');
+                        ind.classList.add('border-rose-500');
+                    }
+                }
+
+                const cont = document.getElementById('erroresCaptura');
+                const ul = document.getElementById('listaErroresCaptura');
+                ul.innerHTML = '';
+                if (errores.length > 0) {
+                    ev.preventDefault();
+                    errores.forEach(msg => {
+                        const li = document.createElement('li');
+                        li.textContent = msg;
+                        ul.appendChild(li);
+                    });
+                    cont.classList.remove('hidden');
+                    cont.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    cont.classList.add('hidden');
+                }
+            });
+        });
     </script>
 </body>
 </html>

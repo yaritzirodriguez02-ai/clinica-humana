@@ -15,6 +15,11 @@ import java.util.Optional;
 @Service
 public class CitaService {
 
+    /** Mensaje único de choque de horario solicitado para todos los paneles. */
+    public static final String MENSAJE_HORARIO_OCUPADO =
+            "El horario seleccionado ya se encuentra ocupado para este médico. Por favor, elija otra hora o fecha.";
+
+
     @Autowired
     private CitaRepository citaRepository;
 
@@ -62,15 +67,15 @@ public class CitaService {
     @Transactional
     public Cita agendarCita(Cita cita) {
         // Regla de Negocio: Validar que no exista choque de citas en la misma fecha y hora con el mismo médico
-        boolean horarioOcupado = citaRepository.existsByMedicoIdUsuarioAndFechaAndHoraAndEstadoNot(
-                cita.getMedico().getIdUsuario(),
-                cita.getFecha(),
-                cita.getHora(),
-                "CANCELADA"
-        );
+        Long idMedico = cita.getMedico().getIdUsuario();
+        boolean horarioOcupado = (cita.getIdCita() == null)
+                ? citaRepository.existsByMedicoIdUsuarioAndFechaAndHoraAndEstadoNot(
+                        idMedico, cita.getFecha(), cita.getHora(), "CANCELADA")
+                : citaRepository.existsByMedicoIdUsuarioAndFechaAndHoraAndEstadoNotAndIdCitaNot(
+                        idMedico, cita.getFecha(), cita.getHora(), "CANCELADA", cita.getIdCita());
 
         if (horarioOcupado) {
-            throw new IllegalStateException("El horario seleccionado ya se encuentra ocupado con este especialista.");
+            throw new IllegalStateException(MENSAJE_HORARIO_OCUPADO);
         }
 
         cita.setEstado("PROGRAMADA");
@@ -82,15 +87,16 @@ public class CitaService {
         Cita cita = citaRepository.findById(idCita)
                 .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada con ID: " + idCita));
 
-        boolean horarioOcupado = citaRepository.existsByMedicoIdUsuarioAndFechaAndHoraAndEstadoNot(
+        boolean horarioOcupado = citaRepository.existsByMedicoIdUsuarioAndFechaAndHoraAndEstadoNotAndIdCitaNot(
                 cita.getMedico().getIdUsuario(),
                 nuevaFecha,
                 nuevaHora,
-                "CANCELADA"
+                "CANCELADA",
+                cita.getIdCita()
         );
 
         if (horarioOcupado) {
-            throw new IllegalStateException("El nuevo horario ya no está disponible con este especialista.");
+            throw new IllegalStateException(MENSAJE_HORARIO_OCUPADO);
         }
 
         cita.setFecha(nuevaFecha);

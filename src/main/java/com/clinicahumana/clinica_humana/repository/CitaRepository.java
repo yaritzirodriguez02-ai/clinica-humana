@@ -12,6 +12,12 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     // Para evitar citas duplicadas en el mismo horario con el mismo especialista
     boolean existsByMedicoIdUsuarioAndFechaAndHoraAndEstadoNot(Long idUsuarioMedico, LocalDate fecha, LocalTime hora, String estado);
 
+    // Variante que excluye la propia cita (para reprogramaciones sin choque consigo misma)
+    boolean existsByMedicoIdUsuarioAndFechaAndHoraAndEstadoNotAndIdCitaNot(Long idUsuarioMedico, LocalDate fecha, LocalTime hora, String estado, Long idCita);
+
+    // Para saber si un usuario médico tiene historial de citas (CRUD de personal)
+    boolean existsByMedicoIdUsuario(Long idUsuarioMedico);
+
     List<Cita> findByFechaAndEspecialidad(LocalDate fecha, String especialidad);
     List<Cita> findByMedicoIdUsuarioAndFecha(Long idUsuarioMedico, LocalDate fecha);
     List<Cita> findByPacienteIdPaciente(Long idPaciente);

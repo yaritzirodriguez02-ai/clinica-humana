@@ -7,11 +7,13 @@ import com.clinicahumana.clinica_humana.model.Usuario;
 import com.clinicahumana.clinica_humana.service.CitaService;
 import com.clinicahumana.clinica_humana.service.ClinicoYPagosService;
 import com.clinicahumana.clinica_humana.service.UsuarioService;
+import com.clinicahumana.clinica_humana.validation.ValidacionesClinicas;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -85,9 +87,28 @@ public class ConsultaController {
     @PostMapping("/pediatria/guardar")
     public String guardarConsultaPediatrica(@Valid @ModelAttribute("expediente") ExpedientePediatrico expediente,
                                            BindingResult result,
+                                           @RequestParam(name = "firmaFisica", required = false) String firmaFisica,
                                            Model model,
                                            RedirectAttributes redirectAttributes) {
+        // Firma en formato físico: el sistema registra el valor canónico de forma automática
+        if (firmaFisica != null && !firmaFisica.isBlank()) {
+            expediente.setFirmaMedicoBase64(ValidacionesClinicas.FIRMA_FISICO);
+        }
+        // La firma es obligatoria: digital trazada o en formato físico
+        if (expediente.getFirmaMedicoBase64() == null || expediente.getFirmaMedicoBase64().isBlank()) {
+            result.addError(new FieldError("expediente", "firmaMedicoBase64",
+                    "La firma médica es obligatoria: firme en el recuadro o seleccione 'Firmar en formato físico'."));
+        }
+
         if (result.hasErrors()) {
+            // Recargar los objetos completos desde la BD para poder volver a pintar la vista
+            citaService.buscarPorId(expediente.getCita().getIdCita()).ifPresent(cita -> {
+                expediente.setCita(cita);
+                expediente.setPaciente(cita.getPaciente());
+                expediente.setMedico(cita.getMedico());
+            });
+            model.addAttribute("erroresValidacion", result.getAllErrors().stream()
+                    .map(e -> e.getDefaultMessage()).toList());
             model.addAttribute("historial", clinicoService.obtenerHistorialPediatrico(expediente.getPaciente().getIdPaciente()));
             return "consultas/consulta_pediatrica";
         }
@@ -101,9 +122,28 @@ public class ConsultaController {
     @PostMapping("/odontopediatria/guardar")
     public String guardarConsultaOdontopediatrica(@Valid @ModelAttribute("expediente") ExpedienteOdontopediatrico expediente,
                                                  BindingResult result,
+                                                 @RequestParam(name = "firmaFisica", required = false) String firmaFisica,
                                                  Model model,
                                                  RedirectAttributes redirectAttributes) {
+        // Firma en formato físico: el sistema registra el valor canónico de forma automática
+        if (firmaFisica != null && !firmaFisica.isBlank()) {
+            expediente.setFirmaMedicoBase64(ValidacionesClinicas.FIRMA_FISICO);
+        }
+        // La firma es obligatoria: digital trazada o en formato físico
+        if (expediente.getFirmaMedicoBase64() == null || expediente.getFirmaMedicoBase64().isBlank()) {
+            result.addError(new FieldError("expediente", "firmaMedicoBase64",
+                    "La firma médica es obligatoria: firme en el recuadro o seleccione 'Firmar en formato físico'."));
+        }
+
         if (result.hasErrors()) {
+            // Recargar los objetos completos desde la BD para poder volver a pintar la vista
+            citaService.buscarPorId(expediente.getCita().getIdCita()).ifPresent(cita -> {
+                expediente.setCita(cita);
+                expediente.setPaciente(cita.getPaciente());
+                expediente.setMedico(cita.getMedico());
+            });
+            model.addAttribute("erroresValidacion", result.getAllErrors().stream()
+                    .map(e -> e.getDefaultMessage()).toList());
             model.addAttribute("historial", clinicoService.obtenerHistorialOdontopediatrico(expediente.getPaciente().getIdPaciente()));
             return "consultas/consulta_odontopediatrica";
         }

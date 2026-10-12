@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import com.clinicahumana.clinica_humana.validation.TextoCoherente;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -35,11 +36,13 @@ public class ExpedienteOdontopediatrico {
     private LocalDateTime fechaAtencion;
 
     @NotBlank(message = "El diagnóstico dental es obligatorio")
+    @TextoCoherente
     @Lob
     @Column(name = "diagnostico_dental", columnDefinition = "TEXT", nullable = false)
     private String diagnosticoDental;
 
     @NotBlank(message = "Los procedimientos realizados son obligatorios")
+    @TextoCoherente
     @Lob
     @Column(name = "procedimientos_realizados", columnDefinition = "TEXT", nullable = false)
     private String procedimientosRealizados;
@@ -47,6 +50,7 @@ public class ExpedienteOdontopediatrico {
     @Column(name = "piezas_tratadas", length = 100)
     private String piezasTratadas;
 
+    @TextoCoherente
     @Lob
     @Column(name = "recomendaciones_higiene", columnDefinition = "TEXT")
     private String recomendacionesHigiene;
@@ -60,7 +64,7 @@ public class ExpedienteOdontopediatrico {
     @Column(name = "pizarron_dental_base64", columnDefinition = "LONGTEXT")
     private String pizarronDentalBase64;
 
-    @NotBlank(message = "La firma médica es obligatoria")
+    // La obligatoriedad de la firma (digital o "FIRMA EN FÍSICO") se valida en ConsultaController
     @Lob
     @Column(name = "firma_medico_base64", columnDefinition = "LONGTEXT", nullable = false)
     private String firmaMedicoBase64;

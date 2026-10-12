@@ -25,6 +25,16 @@
     </header>
 
     <main class="max-w-5xl mx-auto px-4 mt-8">
+
+        <!-- Errores de validación devueltos por el controlador -->
+        <div th:if="${erroresValidacion != null}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 rounded shadow-sm">
+            <p class="font-bold text-rose-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation"></i> No se pudo guardar la consulta:
+            </p>
+            <ul class="list-disc list-inside text-xs text-rose-700 mt-1">
+                <li th:each="err : ${erroresValidacion}" th:text="${err}"></li>
+            </ul>
+        </div>
         
         <!-- Ficha Rápida del Paciente -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap justify-between items-center gap-4">
@@ -102,18 +112,27 @@
                         <textarea th:field="*{diagnostico}" rows="3" required
                                   placeholder="Detalle de hallazgos clínicos y diagnóstico..."
                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <p id="err-diagnostico" class="hidden mt-1 text-xs font-semibold text-rose-600">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba un diagnóstico real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
+                        </p>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tratamiento Indicado *</label>
                         <textarea th:field="*{tratamiento}" rows="3" required
                                   placeholder="Indicaciones médicas, reposo, cuidados..."
                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <p id="err-tratamiento" class="hidden mt-1 text-xs font-semibold text-rose-600">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba el tratamiento real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
+                        </p>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Receta Médica *</label>
                         <textarea th:field="*{recetaMedica}" rows="3" required
                                   placeholder="Medicamentos, dosis, frecuencia y duración..."
                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <p id="err-recetaMedica" class="hidden mt-1 text-xs font-semibold text-rose-600">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba la prescripción real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
+                        </p>
                     </div>
                 </div>
             </div>
@@ -127,11 +146,20 @@
                 <div class="border-2 border-dashed border-slate-300 rounded-lg p-2 inline-block bg-slate-50">
                     <canvas id="canvasFirma" width="450" height="150" class="bg-white rounded cursor-crosshair border border-slate-200"></canvas>
                 </div>
-                <div class="mt-2">
+                <div class="mt-2 flex items-center gap-4 flex-wrap">
                     <button type="button" onclick="limpiarFirma()" class="text-xs text-rose-600 hover:text-rose-800 font-semibold">
                         <i class="fa-solid fa-eraser"></i> Borrar Firma
                     </button>
+                    <label for="chkFirmaFisica" class="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-100 border border-slate-300 rounded-lg px-3 py-1.5 cursor-pointer select-none">
+                        <input type="checkbox" id="chkFirmaFisica" name="firmaFisica" value="true" onchange="alternarFirmaFisica(this)"
+                               class="w-4 h-4 border-slate-300 text-indigo-600 focus:ring-indigo-500 rounded">
+                        Firmar en formato físico
+                    </label>
                 </div>
+                <p id="avisoFirmaFisica" class="hidden mt-2 text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 rounded-lg px-3 py-2">
+                    <i class="fa-solid fa-file-signature"></i>
+                    Firma en formato físico seleccionada: el recuadro quedó bloqueado y el sistema registrará "FIRMA EN FÍSICO" en la base de datos.
+                </p>
                 <input type="hidden" id="firmaBase64" th:field="*{firmaMedicoBase64}" required />
             </div>
 
@@ -165,6 +193,7 @@
         }
 
         function empezar(e) {
+            if (document.getElementById('chkFirmaFisica').checked) { e.preventDefault(); return; }
             dibujando = true;
             const p = pos(e);
             ctx.beginPath();
@@ -197,10 +226,79 @@
             document.getElementById('firmaBase64').value = '';
         }
 
-        function guardarFirmaAntesDeEnviar(e) {
-            const dataUrl = canvas.toDataURL('image/png');
-            document.getElementById('firmaBase64').value = dataUrl;
+        // ---------- Firma en formato físico ----------
+        function alternarFirmaFisica(chk) {
+            const oculto = document.getElementById('firmaBase64');
+            const aviso = document.getElementById('avisoFirmaFisica');
+            if (chk.checked) {
+                limpiarFirma();
+                canvas.style.opacity = '0.35';
+                canvas.style.pointerEvents = 'none';
+                canvas.style.cursor = 'not-allowed';
+                aviso.classList.remove('hidden');
+                oculto.value = 'FIRMA EN FÍSICO';
+            } else {
+                canvas.style.opacity = '';
+                canvas.style.pointerEvents = '';
+                canvas.style.cursor = '';
+                aviso.classList.add('hidden');
+                oculto.value = '';
+            }
         }
+
+        function guardarFirmaAntesDeEnviar(e) {
+            const oculto = document.getElementById('firmaBase64');
+            const chk = document.getElementById('chkFirmaFisica');
+            if (chk && chk.checked) {
+                oculto.value = 'FIRMA EN FÍSICO';
+                return;
+            }
+            oculto.value = canvas.toDataURL('image/png');
+        }
+
+        // ---------- Validación estricta anti texto basura ----------
+        function textoClinicoValido(txt, minPalabras, minCaracteres) {
+            const v = (txt || '').trim();
+            if (v.length < minCaracteres) return false;
+            const palabras = v.split(/\s+/);
+            if (palabras.length < minPalabras) return false;
+            if (palabras.some(p => p.length > 22)) return false;
+            if (/([a-záéíóúüñ]{2,5})\1{3,}/i.test(v)) return false;
+            let letras = 0;
+            for (const p of palabras) {
+                const soloLetras = p.replace(/[^\p{L}]/gu, '');
+                letras += soloLetras.length;
+                if (soloLetras.length >= 4 && !/[aeiouáéíóúü]/i.test(soloLetras)) return false;
+            }
+            return letras >= 8;
+        }
+
+        const camposClinicos = [
+            { id: 'diagnostico', palabras: 2, min: 10 },
+            { id: 'tratamiento', palabras: 2, min: 10 },
+            { id: 'recetaMedica', palabras: 2, min: 10 }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function (ev) {
+                let primeroInvalido = null;
+                camposClinicos.forEach(c => {
+                    const campo = document.getElementById(c.id);
+                    if (!campo) return;
+                    const ok = textoClinicoValido(campo.value, c.palabras, c.min);
+                    const err = document.getElementById('err-' + c.id);
+                    if (err) err.classList.toggle('hidden', ok);
+                    campo.classList.toggle('border-rose-500', !ok);
+                    if (!ok && !primeroInvalido) primeroInvalido = campo;
+                });
+                if (primeroInvalido) {
+                    ev.preventDefault();
+                    primeroInvalido.focus();
+                    primeroInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        });
     </script>
 </body>
 </html>

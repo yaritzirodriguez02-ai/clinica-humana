@@ -2,6 +2,7 @@ package com.clinicahumana.clinica_humana.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import com.clinicahumana.clinica_humana.validation.TextoCoherente;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -69,6 +70,7 @@ public class ExpedientePediatrico {
     // Columna física 1 en MySQL (diagnostico_medico)
     @NotBlank(message = "El diagnóstico médico es obligatorio")
     @Size(min = 5, max = 1000, message = "El diagnóstico debe tener entre 5 y 1000 caracteres")
+    @TextoCoherente
     @Column(name = "diagnostico_medico", columnDefinition = "TEXT", nullable = false)
     private String diagnostico;
 
@@ -77,10 +79,12 @@ public class ExpedientePediatrico {
     private String diagnosticoCompatibilidad;
 
     @NotBlank(message = "El tratamiento indicado es obligatorio")
+    @TextoCoherente
     @Column(name = "tratamiento", columnDefinition = "TEXT")
     private String tratamiento;
 
     @NotBlank(message = "La receta médica es obligatoria")
+    @TextoCoherente
     @Lob
     @Column(name = "receta_medica", columnDefinition = "TEXT", nullable = false)
     private String recetaMedica;
@@ -89,7 +93,7 @@ public class ExpedientePediatrico {
     @Column(name = "pizarron_dibujo_base64", columnDefinition = "LONGTEXT")
     private String pizarronDibujoBase64;
 
-    @NotBlank(message = "La firma médica es obligatoria")
+    // La obligatoriedad de la firma (digital o "FIRMA EN FÍSICO") se valida en ConsultaController
     @Lob
     @Column(name = "firma_medico_base64", columnDefinition = "LONGTEXT", nullable = false)
     private String firmaMedicoBase64;

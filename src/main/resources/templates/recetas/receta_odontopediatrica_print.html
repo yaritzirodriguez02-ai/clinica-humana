@@ -234,9 +234,13 @@
 
     <!-- Firma Digital trazada o línea de firma -->
     <div class="firma-container">
-      <img th:if="${receta.firmaBase64 != null and !receta.firmaBase64.isEmpty()}" 
+      <img th:if="${receta.firmaBase64 != null and #strings.startsWith(receta.firmaBase64, 'data:')}"
            th:src="${receta.firmaBase64}" style="max-height:35px;max-width:115px;object-fit:contain" alt="Firma Médica" />
-      <div th:unless="${receta.firmaBase64 != null and !receta.firmaBase64.isEmpty()}" style="width:90px;border-bottom:1px solid #2b4aa0;margin-top:14px"></div>
+      <div th:if="${#strings.equals(receta.firmaBase64, 'FIRMA EN FÍSICO')}"
+           style="font-size:9px;font-weight:bold;letter-spacing:0.3px;color:#2b4aa0;text-align:center;border:1px dashed #2b4aa0;padding:2px 4px;white-space:nowrap">
+        FIRMA EN FÍSICO
+      </div>
+      <div th:unless="${receta.firmaBase64 != null and (#strings.startsWith(receta.firmaBase64, 'data:') or #strings.equals(receta.firmaBase64, 'FIRMA EN FÍSICO'))}" style="width:90px;border-bottom:1px solid #2b4aa0;margin-top:14px"></div>
     </div>
 
     <!-- Sobre + correo -->
