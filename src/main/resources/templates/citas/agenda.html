@@ -137,7 +137,8 @@
                                     <span class="text-[11px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
                                         <i class="fa-solid fa-check-double"></i> Atendida
                                     </span>
-                                    <a th:href="@{/recetas/nueva/{id}(id=${c.idCita})}"
+                                    <a th:if="${usuarioActual != null and usuarioActual.rol != 'RECEPCIONISTA'}"
+                                       th:href="@{/recetas/nueva/{id}(id=${c.idCita})}"
                                        class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
                                         <i class="fa-solid fa-file-prescription"></i> Receta
                                     </a>

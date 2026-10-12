@@ -24,6 +24,9 @@ public class SecurityConfig {
                 // Recursos estáticos públicos
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/portal-citas/**").permitAll()
                 
+                // Panel de administración y gestión de personal: EXCLUSIVO de ADMIN
+                .requestMatchers("/admin/**", "/empleados/**").hasRole("ADMIN")
+
                 // Módulo CU01 (Pacientes y Tutores): Acceso para todos los roles autorizados
                 .requestMatchers("/pacientes/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOPEDIATRA")
                 
@@ -36,7 +39,13 @@ public class SecurityConfig {
                 // Módulo CU04 (Consulta Odontopediátrica): Odontopediatra y Admin
                 .requestMatchers("/consultas/odontopediatria/**").hasAnyRole("ODONTOPEDIATRA", "ADMIN")
                 
-                // Módulo CU06 (Cobros, Caja y Corte): Habilitado para RECEPCIÓN, ADMIN y MÉDICOS (evita el 403)
+                // Apertura de expediente desde la agenda (/consultas/atender/{id}): solo personal médico
+                .requestMatchers("/consultas/atender/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
+
+                // Recetas médicas: solo personal médico (Recepción no emite recetas)
+                .requestMatchers("/recetas/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
+
+                // Módulo CU06 (Cobros, Caja y Corte): RECEPCIÓN, ADMIN y MÉDICOS
                 .requestMatchers("/pagos/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOPEDIATRA")
                 
                 // El resto de rutas requiere sesión iniciada
@@ -61,7 +70,8 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
             )
-            .csrf(csrf -> csrf.disable())
+            // CSRF queda ACTIVO (protección por defecto de Spring Security); los formularios
+            // Thymeleaf con th:action envían el token _csrf automáticamente
             .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
