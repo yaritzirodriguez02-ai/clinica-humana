@@ -107,12 +107,6 @@
             </div>
         </div>
 
-        <div th:if="${esAdmin or esPediatra}" class="mt-6 flex justify-end">
-            <a th:href="@{/consultas/pediatria/expediente/nuevo/{idPaciente}(idPaciente=${idPaciente})}"
-               class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2 shadow">
-                <i class="fa-solid fa-plus"></i> Nueva Atención Pediátrica
-            </a>
-        </div>
     </section>
 
     <!-- Historia Odontopediátrica -->
@@ -183,12 +177,6 @@
             </div>
         </div>
 
-        <div th:if="${esAdmin or esOdontopediatra or esRecepcionista}" class="mt-6 flex justify-end">
-            <a th:href="@{/consultas/odontopediatria/expediente/nuevo/{idPaciente}(idPaciente=${idPaciente})}"
-               class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition flex items-center gap-2 shadow">
-                <i class="fa-solid fa-plus"></i> Nueva Atención Odontopediátrica
-            </a>
-        </div>
     </section>
 
     <p class="text-xs text-slate-400 text-center pt-4 border-t border-slate-200">

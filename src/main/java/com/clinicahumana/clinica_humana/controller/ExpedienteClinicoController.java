@@ -1,11 +1,8 @@
 package com.clinicahumana.clinica_humana.controller;
 
-import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
 import com.clinicahumana.clinica_humana.model.ExpedientePediatrico;
-import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.service.ClinicoYPagosService;
-import com.clinicahumana.clinica_humana.service.PacienteService;
 import com.clinicahumana.clinica_humana.model.Usuario;
 import com.clinicahumana.clinica_humana.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -17,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/consultas")
@@ -29,47 +24,14 @@ public class ExpedienteClinicoController {
     private ClinicoYPagosService clinicoService;
 
     @Autowired
-    private PacienteService pacienteService;
+    private UsuarioService usuarioService;
 
     @Autowired
-    private UsuarioService usuarioService;
+    private PacienteService pacienteService;
 
     // ===================== PEDIATRÍA =====================
 
-    @GetMapping("/pediatria/expediente/nuevo/{idPaciente}")
-    public String formularioNuevoExpedientePediatrico(@PathVariable Long idPaciente,
-                                                      Principal principal,
-                                                      Model model,
-                                                      RedirectAttributes redirectAttributes) {
-        if (!pacienteService.buscarPorId(idPaciente).isPresent()) {
-            redirectAttributes.addFlashAttribute("mensajeError", "El paciente no existe.");
-            return "redirect:/pacientes";
-        }
-
-        Usuario medico = obtenerMedicoAsignado(principal, "PEDIATRA");
-        if (medico == null) {
-            redirectAttributes.addFlashAttribute("mensajeError", "No tienes permiso para esta operación.");
-            return "redirect:/citas";
-        }
-
-        List<Cita> citasDisponibles = clinicoService.obtenerCitasDisponiblesParaExpedientePediatrico(idPaciente);
-        if (citasDisponibles.isEmpty()) {
-            model.addAttribute("sinCitasDisponibles", true);
-        }
-
-        ExpedientePediatrico exp = new ExpedientePediatrico();
-        exp.setPaciente(new Paciente());
-        exp.setCita(new Cita());
-        exp.setMedico(new Usuario());
-        model.addAttribute("expediente", exp);
-        model.addAttribute("idPaciente", idPaciente);
-        model.addAttribute("citasDisponibles", citasDisponibles);
-        model.addAttribute("medico", medico);
-        model.addAttribute("tituloFormulario", "Nueva Atención Pediátrica");
-        model.addAttribute("urlAction", "/consultas/pediatria/expediente/guardar");
-        model.addAttribute("linkVolver", "/pacientes/expediente/" + idPaciente);
-        return "consultas/expediente_pediatrico_form";
-    }
+    // ===================== PEDIATRÍA =====================
 
     @PostMapping("/pediatria/expediente/guardar")
     public String guardarExpedientePediatrico(@Valid @ModelAttribute("expediente") ExpedientePediatrico expediente,
@@ -93,7 +55,7 @@ public class ExpedienteClinicoController {
         }
 
         Cita cita = citaOpt.get();
-        if (!idPaciente.equals(cita.getPaciente().getIdPaciente())) {
+        if (idPaciente != null && !idPaciente.equals(cita.getPaciente().getIdPaciente())) {
             result.rejectValue("cita", "", "La cita seleccionada no corresponde al paciente indicado.");
             return "consultas/expediente_pediatrico_form";
         }
@@ -134,6 +96,7 @@ public class ExpedienteClinicoController {
 
         model.addAttribute("expediente", exp);
         model.addAttribute("tituloFormulario", "Editar Atención Pediátrica");
+
         model.addAttribute("urlAction", "/consultas/pediatria/expediente/actualizar");
         model.addAttribute("linkVolver", "/pacientes/expediente/" + exp.getPaciente().getIdPaciente());
         return "consultas/expediente_pediatrico_form";
@@ -193,41 +156,6 @@ public class ExpedienteClinicoController {
 
     // ===================== ODONTOPEDIATRÍA =====================
 
-    @GetMapping("/odontopediatria/expediente/nuevo/{idPaciente}")
-    public String formularioNuevoExpedienteOdontopediatrico(@PathVariable Long idPaciente,
-                                                            Principal principal,
-                                                            Model model,
-                                                            RedirectAttributes redirectAttributes) {
-        if (!pacienteService.buscarPorId(idPaciente).isPresent()) {
-            redirectAttributes.addFlashAttribute("mensajeError", "El paciente no existe.");
-            return "redirect:/pacientes";
-        }
-
-        Usuario medico = obtenerMedicoAsignado(principal, "ODONTOPEDIATRA");
-        if (medico == null) {
-            redirectAttributes.addFlashAttribute("mensajeError", "No tienes permiso para esta operación.");
-            return "redirect:/citas";
-        }
-
-        List<Cita> citasDisponibles = clinicoService.obtenerCitasDisponiblesParaExpedienteOdontopediatrico(idPaciente);
-        if (citasDisponibles.isEmpty()) {
-            model.addAttribute("sinCitasDisponibles", true);
-        }
-
-        ExpedienteOdontopediatrico exp = new ExpedienteOdontopediatrico();
-        exp.setPaciente(new Paciente());
-        exp.setCita(new Cita());
-        exp.setMedico(new Usuario());
-        model.addAttribute("expediente", exp);
-        model.addAttribute("idPaciente", idPaciente);
-        model.addAttribute("citasDisponibles", citasDisponibles);
-        model.addAttribute("medico", medico);
-        model.addAttribute("tituloFormulario", "Nueva Atención Odontopediátrica");
-        model.addAttribute("urlAction", "/consultas/odontopediatria/expediente/guardar");
-        model.addAttribute("linkVolver", "/pacientes/expediente/" + idPaciente);
-        return "consultas/expediente_odontopediatrico_form";
-    }
-
     @PostMapping("/odontopediatria/expediente/guardar")
     public String guardarExpedienteOdontopediatrico(@Valid @ModelAttribute("expediente") ExpedienteOdontopediatrico expediente,
                                                    BindingResult result,
@@ -250,7 +178,7 @@ public class ExpedienteClinicoController {
         }
 
         Cita cita = citaOpt.get();
-        if (!idPaciente.equals(cita.getPaciente().getIdPaciente())) {
+        if (idPaciente != null && !idPaciente.equals(cita.getPaciente().getIdPaciente())) {
             result.rejectValue("cita", "", "La cita seleccionada no corresponde al paciente indicado.");
             return "consultas/expediente_odontopediatrico_form";
         }
@@ -291,6 +219,7 @@ public class ExpedienteClinicoController {
 
         model.addAttribute("expediente", exp);
         model.addAttribute("tituloFormulario", "Editar Atención Odontopediátrica");
+
         model.addAttribute("urlAction", "/consultas/odontopediatria/expediente/actualizar");
         model.addAttribute("linkVolver", "/pacientes/expediente/" + exp.getPaciente().getIdPaciente());
         return "consultas/expediente_odontopediatrico_form";

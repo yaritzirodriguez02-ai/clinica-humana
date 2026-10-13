@@ -43,20 +43,6 @@
     <form th:action="${urlAction}" th:object="${expediente}" method="post" class="space-y-6">
         <input type="hidden" th:field="*{idExpedienteOdonto}" />
         <input type="hidden" name="idPaciente" th:value="${idPaciente}" />
-        <div th:if="${expediente.idExpedienteOdonto == null}" class="mb-4">
-            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Cita asociada *</label>
-            <select th:field="*{cita.idCita}" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500">
-                <option value="">-- Seleccione una cita --</option>
-                <option th:each="c : ${citasDisponibles}"
-                    th:value="${c.idCita}"
-                    th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy') + ' ' + c.hora + ' - ' + (c.paciente?.nombre != null ? (c.paciente.nombre + ' ' + c.paciente.apellidos) : '')}"
-                    th:title="${c.paciente?.nombre != null ? (c.paciente.nombre + ' ' + c.paciente.apellidos) : ''}">
-            </option>
-            </select>
-            <span th:if="${sinCitasDisponibles}" class="text-xs text-rose-600 mt-1 block">
-                <i class="fa-solid fa-circle-exclamation"></i> No hay citas disponibles para registrar un nuevo expediente. Si desea crear uno, agende una cita primero.
-            </span>
-        </div>
         <input type="hidden" th:if="${expediente.idExpedienteOdonto != null}" th:field="*{cita.idCita}" />
         <input type="hidden" th:field="*{paciente.idPaciente}" />
         <input type="hidden" th:field="*{medico.idUsuario}" />

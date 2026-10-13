@@ -5,8 +5,8 @@ import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
 import com.clinicahumana.clinica_humana.model.ExpedientePediatrico;
 import com.clinicahumana.clinica_humana.model.Pago;
 import com.clinicahumana.clinica_humana.repository.CitaRepository;
-import com.clinicahumana.clinica_humana.repository.ExpedienteOdontopediatricoRepository;
 import com.clinicahumana.clinica_humana.repository.ExpedientePediatricoRepository;
+import com.clinicahumana.clinica_humana.repository.ExpedienteOdontopediatricoRepository;
 import com.clinicahumana.clinica_humana.repository.PagoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -147,14 +147,6 @@ public class ClinicoYPagosService {
         return expPediatricoRepo.save(exp);
     }
 
-    public List<Cita> obtenerCitasDisponiblesParaExpedientePediatrico(Long idPaciente) {
-        List<Cita> citas = citaRepo.findByPacienteIdPaciente(idPaciente);
-        return citas.stream()
-                .filter(c -> ("PROGRAMADA".equals(c.getEstado()) || "COMPLETADA".equals(c.getEstado())))
-                .filter(c -> !expPediatricoRepo.findByCitaIdCita(c.getIdCita()).isPresent())
-                .collect(Collectors.toList());
-    }
-
     public Optional<ExpedienteOdontopediatrico> buscarExpedienteOdontopediatricoPorCita(Long idCita) {
         return expOdontoRepo.findByCitaIdCita(idCita);
     }
@@ -172,13 +164,5 @@ public class ClinicoYPagosService {
     @Transactional
     public ExpedienteOdontopediatrico actualizarExpedienteOdontopediatrico(ExpedienteOdontopediatrico exp) {
         return expOdontoRepo.save(exp);
-    }
-
-    public List<Cita> obtenerCitasDisponiblesParaExpedienteOdontopediatrico(Long idPaciente) {
-        List<Cita> citas = citaRepo.findByPacienteIdPaciente(idPaciente);
-        return citas.stream()
-                .filter(c -> ("PROGRAMADA".equals(c.getEstado()) || "COMPLETADA".equals(c.getEstado())))
-                .filter(c -> !expOdontoRepo.findByCitaIdCita(c.getIdCita()).isPresent())
-                .collect(Collectors.toList());
     }
 }
