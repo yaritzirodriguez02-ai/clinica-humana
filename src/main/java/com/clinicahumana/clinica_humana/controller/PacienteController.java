@@ -1,7 +1,10 @@
 package com.clinicahumana.clinica_humana.controller;
 
+import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
+import com.clinicahumana.clinica_humana.model.ExpedientePediatrico;
 import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.model.Tutor;
+import com.clinicahumana.clinica_humana.service.ClinicoYPagosService;
 import com.clinicahumana.clinica_humana.service.PacienteService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -19,6 +24,9 @@ public class PacienteController {
 
     @Autowired
     private PacienteService pacienteService;
+
+    @Autowired
+    private ClinicoYPagosService clinicoService;
 
     // Listar todos los pacientes con opción de búsqueda (RF02)
     @GetMapping
@@ -32,6 +40,35 @@ public class PacienteController {
         model.addAttribute("pacientes", lista);
         model.addAttribute("buscar", buscar);
         return "pacientes/lista_pacientes";
+    }
+
+    // Historial clínico completo del paciente (pediátrico + odontopediátrico) ordenado cronológicamente
+    @GetMapping("/expediente/{idPaciente}")
+    public String verExpedientePaciente(@PathVariable("idPaciente") Long idPaciente,
+                                        Model model,
+                                        RedirectAttributes redirectAttributes) {
+        if (!pacienteService.buscarPorId(idPaciente).isPresent()) {
+            redirectAttributes.addFlashAttribute("mensajeError", "El paciente solicitado no existe.");
+            return "redirect:/pacientes";
+        }
+
+        List<ExpedientePediatrico> historiaPediatrica =
+                clinicoService.obtenerHistorialPediatrico(idPaciente);
+        List<ExpedienteOdontopediatrico> historiaOdontopediatrica =
+                clinicoService.obtenerHistorialOdontopediatrico(idPaciente);
+
+        // Orden cronológico (del más antiguo al más reciente)
+        List<ExpedientePediatrico> pediatraCronologica = new ArrayList<>(historiaPediatrica);
+        Collections.reverse(pediatraCronologica);
+        List<ExpedienteOdontopediatrico> odontoCronologica = new ArrayList<>(historiaOdontopediatrica);
+        Collections.reverse(odontoCronologica);
+
+        model.addAttribute("historiaPediatrica", historiaPediatrica);
+        model.addAttribute("historiaOdontopediatrica", historiaOdontopediatrica);
+        model.addAttribute("historiaPediatricaCronologica", pediatraCronologica);
+        model.addAttribute("historiaOdontopediatricaCronologica", odontoCronologica);
+
+        return "pacientes/ver_expediente";
     }
 
     // Mostrar formulario de nuevo paciente (RF01, RF03)

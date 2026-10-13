@@ -99,8 +99,12 @@
                             </td>
                             <td class="py-3 px-4 font-mono text-slate-700" th:text="${p.tutor.telefono}">7471234567</td>
                             <td class="py-3 px-4 text-center">
-                                <a th:href="@{/pacientes/editar/{id}(id=${p.idPaciente})}" 
+                                <a th:href="@{/pacientes/expediente/{id}(id=${p.idPaciente})}" 
                                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-file-lines"></i> Ver Expediente
+                                </a>
+                                <a th:href="@{/pacientes/editar/{id}(id=${p.idPaciente})}" 
+                                   class="text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 p-2 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
                                     <i class="fa-solid fa-pen-to-square"></i> Editar
                                 </a>
                             </td>

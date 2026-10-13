@@ -138,6 +138,13 @@
         </form>
     </main>
 
+    <style>
+        @media print {
+            #avisoFirmaFisica { display: none !important; }
+            #chkFirmaFisica, label[for="chkFirmaFisica"] { display: none !important; }
+            #canvasFirma { opacity: 1 !important; pointer-events: auto !important; }
+        }
+    </style>
     <script>
         const canvas = document.getElementById('canvasFirma');
         const ctx = canvas.getContext('2d');

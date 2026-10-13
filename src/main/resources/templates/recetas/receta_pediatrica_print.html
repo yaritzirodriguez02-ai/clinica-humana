@@ -273,14 +273,12 @@
     </svg>
     <div class="t" style="left:1039px;top:731px;font-size:14px;font-weight:bold">Firma</div>
 
-    <!-- Apartado de Firma: Muestra la firma digital si existe; si no, deja la línea para firma -->
+    <!-- Apartado de Firma: firma digital trazada o espacio para firma física (sin texto) -->
     <div class="firma-container">
       <img th:if="${receta.firmaBase64 != null and #strings.startsWith(receta.firmaBase64, 'data:')}"
            th:src="${receta.firmaBase64}" style="max-height:55px;max-width:200px;object-fit:contain" alt="Firma Médica Digital" />
-      <div th:if="${#strings.equals(receta.firmaBase64, 'FIRMA EN FÍSICO')}"
-           style="font-size:13px;font-weight:bold;letter-spacing:0.5px;color:#000;text-align:center;border:1px dashed #000;padding:4px 8px;white-space:nowrap;margin-top:18px">
-        FIRMA EN FÍSICO
-      </div>
+      <!-- Firma física: solo espacio (línea) para que la especialista firme en el documento impreso -->
+      <div th:if="${#strings.equals(receta.firmaBase64, 'FIRMA EN FÍSICO')}" style="width:180px;border-bottom:1px solid #000;margin-top:28px"></div>
       <div th:unless="${receta.firmaBase64 != null and (#strings.startsWith(receta.firmaBase64, 'data:') or #strings.equals(receta.firmaBase64, 'FIRMA EN FÍSICO'))}" style="width:180px;border-bottom:1px solid #000;margin-top:28px"></div>
     </div>
 
