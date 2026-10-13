@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.controller;
 
+import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
 import com.clinicahumana.clinica_humana.model.ExpedientePediatrico;
 import com.clinicahumana.clinica_humana.service.ClinicoYPagosService;
@@ -25,11 +26,6 @@ public class ExpedienteClinicoController {
 
     @Autowired
     private UsuarioService usuarioService;
-
-    @Autowired
-    private PacienteService pacienteService;
-
-    // ===================== PEDIATRÍA =====================
 
     // ===================== PEDIATRÍA =====================
 
