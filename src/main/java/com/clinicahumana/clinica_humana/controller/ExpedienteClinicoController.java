@@ -59,6 +59,7 @@ public class ExpedienteClinicoController {
 
         ExpedientePediatrico exp = new ExpedientePediatrico();
         exp.setPaciente(new Paciente());
+        exp.setCita(new Cita());
         exp.setMedico(new Usuario());
         model.addAttribute("expediente", exp);
         model.addAttribute("idPaciente", idPaciente);
@@ -215,6 +216,7 @@ public class ExpedienteClinicoController {
 
         ExpedienteOdontopediatrico exp = new ExpedienteOdontopediatrico();
         exp.setPaciente(new Paciente());
+        exp.setCita(new Cita());
         exp.setMedico(new Usuario());
         model.addAttribute("expediente", exp);
         model.addAttribute("idPaciente", idPaciente);
