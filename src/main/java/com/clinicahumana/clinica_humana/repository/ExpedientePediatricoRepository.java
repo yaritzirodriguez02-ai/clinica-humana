@@ -9,5 +9,10 @@ import java.util.Optional;
 @Repository
 public interface ExpedientePediatricoRepository extends JpaRepository<ExpedientePediatrico, Long> {
     Optional<ExpedientePediatrico> findByCitaIdCita(Long idCita);
+
     List<ExpedientePediatrico> findByPacienteIdPacienteOrderByFechaAtencionDesc(Long idPaciente);
+
+    List<ExpedientePediatrico> findByPacienteIdPacienteAndMedicoIdUsuarioOrderByFechaAtencionDesc(Long idPaciente, Long idMedico);
+
+    boolean existsByPacienteIdPacienteAndIdExpedientePed(Long idPaciente, Long idExpedientePed);
 }

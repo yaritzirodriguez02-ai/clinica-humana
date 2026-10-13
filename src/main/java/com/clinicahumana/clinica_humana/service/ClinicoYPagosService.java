@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ClinicoYPagosService {
@@ -54,6 +56,19 @@ public class ClinicoYPagosService {
         return expPediatricoRepo.findByPacienteIdPacienteOrderByFechaAtencionDesc(idPaciente);
     }
 
+    public List<ExpedientePediatrico> obtenerHistorialPediatricoPorMedico(Long idPaciente, Long idMedico) {
+        return expPediatricoRepo.findByPacienteIdPacienteAndMedicoIdUsuarioOrderByFechaAtencionDesc(idPaciente, idMedico);
+    }
+
+    public Optional<ExpedientePediatrico> obtenerExpedientePediatricoPorId(Long idExpedientePed) {
+        return expPediatricoRepo.findById(idExpedientePed);
+    }
+
+    @Transactional
+    public void eliminarExpedientePediatrico(Long idExpedientePed) {
+        expPediatricoRepo.deleteById(idExpedientePed);
+    }
+
     // CU04: Guardar Consulta Dental Odontopediátrica y marcar cita completada
     @Transactional
     public ExpedienteOdontopediatrico guardarConsultaOdontopediatrica(ExpedienteOdontopediatrico exp) {
@@ -77,6 +92,19 @@ public class ClinicoYPagosService {
         return expOdontoRepo.findByPacienteIdPacienteOrderByFechaAtencionDesc(idPaciente);
     }
 
+    public List<ExpedienteOdontopediatrico> obtenerHistorialOdontopediatricoPorMedico(Long idPaciente, Long idMedico) {
+        return expOdontoRepo.findByPacienteIdPacienteAndMedicoIdUsuarioOrderByFechaAtencionDesc(idPaciente, idMedico);
+    }
+
+    public Optional<ExpedienteOdontopediatrico> obtenerExpedienteOdontopediatricoPorId(Long idExpedienteOdonto) {
+        return expOdontoRepo.findById(idExpedienteOdonto);
+    }
+
+    @Transactional
+    public void eliminarExpedienteOdontopediatrico(Long idExpedienteOdonto) {
+        expOdontoRepo.deleteById(idExpedienteOdonto);
+    }
+
     // CU06: Registro de Cobro y cálculo de IVA
     @Transactional
     public Pago registrarPago(Pago pago) {
@@ -94,5 +122,63 @@ public class ClinicoYPagosService {
     // CU07: Consultas para Reportes
     public List<Pago> obtenerPagosPorMedico(Long idMedico) {
         return pagoRepo.findByMedicoIdUsuario(idMedico);
+    }
+
+    public Optional<Cita> buscarCitaPorId(Long idCita) {
+        return citaRepo.findById(idCita);
+    }
+
+    public Optional<ExpedientePediatrico> buscarExpedientePediatricoPorCita(Long idCita) {
+        return expPediatricoRepo.findByCitaIdCita(idCita);
+    }
+
+    @Transactional
+    public ExpedientePediatrico guardarExpedientePediatricoDesdeCrud(ExpedientePediatrico exp, Cita cita) {
+        cita.setEstado("COMPLETADA");
+        citaRepo.save(cita);
+        exp.setCita(cita);
+        exp.setPaciente(cita.getPaciente());
+        exp.setMedico(cita.getMedico());
+        return expPediatricoRepo.save(exp);
+    }
+
+    @Transactional
+    public ExpedientePediatrico actualizarExpedientePediatrico(ExpedientePediatrico exp) {
+        return expPediatricoRepo.save(exp);
+    }
+
+    public List<Cita> obtenerCitasDisponiblesParaExpedientePediatrico(Long idPaciente) {
+        List<Cita> citas = citaRepo.findByPacienteIdPaciente(idPaciente);
+        return citas.stream()
+                .filter(c -> ("PROGRAMADA".equals(c.getEstado()) || "COMPLETADA".equals(c.getEstado())))
+                .filter(c -> !expPediatricoRepo.findByCitaIdCita(c.getIdCita()).isPresent())
+                .collect(Collectors.toList());
+    }
+
+    public Optional<ExpedienteOdontopediatrico> buscarExpedienteOdontopediatricoPorCita(Long idCita) {
+        return expOdontoRepo.findByCitaIdCita(idCita);
+    }
+
+    @Transactional
+    public ExpedienteOdontopediatrico guardarExpedienteOdontopediatricoDesdeCrud(ExpedienteOdontopediatrico exp, Cita cita) {
+        cita.setEstado("COMPLETADA");
+        citaRepo.save(cita);
+        exp.setCita(cita);
+        exp.setPaciente(cita.getPaciente());
+        exp.setMedico(cita.getMedico());
+        return expOdontoRepo.save(exp);
+    }
+
+    @Transactional
+    public ExpedienteOdontopediatrico actualizarExpedienteOdontopediatrico(ExpedienteOdontopediatrico exp) {
+        return expOdontoRepo.save(exp);
+    }
+
+    public List<Cita> obtenerCitasDisponiblesParaExpedienteOdontopediatrico(Long idPaciente) {
+        List<Cita> citas = citaRepo.findByPacienteIdPaciente(idPaciente);
+        return citas.stream()
+                .filter(c -> ("PROGRAMADA".equals(c.getEstado()) || "COMPLETADA".equals(c.getEstado())))
+                .filter(c -> !expOdontoRepo.findByCitaIdCita(c.getIdCita()).isPresent())
+                .collect(Collectors.toList());
     }
 }

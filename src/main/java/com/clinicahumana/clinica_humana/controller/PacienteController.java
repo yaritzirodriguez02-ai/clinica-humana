@@ -4,8 +4,10 @@ import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
 import com.clinicahumana.clinica_humana.model.ExpedientePediatrico;
 import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.model.Tutor;
+import com.clinicahumana.clinica_humana.model.Usuario;
 import com.clinicahumana.clinica_humana.service.ClinicoYPagosService;
 import com.clinicahumana.clinica_humana.service.PacienteService;
+import com.clinicahumana.clinica_humana.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +30,9 @@ public class PacienteController {
 
     @Autowired
     private ClinicoYPagosService clinicoService;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     // Listar todos los pacientes con opción de búsqueda (RF02)
     @GetMapping
@@ -45,6 +51,7 @@ public class PacienteController {
     // Historial clínico completo del paciente (pediátrico + odontopediátrico) ordenado cronológicamente
     @GetMapping("/expediente/{idPaciente}")
     public String verExpedientePaciente(@PathVariable("idPaciente") Long idPaciente,
+                                        Principal principal,
                                         Model model,
                                         RedirectAttributes redirectAttributes) {
         if (!pacienteService.buscarPorId(idPaciente).isPresent()) {
@@ -52,12 +59,37 @@ public class PacienteController {
             return "redirect:/pacientes";
         }
 
-        List<ExpedientePediatrico> historiaPediatrica =
-                clinicoService.obtenerHistorialPediatrico(idPaciente);
-        List<ExpedienteOdontopediatrico> historiaOdontopediatrica =
-                clinicoService.obtenerHistorialOdontopediatrico(idPaciente);
+        Paciente paciente = pacienteService.buscarPorId(idPaciente).orElseThrow();
+        model.addAttribute("paciente", paciente);
 
-        // Orden cronológico (del más antiguo al más reciente)
+        Usuario usuarioActual = usuarioService.buscarPorUsername(principal != null ? principal.getName() : "").orElse(null);
+        String rol = usuarioActual != null ? usuarioActual.getRol() : "";
+        boolean esAdmin = "ADMIN".equals(rol);
+        boolean esPediatra = "PEDIATRA".equals(rol);
+        boolean esOdontopediatra = "ODONTOPEDIATRA".equals(rol);
+        boolean esRecepcionista = "RECEPCIONISTA".equals(rol);
+
+        model.addAttribute("rolUsuario", rol);
+        model.addAttribute("esAdmin", esAdmin);
+        model.addAttribute("esPediatra", esPediatra);
+        model.addAttribute("esOdontopediatra", esOdontopediatra);
+        model.addAttribute("esRecepcionista", esRecepcionista);
+        model.addAttribute("idPaciente", idPaciente);
+
+        List<ExpedientePediatrico> historiaPediatrica;
+        List<ExpedienteOdontopediatrico> historiaOdontopediatrica;
+
+        if (esPediatra) {
+            historiaPediatrica = clinicoService.obtenerHistorialPediatricoPorMedico(idPaciente, usuarioActual.getIdUsuario());
+            historiaOdontopediatrica = List.of();
+        } else if (esOdontopediatra || esRecepcionista) {
+            historiaPediatrica = List.of();
+            historiaOdontopediatrica = clinicoService.obtenerHistorialOdontopediatricoPorMedico(idPaciente, usuarioActual.getIdUsuario());
+        } else {
+            historiaPediatrica = clinicoService.obtenerHistorialPediatrico(idPaciente);
+            historiaOdontopediatrica = clinicoService.obtenerHistorialOdontopediatrico(idPaciente);
+        }
+
         List<ExpedientePediatrico> pediatraCronologica = new ArrayList<>(historiaPediatrica);
         Collections.reverse(pediatraCronologica);
         List<ExpedienteOdontopediatrico> odontoCronologica = new ArrayList<>(historiaOdontopediatrica);
