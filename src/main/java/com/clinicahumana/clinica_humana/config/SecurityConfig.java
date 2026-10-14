@@ -23,6 +23,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Recursos estáticos públicos
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/portal-citas/**").permitAll()
+
+                // Portal Público de Citas para Tutores (agendamiento en línea SIN sesión):
+                // incluye /public/agendar-cita y sus endpoints JSON de médicos y horarios ocupados
+                .requestMatchers("/public/**").permitAll()
                 
                 // Panel de administración y gestión de personal: EXCLUSIVO de ADMIN
                 .requestMatchers("/admin/**", "/empleados/**").hasRole("ADMIN")

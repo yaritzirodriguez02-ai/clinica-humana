@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar Cita en Línea - Clínica Humana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans pb-12">
+
+    <!-- Encabezado del Portal Público -->
+    <header class="bg-indigo-900 text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-700 rounded-lg flex items-center justify-center text-indigo-200">
+                    <i class="fa-solid fa-hospital-user text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold leading-tight">Clínica Humana</h1>
+                    <span class="text-xs text-indigo-300">Portal de Citas en Línea para Padres y Tutores</span>
+                </div>
+            </div>
+            <a th:href="@{/login}" class="text-xs bg-indigo-800 hover:bg-indigo-700 px-3 py-1.5 rounded-lg border border-indigo-600 transition">
+                <i class="fa-solid fa-user-lock"></i> Acceso Personal Médico
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 mt-8">
+
+        <!-- Mensajes Flash -->
+        <div th:if="${mensajeExito}" class="mb-6 p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 rounded-lg shadow-sm flex items-start gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>
+            <span th:text="${mensajeExito}"></span>
+        </div>
+        <div th:if="${mensajeError}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 text-rose-800 rounded-lg shadow-sm flex items-start gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600 mt-0.5"></i>
+            <span th:text="${mensajeError}"></span>
+        </div>
+
+        <!-- Tarjeta del Formulario -->
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
+            <div class="mb-6 text-center border-b border-slate-100 pb-4">
+                <h2 class="text-2xl font-black text-slate-900">Agendar Cita Médica o Dental</h2>
+                <p class="text-xs text-slate-500 mt-1">Completa los datos del menor y del tutor legal para reservar tu turno. No se requiere cuenta ni contraseña.</p>
+            </div>
+
+            <form id="formPortalCita" th:action="@{/public/agendar-cita}" method="post" class="space-y-6">
+
+                <!-- PASO 1: DATOS DEL PACIENTE (INFANTE) -->
+                <div>
+                    <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center text-[10px]">1</span>
+                        Datos del Paciente (Infante)
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nombre(s) *</label>
+                            <input type="text" name="nombrePaciente" required maxlength="100" placeholder="Nombre del infante"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Apellidos *</label>
+                            <input type="text" name="apellidosPaciente" required maxlength="100" placeholder="Apellidos"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">CURP del Niño(a) *</label>
+                            <input type="text" id="campoCurp" name="curp" required maxlength="18" placeholder="Ej. AAAA000000HGRNNN00"
+                                   class="w-full uppercase font-mono px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                            <span class="text-[10px] text-slate-400">18 caracteres oficiales. Si el paciente ya tiene citas anteriores, use la misma CURP.</span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fecha de Nacimiento *</label>
+                            <input type="date" name="fechaNacimiento" required
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Sexo *</label>
+                            <select name="sexo" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                                <option value="">-- Selecciona --</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 2: DATOS DEL TUTOR LEGAL -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center text-[10px]">2</span>
+                        Datos del Tutor Legal
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nombre del Tutor *</label>
+                            <input type="text" name="nombreTutor" required maxlength="100" placeholder="Ej. Juan / María"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Apellidos del Tutor *</label>
+                            <input type="text" name="apellidosTutor" required maxlength="100" placeholder="Apellidos completos"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Parentesco *</label>
+                            <select name="parentesco" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                                <option value="">-- Selecciona --</option>
+                                <option value="Mamá">Mamá</option>
+                                <option value="Papá">Papá</option>
+                                <option value="Tutor Legal">Tutor Legal</option>
+                                <option value="Abuelo/a">Abuelo/a</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Teléfono Móvil (10 dígitos) *</label>
+                            <input type="tel" name="telefonoTutor" required maxlength="10" placeholder="7471234567"
+                                   class="w-full font-mono px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Correo Electrónico *</label>
+                            <input type="email" name="emailTutor" required maxlength="100" placeholder="correo@ejemplo.com"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                            <span class="text-[10px] text-slate-400">Se usará para confirmaciones de la cita.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 3: ESPECIALIDAD Y MÉDICO ASIGNADO -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center text-[10px]">3</span>
+                        Especialidad y Médico Asignado
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Especialidad Requerida *</label>
+                            <select id="campoEspecialidad" name="especialidad" required
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-indigo-900 focus:ring-2 focus:ring-indigo-500">
+                                <option value="">-- Selecciona Especialidad --</option>
+                                <option value="PEDIATRIA">Pediatría General</option>
+                                <option value="ODONTOPEDIATRIA">Odontopediatría Dental</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Médico Asignado *</label>
+                            <select id="campoMedico" name="idMedico" required disabled
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100">
+                                <option value="">-- Primero elige una especialidad --</option>
+                            </select>
+                            <span class="text-[10px] text-slate-400">El listado se carga según la especialidad seleccionada.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 4: FECHA Y HORARIO -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center text-[10px]">4</span>
+                        Selector de Fecha y Horario
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Fecha Deseada *</label>
+                            <input type="date" id="campoFecha" name="fechaCita" required th:min="${hoy}"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                            <span class="text-[10px] text-slate-400">Sólo fechas vigentes (a partir de hoy).</span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Horario de Consulta *</label>
+                            <select id="campoHora" name="horaCita" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono font-bold focus:ring-2 focus:ring-indigo-500">
+                                <option value="">-- Selecciona Horario --</option>
+                                <option value="09:00">09:00 hrs</option>
+                                <option value="09:30">09:30 hrs</option>
+                                <option value="10:00">10:00 hrs</option>
+                                <option value="10:30">10:30 hrs</option>
+                                <option value="11:00">11:00 hrs</option>
+                                <option value="11:30">11:30 hrs</option>
+                                <option value="12:00">12:00 hrs</option>
+                                <option value="12:30">12:30 hrs</option>
+                                <option value="13:00">13:00 hrs</option>
+                                <option value="13:30">13:30 hrs</option>
+                                <option value="14:00">14:00 hrs</option>
+                                <option value="16:00">16:00 hrs</option>
+                                <option value="16:30">16:30 hrs</option>
+                                <option value="17:00">17:00 hrs</option>
+                                <option value="17:30">17:30 hrs</option>
+                                <option value="18:00">18:00 hrs</option>
+                                <option value="18:30">18:30 hrs</option>
+                                <option value="19:00">19:00 hrs</option>
+                            </select>
+                            <span class="text-[10px] text-slate-400">Atención de 09:00 a 19:00 hrs. Los horarios ocupados se bloquean automáticamente.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PASO 5: MOTIVO -->
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
+                        <span class="w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center text-[10px]">5</span>
+                        Motivo de la Cita
+                    </h3>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Motivo o Síntomas *</label>
+                    <textarea id="campoMotivo" name="motivo" rows="2" required minlength="10" maxlength="255"
+                              placeholder="Describe brevemente el motivo de la consulta (ej. Control de niño sano, dolor dental, fiebre persistente...)"
+                              class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                    <p id="errorMotivoCliente" class="text-xs text-rose-600 mt-1 hidden font-semibold">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        El motivo debe describir una causa real con palabras coherentes (mínimo 2 palabras).
+                    </p>
+                </div>
+
+                <!-- Acciones -->
+                <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <p class="text-[11px] text-slate-400 flex items-center gap-1">
+                        <i class="fa-solid fa-shield-heart text-emerald-500"></i>
+                        Sus datos se registran directamente en el sistema clínico.
+                    </p>
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calendar-plus"></i> Confirmar y Reservar Cita
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Pie del Portal -->
+        <footer class="mt-8 text-center text-[11px] text-slate-400">
+            <p>Clínica Humana - Pediatría &amp; Odontopediatría · Av. Lázaro Cárdenas #59, 3er Piso, Col. Haciendita, Chilpancingo, Gro.</p>
+        </footer>
+    </main>
+
+    <!-- Scripts: filtrado dinámico de médicos y bloqueo de horarios ocupados -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // CURP en mayúsculas automáticas
+            const campoCurp = document.getElementById("campoCurp");
+            campoCurp.addEventListener("input", function() {
+                this.value = this.value.toUpperCase();
+            });
+
+            // Bloqueo de fechas pasadas
+            const campoFecha = document.getElementById("campoFecha");
+            const hoy = new Date();
+            const anio = hoy.getFullYear();
+            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoy.getDate()).padStart(2, '0');
+            campoFecha.min = `${anio}-${mes}-${dia}`;
+
+            const campoEspecialidad = document.getElementById("campoEspecialidad");
+            const campoMedico = document.getElementById("campoMedico");
+            const campoHora = document.getElementById("campoHora");
+
+            // 1. Carga dinámica de médicos según la especialidad elegida
+            campoEspecialidad.addEventListener("change", async function() {
+                const esp = this.value;
+                campoMedico.innerHTML = '<option value="">-- Cargando especialistas... --</option>';
+                campoMedico.disabled = true;
+                desbloquearTodasLasHoras();
+
+                if (!esp) {
+                    campoMedico.innerHTML = '<option value="">-- Primero elige una especialidad --</option>';
+                    return;
+                }
+
+                try {
+                    const respuesta = await fetch('/public/medicos?especialidad=' + encodeURIComponent(esp));
+                    const lista = await respuesta.json();
+                    campoMedico.innerHTML = '<option value="">-- Selecciona al especialista --</option>';
+                    lista.forEach(function(m) {
+                        const opcion = document.createElement('option');
+                        opcion.value = m.id;
+                        opcion.textContent = m.nombre;
+                        campoMedico.appendChild(opcion);
+                    });
+                    campoMedico.disabled = false;
+                } catch (e) {
+                    campoMedico.innerHTML = '<option value="">-- No se pudieron cargar los especialistas --</option>';
+                }
+            });
+
+            // 2. Bloqueo de horarios ya ocupados del médico en la fecha elegida
+            async function bloquearHorariosOcupados() {
+                desbloquearTodasLasHoras();
+                const idMedico = campoMedico.value;
+                const fecha = campoFecha.value;
+                if (!idMedico || !fecha) return;
+
+                try {
+                    const respuesta = await fetch('/public/horarios-ocupados?medico=' + idMedico + '&fecha=' + fecha);
+                    const ocupados = await respuesta.json();
+                    Array.from(campoHora.options).forEach(function(opcion) {
+                        if (opcion.value && ocupados.includes(opcion.value)) {
+                            opcion.disabled = true;
+                            opcion.textContent = opcion.value + ' hrs (Ocupado)';
+                        }
+                    });
+                    // Si la hora elegida quedó ocupada, se limpia la selección
+                    if (campoHora.selectedOptions.length && campoHora.selectedOptions[0].disabled) {
+                        campoHora.value = "";
+                    }
+                } catch (e) {
+                    // Silencioso: la validación final del servidor sigue protegiendo el empalme
+                }
+            }
+
+            function desbloquearTodasLasHoras() {
+                Array.from(campoHora.options).forEach(function(opcion) {
+                    opcion.disabled = false;
+                    if (opcion.value) opcion.textContent = opcion.value + ' hrs';
+                });
+            }
+
+            campoMedico.addEventListener("change", bloquearHorariosOcupados);
+            campoFecha.addEventListener("change", bloquearHorariosOcupados);
+
+            // 3. Validación cliente anti-texto basura en el motivo (misma regla del sistema interno)
+            const form = document.getElementById("formPortalCita");
+            const campoMotivo = document.getElementById("campoMotivo");
+            const errorMotivo = document.getElementById("errorMotivoCliente");
+
+            form.addEventListener("submit", function(e) {
+                const valor = campoMotivo.value.trim();
+                const palabras = valor.split(/\s+/).filter(function(p) { return p.length > 1; });
+                const tienePalabraRara = palabras.some(function(p) {
+                    return p.length > 22 || /(.)\1{3,}/.test(p);
+                });
+
+                if (valor.length < 10 || palabras.length < 2 || tienePalabraRara) {
+                    e.preventDefault();
+                    errorMotivo.classList.remove("hidden");
+                    campoMotivo.classList.add("border-rose-500", "focus:ring-rose-500");
+                    campoMotivo.focus();
+                } else {
+                    errorMotivo.classList.add("hidden");
+                    campoMotivo.classList.remove("border-rose-500");
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
