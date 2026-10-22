@@ -29,15 +29,29 @@
             <div>
                 <!-- Vista para Dra. Pilar -->
                 <div th:if="${usuarioActual != null and usuarioActual.rol == 'PEDIATRA'}">
-                    <h2 class="text-2xl font-bold text-slate-900">Consultorio Pediátrico - Dra. Pilar Ríos</h2>
-                    <p class="text-sm text-slate-500">Gestión de consultas médicas, signos vitales y control de citas pediátricas.</p>
-                    <p class="text-[11px] uppercase tracking-widest text-blue-200 font-bold mt-1 border-t border-blue-800/60 pt-2">DRA. PILAR RÍOS - PEDIATRÍA</p>
+                    <h2 class="text-2xl font-bold text-slate-900">Consultorio Pediátrico - Dra. Pilar Guadalupe Cortés Ríos</h2>
+                    <p class="text-sm text-slate-500">Gestión de consultas médicas, signos vitales y control de citas pediátricas (bebés y menores hasta 15 años).</p>
                 </div>
                 <!-- Vista para Dra. Gloria -->
-                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOPEDIATRA'}">
-                    <h2 class="text-2xl font-extrabold uppercase tracking-wide text-slate-900">Consultorio Dental - CISO</h2>
-                    <p class="text-sm text-slate-500">Atención bucodental, procedimientos y registro de tratamientos odontopediátricos.</p>
-                    <p class="text-[11px] uppercase tracking-widest text-blue-200 font-bold mt-1 border-t border-blue-800/60 pt-2">DRA. GLORIA GONZÁLEZ HERRERA - CIRUJANA DENTISTA</p>
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOLOGIA'}">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                        <div class="flex flex-col items-start gap-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-slate-800 to-blue-700 flex items-center justify-center shadow-sm">
+                                    <i class="fa-solid fa-user-doctor text-2xl text-white"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-extrabold uppercase tracking-wide text-slate-900">CONSULTORIO DENTAL</h2>
+                                    <span class="text-[11px] uppercase tracking-widest text-blue-700 font-bold">CISO - Clave en Salud Oral</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-slate-500">Atención bucodental, procedimientos y registro de tratamientos odontológicos.</p>
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                <span class="text-[11px] uppercase tracking-widest text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full font-semibold">DRA. GLORIA GONZÁLEZ HERRERA</span>
+                                <span class="text-[11px] uppercase tracking-widest text-blue-700 font-bold">CIRUJANA DENTISTA</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!-- Vista para Recepción / Admin -->
                 <div th:if="${usuarioActual != null and (usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}">
@@ -46,9 +60,9 @@
                 </div>
             </div>
 
-            <!-- Botón Agendar Cita (Habilitado para ODONTOPEDIATRA, PEDIATRA, RECEPCIONISTA y ADMIN) -->
-            <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'ODONTOPEDIATRA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
-               th:href="@{/citas/nueva}" class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg shadow font-extrabold uppercase tracking-wide flex items-center gap-2 transition text-sm">
+            <!-- Botón Agendar Cita (Habilitado para ODONTOLOGIA, PEDIATRA, RECEPCIONISTA y ADMIN) -->
+            <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'ODONTOLOGIA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
+               th:href="@{/citas/nueva}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg shadow text-sm font-extrabold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700 text-white transition">
                 <i class="fa-solid fa-calendar-plus"></i> Agendar Cita
             </a>
         </div>
@@ -66,10 +80,9 @@
                 <select th:if="${esAdmin}" name="especialidad"
                         class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                     <option value="">Todas las especialidades</option>
-                    <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>                        <option value="ODONTOPEDIATRIA" th:selected="${filtroEspecialidad == 'ODONTOPEDIATRIA'}">CISO - Odontopediatría</option>
-                </select>
-                <button type="submit" class="px-4 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow">Buscar</button>
-                <a th:href="@{/citas}" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold">Ver próximas</a>
+                    <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>                        <option value="ODONTOLOGIA" th:selected="${filtroEspecialidad == 'ODONTOLOGIA'}">CISO - Odontología</option>
+                </select>                        <button type="submit" class="px-4 py-1.5 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow transition">Buscar</button>
+                <a th:href="@{/citas}" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold uppercase tracking-wide">Ver próximas</a>
             </form>
         </div>
 
@@ -78,13 +91,13 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
-                            <th class="py-3.5 px-4 font-semibold">Horario</th>
-                            <th class="py-3.5 px-4 font-semibold">Paciente Infantil</th>
-                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider">Especialidad</th>
-                            <th class="py-3.5 px-4 font-semibold">Médico Asignado</th>
-                            <th class="py-3.5 px-4 font-semibold">Motivo</th>
-                            <th class="py-3.5 px-4 font-semibold">Estado</th>
+                        <tr class="bg-gradient-to-r from-slate-100 to-slate-50 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Horario</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Paciente Infantil</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Especialidad</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Médico Asignado</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Motivo</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Estado</th>
                             <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-center">Acciones</th>
                         </tr>
                     </thead>
@@ -98,7 +111,7 @@
                         <tr th:each="c : ${citas}" class="hover:bg-slate-50 transition">
                             <td class="py-3 px-4">
                                 <div class="font-semibold text-slate-900" th:text="${c.fecha}">2026-09-25</div>
-                                <span class="text-xs font-mono text-indigo-600 font-bold" th:text="${c.hora}">10:00</span>
+                                <span class="text-xs font-mono font-extrabold text-blue-700" th:text="${c.hora}">10:00</span>
                             </td>
                             <td class="py-3 px-4">
                                 <div class="font-medium text-slate-900" th:text="${c.paciente.nombre + ' ' + c.paciente.apellidos}">Nombre Niño</div>
@@ -112,9 +125,9 @@
                             <td class="py-3 px-4 text-slate-700" th:text="${c.medico.nombreCompleto}">Dra. Asignada</td>
                             <td class="py-3 px-4 text-slate-600 max-w-xs truncate" th:text="${c.motivo}" th:title="${c.motivo}">Motivo de consulta</td>
                             <td class="py-3 px-4">
-                                <span class="px-2 py-0.5 text-xs font-semibold rounded"
-                                      th:classappend="${c.estado == 'PROGRAMADA'} ? 'bg-sky-100 text-sky-700' : 
-                                                     (${c.estado == 'COMPLETADA'} ? 'bg-emerald-100 text-emerald-700' :                                                       (${c.estado == 'NO_ASISTIO'} ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'))"
+                                <span class="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded"
+                                      th:classappend="${c.estado == 'PROGRAMADA'} ? 'bg-blue-100 text-blue-800' : 
+                                                     (${c.estado == 'COMPLETADA'} ? 'bg-emerald-100 text-emerald-800' :                                                       (${c.estado == 'NO_ASISTIO'} ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'))"
                                       th:text="${c.estado}">PROGRAMADA</span>
                             </td>
                             <td class="py-3 px-4 text-center whitespace-nowrap">
@@ -163,16 +176,16 @@
                                     </span>
                                     <a th:if="${usuarioActual != null and usuarioActual.rol != 'RECEPCIONISTA'}"
                                        th:href="@{/recetas/nueva/{id}(id=${c.idCita})}"
-                                       class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                       class="text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide inline-flex items-center gap-1 transition">
                                         <i class="fa-solid fa-file-prescription"></i> Receta
                                     </a>
                                 </div>
 
                                 <!-- Si fue CANCELADA o NO ASISTIÓ: solo lectura con detalle -->
-                                <div th:if="${c.estado == 'CANCELADA'}" class="text-rose-600 text-xs italic" th:title="${c.motivoCancelacion != null ? c.motivoCancelacion : 'Cancelada'}">
+                                <div th:if="${c.estado == 'CANCELADA'}" class="text-rose-700 text-xs font-bold uppercase tracking-wide italic" th:title="${c.motivoCancelacion != null ? c.motivoCancelacion : 'Cancelada'}">
                                     <span th:text="${c.motivoCancelacion != null ? 'Motivo: ' + c.motivoCancelacion : 'Cancelada'}"></span>
                                 </div>
-                                <div th:if="${c.estado == 'NO_ASISTIO'}" class="text-amber-600 text-xs italic">
+                                <div th:if="${c.estado == 'NO_ASISTIO'}" class="text-amber-700 text-xs font-bold uppercase tracking-wide">
                                     Inasistencia registrada
                                 </div>
 
@@ -187,10 +200,10 @@
     <!-- MODAL PARA REPROGRAMAR CITA -->
     <div id="modalReprogramar" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
-            <h3 class="text-base font-black text-slate-900 flex items-center gap-2 mb-2">
-                <i class="fa-solid fa-calendar-days text-blue-600"></i> Reagendar Consulta Médica
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2 mb-2 uppercase tracking-wide">
+                <i class="fa-solid fa-calendar-days text-blue-700"></i> Reagendar Consulta Médica
             </h3>
-            <p class="text-xs text-slate-500 mb-4">Selecciona el nuevo día y horario disponible para el paciente.</p>
+            <p class="text-xs text-slate-500 mb-4 uppercase tracking-wider">Selecciona el nuevo día y horario disponible para el paciente.</p>
             
             <form th:action="@{/citas/reprogramar}" method="post" class="space-y-4">
                 <input type="hidden" id="idCitaReprogramar" name="idCita">
@@ -235,10 +248,10 @@
     <!-- MODAL PARA CANCELAR CITA CON MOTIVO -->
     <div id="modalCancelar" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
-            <h3 class="text-base font-black text-slate-900 flex items-center gap-2 mb-2">
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2 mb-2 uppercase tracking-wide">
                 <i class="fa-solid fa-ban text-rose-600"></i> Cancelación de Cita
             </h3>
-            <p class="text-xs text-slate-500 mb-4">Indica la causa por la cual se cancela la cita para mantener la trazabilidad clínica.</p>
+            <p class="text-xs text-slate-500 mb-4 uppercase tracking-wider">Indica la causa por la cual se cancela la cita para mantener la trazabilidad clínica.</p>
             
             <form th:action="@{/citas/cancelar}" method="post" class="space-y-4">
                 <input type="hidden" id="idCitaCancelar" name="idCita">

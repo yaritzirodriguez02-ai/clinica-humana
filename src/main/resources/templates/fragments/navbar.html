@@ -14,7 +14,6 @@
                 </div>
                 <div>
                     <span class="font-extrabold text-base uppercase tracking-tight block leading-tight">Clínica Dental (CISO)</span>
-                    <span class="text-[11px] uppercase tracking-wider text-blue-200 block font-semibold">Ceso de Atención Odontoestomatológica</span>
                 </div>
             </a>
 
@@ -48,8 +47,8 @@
                 <!-- 3b. CATÁLOGO DE MEDICAMENTOS (Personal médico y Admin) -->
                 <a sec:authorize="hasAnyRole('PEDIATRA', 'ODONTOPEDIATRA', 'ADMIN')"
                    th:href="@{/medicamentos}"
-                   class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
-                    <i class="fa-solid fa-pills text-indigo-300"></i> Medicamentos
+                   class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-blue-900 transition flex items-center gap-1.5 text-blue-100">
+                    <i class="fa-solid fa-pills text-blue-300"></i> Medicamentos
                 </a>
 
                 <!-- 4. AGENDAR NUEVA CITA -->
@@ -73,9 +72,9 @@
             <div class="flex items-center gap-3">
                 <div class="text-right">
                     <span class="block text-xs font-bold text-white leading-tight" sec:authentication="name">Usuario</span>
-                    <span sec:authorize="hasRole('PEDIATRA')" class="bg-blue-100 text-blue-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">PEDIATRÍA</span>
+                    <span sec:authorize="hasRole('PEDIATRA')" class="bg-amber-100 text-amber-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">PEDIATRÍA</span>
                     <span sec:authorize="hasRole('ODONTOPEDIATRA')" class="bg-blue-800/50 text-blue-50 border border-blue-400/40 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block">CISO Especialista Dental</span>
-                    <span sec:authorize="hasRole('RECEPCIONISTA')" class="bg-blue-100 text-blue-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Recepción y Caja</span>
+                    <span sec:authorize="hasRole('RECEPCIONISTA')" class="bg-sky-100 text-sky-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Recepción y Caja</span>
                     <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')" class="bg-purple-100 text-purple-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Administrador General</span>
                 </div>
 
