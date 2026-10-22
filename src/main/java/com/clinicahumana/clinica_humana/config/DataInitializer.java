@@ -28,6 +28,13 @@ public class DataInitializer implements CommandLineRunner {
     /** Clave de las cuentas de demostración (coincide con la ayuda mostrada en login.html). */
     private static final String CLAVE_DEMO = "123456";
 
+    /**
+     * Nombre oficial de la especialista odontopediatra que debe aparecer siempre
+     * con la titulación completa en el panel de la doctora y en toda la comunicación del módulo CISO.
+     */
+    public static final String NOMBRE_OFICIAL_DRA_GONZALEZ_HERRERA =
+            "DRA. GLORIA GONZÁLEZ HERRERA - CIRUJANA DENTISTA";
+
     /** Clave del administrador: más robusta por ser el rol con acceso total. */
     private static final String CLAVE_ADMIN = "Admin@2026";
 
@@ -58,7 +65,7 @@ public class DataInitializer implements CommandLineRunner {
         crearUsuarioSiNoExiste("laura.mendez", "Dra. Laura Méndez", "PEDIATRA", CLAVE_DEMO);
 
         // 4. Médicas odontopediatras
-        crearUsuarioSiNoExiste("gloria.gonzalez", "Dra. Gloria González", "ODONTOPEDIATRA", CLAVE_DEMO);
+        crearUsuarioSiNoExiste("gloria.gonzalez", NOMBRE_OFICIAL_DRA_GONZALEZ_HERRERA, "ODONTOPEDIATRA", CLAVE_DEMO);
         crearUsuarioSiNoExiste("sofia.castro", "Dra. Sofía Castro", "ODONTOPEDIATRA", CLAVE_DEMO);
 
         log.info("=== Usuarios iniciales listos | admin: '{}' | cuentas demo: '{}' ===",

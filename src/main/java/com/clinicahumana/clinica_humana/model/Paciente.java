@@ -2,7 +2,6 @@ package com.clinicahumana.clinica_humana.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
@@ -17,9 +16,12 @@ public class Paciente {
     private Long idPaciente;
 
     // Llave foránea hacia la tabla tutores
-    @NotNull(message = "El tutor es obligatorio")
+    /**
+     * Tutor legal del paciente.
+     * Dejado opcional para permitir el registro de pacientes adultos de forma independiente.
+     */
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_tutor", nullable = false)
+    @JoinColumn(name = "id_tutor")
     private Tutor tutor;
 
     @NotBlank(message = "El nombre del paciente es obligatorio")
@@ -34,17 +36,26 @@ public class Paciente {
     @Column(name = "apellidos", nullable = false, length = 100)
     private String apellidos;
 
-    @NotBlank(message = "La CURP es obligatoria")
+    /**
+     * CURP (Código Único de Registro de Población).
+     * Identificador oficial del paciente (dejado opcional para permitir registro de adultos sin CURP).
+     */
     @Pattern(regexp = "^[A-Z]{4}[0-9]{6}[HM][A-Z]{5}[0-9A-Z]{2}$", message = "La CURP no cumple con el formato estándar oficial de 18 caracteres")
-    @Column(name = "curp", nullable = false, unique = true, length = 18)
+    @Column(name = "curp", unique = true, length = 18)
     private String curp;
 
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
-    @Column(name = "fecha_nacimiento", nullable = false)
+    /**
+     * Fecha de nacimiento.
+     * Si el paciente es adulto registrado de forma independiente, este campo puede ir vacío.
+     */
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
-    @NotBlank(message = "El sexo es obligatorio")
-    @Column(name = "sexo", nullable = false, length = 1)
+    /**
+     * Sexo del paciente: 'M' o 'F'.
+     * Dejado opcional para permitir registro de adultos de forma independiente.
+     */
+    @Column(name = "sexo", length = 1)
     private String sexo; // 'M' o 'F'
 
     @Column(name = "tipo_sangre", length = 5)

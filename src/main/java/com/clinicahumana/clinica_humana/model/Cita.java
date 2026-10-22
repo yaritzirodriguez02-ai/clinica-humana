@@ -59,6 +59,12 @@ public class Cita {
     @Column(name = "fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion;
 
+    /**     * Consentimiento legal para aviso de confidencialidad e uso de imágenes clínicas.
+     * Registrado para fines legales y documentación del paciente.
+     */
+    @Column(name = "acepta_uso_fotos_clinicas", columnDefinition = "BIT DEFAULT 0")
+    private Boolean aceptaUsoFotosClinicas = Boolean.FALSE;
+
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();
@@ -153,5 +159,13 @@ public class Cita {
 
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public Boolean getAceptaUsoFotosClinicas() {
+        return aceptaUsoFotosClinicas;
+    }
+
+    public void setAceptaUsoFotosClinicas(Boolean aceptaUsoFotosClinicas) {
+        this.aceptaUsoFotosClinicas = aceptaUsoFotosClinicas;
     }
 }
