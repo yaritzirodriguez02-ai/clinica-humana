@@ -31,11 +31,13 @@
                 <div th:if="${usuarioActual != null and usuarioActual.rol == 'PEDIATRA'}">
                     <h2 class="text-2xl font-bold text-slate-900">Consultorio Pediátrico - Dra. Pilar Ríos</h2>
                     <p class="text-sm text-slate-500">Gestión de consultas médicas, signos vitales y control de citas pediátricas.</p>
+                    <p class="text-[11px] uppercase tracking-widest text-blue-200 font-bold mt-1 border-t border-blue-800/60 pt-2">DRA. PILAR RÍOS - PEDIATRÍA</p>
                 </div>
                 <!-- Vista para Dra. Gloria -->
                 <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOPEDIATRA'}">
-                    <h2 class="text-2xl font-bold text-slate-900">Consultorio Dental - Dra. Gloria González</h2>
+                    <h2 class="text-2xl font-extrabold uppercase tracking-wide text-slate-900">Consultorio Dental - CISO</h2>
                     <p class="text-sm text-slate-500">Atención bucodental, procedimientos y registro de tratamientos odontopediátricos.</p>
+                    <p class="text-[11px] uppercase tracking-widest text-blue-200 font-bold mt-1 border-t border-blue-800/60 pt-2">DRA. GLORIA GONZÁLEZ HERRERA - CIRUJANA DENTISTA</p>
                 </div>
                 <!-- Vista para Recepción / Admin -->
                 <div th:if="${usuarioActual != null and (usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}">
@@ -46,7 +48,7 @@
 
             <!-- Botón Agendar Cita (Habilitado para ODONTOPEDIATRA, PEDIATRA, RECEPCIONISTA y ADMIN) -->
             <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'ODONTOPEDIATRA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
-               th:href="@{/citas/nueva}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow font-medium flex items-center gap-2 transition text-sm">
+               th:href="@{/citas/nueva}" class="bg-blue-700 hover:bg-blue-800 text-white px-5 py-2.5 rounded-lg shadow font-extrabold uppercase tracking-wide flex items-center gap-2 transition text-sm">
                 <i class="fa-solid fa-calendar-plus"></i> Agendar Cita
             </a>
         </div>
@@ -62,12 +64,11 @@
                 <input type="date" name="fecha" th:value="${filtroFecha}"
                        class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                 <select th:if="${esAdmin}" name="especialidad"
-                        class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                     <option value="">Todas las especialidades</option>
-                    <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>
-                    <option value="ODONTOPEDIATRIA" th:selected="${filtroEspecialidad == 'ODONTOPEDIATRIA'}">Odontopediatría</option>
+                    <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>                        <option value="ODONTOPEDIATRIA" th:selected="${filtroEspecialidad == 'ODONTOPEDIATRIA'}">CISO - Odontopediatría</option>
                 </select>
-                <button type="submit" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow">Buscar</button>
+                <button type="submit" class="px-4 py-1.5 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow">Buscar</button>
                 <a th:href="@{/citas}" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold">Ver próximas</a>
             </form>
         </div>
@@ -80,11 +81,11 @@
                         <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
                             <th class="py-3.5 px-4 font-semibold">Horario</th>
                             <th class="py-3.5 px-4 font-semibold">Paciente Infantil</th>
-                            <th class="py-3.5 px-4 font-semibold">Especialidad</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider">Especialidad</th>
                             <th class="py-3.5 px-4 font-semibold">Médico Asignado</th>
                             <th class="py-3.5 px-4 font-semibold">Motivo</th>
                             <th class="py-3.5 px-4 font-semibold">Estado</th>
-                            <th class="py-3.5 px-4 font-semibold text-center">Acciones</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 text-sm">
@@ -104,8 +105,8 @@
                                 <span class="text-xs text-slate-400 font-mono" th:text="'CURP: ' + ${c.paciente.curp}"></span>
                             </td>
                             <td class="py-3 px-4">
-                                <span class="px-2.5 py-1 text-xs font-semibold rounded-full"
-                                      th:classappend="${c.especialidad == 'PEDIATRIA'} ? 'bg-amber-100 text-amber-800' : 'bg-teal-100 text-teal-800'"
+                                <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-full"
+                                      th:classappend="${c.especialidad == 'PEDIATRIA'} ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'"
                                       th:text="${c.especialidad}"></span>
                             </td>
                             <td class="py-3 px-4 text-slate-700" th:text="${c.medico.nombreCompleto}">Dra. Asignada</td>

@@ -9,12 +9,12 @@
             
             <!-- Logo y Nombre Clínico -->
             <a th:href="@{/citas}" class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-indigo-700 rounded-lg flex items-center justify-center text-indigo-200">
+                <div class="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center text-blue-100">
                     <i class="fa-solid fa-hospital-user text-xl"></i>
                 </div>
                 <div>
-                    <span class="font-bold text-base tracking-wide block leading-tight">Clínica Humana</span>
-                    <span class="text-[11px] text-indigo-300 block">Pediatría & Odontopediatría</span>
+                    <span class="font-extrabold text-base uppercase tracking-tight block leading-tight">Clínica Dental (CISO)</span>
+                    <span class="text-[11px] uppercase tracking-wider text-blue-200 block font-semibold">Ceso de Atención Odontoestomatológica</span>
                 </div>
             </a>
 
@@ -36,13 +36,13 @@
                 </a>
 
                 <!-- 2. AGENDA / CITAS (Todos la ven, pero filtrada a su rol) -->
-                <a th:href="@{/citas}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
-                    <i class="fa-solid fa-calendar-days text-indigo-300"></i> Mi Agenda
+                <a th:href="@{/citas}" class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-blue-900 transition flex items-center gap-1.5 text-blue-100">
+                    <i class="fa-solid fa-calendar-days text-blue-300"></i> Mi Agenda
                 </a>
 
                 <!-- 3. PACIENTES Y TUTORES -->
-                <a th:href="@{/pacientes}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
-                    <i class="fa-solid fa-children text-indigo-300"></i> Pacientes y Tutores
+                <a th:href="@{/pacientes}" class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-blue-900 transition flex items-center gap-1.5 text-blue-100">
+                    <i class="fa-solid fa-user-injured text-blue-300"></i> Pacientes y Tutores
                 </a>
 
                 <!-- 3b. CATÁLOGO DE MEDICAMENTOS (Personal médico y Admin) -->
@@ -54,18 +54,18 @@
 
                 <!-- 4. AGENDAR NUEVA CITA -->
                 <a sec:authorize="hasAnyRole('PEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
-                   th:href="@{/citas/nueva}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
-                    <i class="fa-solid fa-calendar-plus text-indigo-300"></i> Agendar Cita
+                   th:href="@{/citas/nueva}" class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-blue-900 transition flex items-center gap-1.5 text-blue-100">
+                    <i class="fa-solid fa-calendar-plus text-blue-300"></i> Agendar Cita
                 </a>
 
                 <!-- 5. CONTROL DE CAJA Y COBROS -->
-                <a th:href="@{/pagos}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-emerald-300 bg-indigo-950/40 border border-emerald-500/30">
+                <a th:href="@{/pagos}" class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-blue-900 transition flex items-center gap-1.5 text-blue-50 bg-blue-950/30 border border-blue-400/40">
                     <i class="fa-solid fa-cash-register"></i> Caja y Cobros
                 </a>
 
                 <!-- 6. CORTE DIARIO / REPORTES FINANCIEROS -->
-                <a th:href="@{/pagos/corte}" class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
-                    <i class="fa-solid fa-chart-line text-indigo-300"></i> Corte de Caja
+                <a th:href="@{/pagos/corte}" class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-blue-900 transition flex items-center gap-1.5 text-blue-100">
+                    <i class="fa-solid fa-chart-line text-blue-300"></i> Corte de Caja
                 </a>
             </nav>
 
@@ -73,9 +73,9 @@
             <div class="flex items-center gap-3">
                 <div class="text-right">
                     <span class="block text-xs font-bold text-white leading-tight" sec:authentication="name">Usuario</span>
-                    <span sec:authorize="hasRole('PEDIATRA')" class="bg-amber-100 text-amber-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Dra. Pediatra (Autónoma)</span>
-                    <span sec:authorize="hasRole('ODONTOPEDIATRA')" class="bg-teal-100 text-teal-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Dra. Odontopediatra</span>
-                    <span sec:authorize="hasRole('RECEPCIONISTA')" class="bg-sky-100 text-sky-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Recepción y Caja</span>
+                    <span sec:authorize="hasRole('PEDIATRA')" class="bg-blue-100 text-blue-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">PEDIATRÍA</span>
+                    <span sec:authorize="hasRole('ODONTOPEDIATRA')" class="bg-blue-800/50 text-blue-50 border border-blue-400/40 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block">CISO Especialista Dental</span>
+                    <span sec:authorize="hasRole('RECEPCIONISTA')" class="bg-blue-100 text-blue-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Recepción y Caja</span>
                     <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')" class="bg-purple-100 text-purple-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Administrador General</span>
                 </div>
 
