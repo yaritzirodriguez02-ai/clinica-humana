@@ -50,10 +50,10 @@
                 <div>
                     <span class="text-xs font-bold uppercase text-slate-400">Corte del Turno</span>
                     <p class="text-sm font-semibold text-slate-700 mt-1">Totalizar caja del día</p>
-                </div>
-                <a               th:href="@{/pagos/corte}" class="inline-flex items-center gap-1 px-4 py-2 rounded-lg shadow text-xs font-bold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700 text-white transition">
-                    Ver Corte <i class="fa-solid fa-arrow-right"></i>
-                </a>
+                </div>            <a th:href="@{/pagos/corte}" class="group relative inline-flex items-center gap-1 px-4 py-2 rounded-xl shadow-md text-xs font-extrabold uppercase tracking-wide border border-white/30 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 hover:from-blue-800 hover:via-blue-700 hover:to-blue-600 text-white transition-all duration-200">
+                    Ver Corte <i class="fa-solid fa-arrow-right text-xs"></i>
+                <span class="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+            </a>
             </div>
         </div>
 

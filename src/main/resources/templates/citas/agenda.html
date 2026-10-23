@@ -28,28 +28,29 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
                 <!-- Vista para Dra. Pilar -->
-                <div th:if="${usuarioActual != null and usuarioActual.rol == 'PEDIATRA'}">
-                    <h2 class="text-2xl font-bold text-slate-900">Consultorio Pediátrico - Dra. Pilar Guadalupe Cortés Ríos</h2>
-                    <p class="text-sm text-slate-500">Gestión de consultas médicas, signos vitales y control de citas pediátricas (bebés y menores hasta 15 años).</p>
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'PEDIATRA'}" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0 shadow-sm">
+                            <img th:src="@{/img/logo-pediatria.png}" src="/img/logo-pediatria.png" alt="Logo Pediatría" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
+                            <i class="fa-solid fa-user-injured text-2xl"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="text-xl font-extrabold text-slate-900">Consultorio Pediátrico</h2>
+                            <p class="text-sm text-slate-600">Dr/a Pediatra · Atención de bebés y menores hasta 15 años.</p>
+                        </div>
+                    </div>
                 </div>
-                <!-- Vista para Dra. Gloria -->
-                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOLOGIA'}">
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-                        <div class="flex flex-col items-start gap-2">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-slate-800 to-blue-700 flex items-center justify-center shadow-sm">
-                                    <i class="fa-solid fa-user-doctor text-2xl text-white"></i>
-                                </div>
-                                <div>
-                                    <h2 class="text-xl font-extrabold uppercase tracking-wide text-slate-900">CONSULTORIO DENTAL</h2>
-                                    <span class="text-[11px] uppercase tracking-widest text-blue-700 font-bold">CISO - Clave en Salud Oral</span>
-                                </div>
-                            </div>
-                            <p class="text-sm text-slate-500">Atención bucodental, procedimientos y registro de tratamientos odontológicos.</p>
-                            <div class="mt-2 flex flex-wrap gap-2">
-                                <span class="text-[11px] uppercase tracking-widest text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full font-semibold">DRA. GLORIA GONZÁLEZ HERRERA</span>
-                                <span class="text-[11px] uppercase tracking-widest text-blue-700 font-bold">CIRUJANA DENTISTA</span>
-                            </div>
+                <!-- Vista para Odontología / CISO -->
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOLOGIA'}" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 overflow-hidden">
+                    <div class="absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl from-blue-200/40 to-transparent rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                    <div class="flex items-start gap-4 relative">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-900 to-blue-600 flex items-center justify-center text-white shadow-md shrink-0">
+                            <img th:src="@{/img/logo-odontologia.png}" src="/img/logo-odontologia.png" alt="Logo Odontología" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
+                            <i class="fa-solid fa-tooth text-2xl"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="text-xl font-extrabold uppercase tracking-wide text-slate-900">Consultorio de Odontología</h2>
+                            <p class="text-sm text-slate-600">Dra. Gloria González Herrera · CIRUJANA DENTISTA · CISO.</p>
                         </div>
                     </div>
                 </div>
@@ -62,8 +63,9 @@
 
             <!-- Botón Agendar Cita (Habilitado para ODONTOLOGIA, PEDIATRA, RECEPCIONISTA y ADMIN) -->
             <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'ODONTOLOGIA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
-               th:href="@{/citas/nueva}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg shadow text-sm font-extrabold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-blue-800 to-blue-600 hover:from-blue-900 hover:to-blue-700 text-white transition">
-                <i class="fa-solid fa-calendar-plus"></i> Agendar Cita
+               th:href="@{/citas/nueva}" class="group relative inline-flex items-center gap-2 px-6 py-2.5 rounded-xl shadow-md text-sm font-extrabold uppercase tracking-wide border border-white/30 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 hover:from-blue-800 hover:via-blue-700 hover:to-blue-600 text-white transition-all duration-200">
+                <span class="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                <i class="fa-solid fa-calendar-plus text-base"></i> Agendar Cita
             </a>
         </div>
 
