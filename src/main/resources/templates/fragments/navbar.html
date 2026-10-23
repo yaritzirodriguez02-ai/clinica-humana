@@ -9,7 +9,8 @@
             
             <!-- Logo y Nombre Clínico -->
             <a th:href="@{/citas}" class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center text-blue-100">
+                <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-slate-100 shadow-sm">
+                    <img th:srcset="@{/img/logo-ciso.png}, @{/img/logo-ciso.jpg}" src="/img/logo-ciso.png" alt="CISO" class="w-8 h-8 object-contain" onerror="this.style.display='none'">
                     <i class="fa-solid fa-hospital-user text-xl"></i>
                 </div>
                 <div>
@@ -70,6 +71,13 @@
 
             <!-- Perfil de Usuario y Logout -->
             <div class="flex items-center gap-3">
+                <!-- Logo de especialidad en cabecera, se muestra según rol -->
+                <div sec:authorize="hasRole('PEDIATRA')" class="mr-3 shrink-0 hidden md:block">
+                    <img th:src="@{/img/logo-pediatria.png}" src="/img/logo-pediatria.png" alt="Pediatría" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
+                </div>
+                <div sec:authorize="hasRole('ODONTOLOGIA')" class="mr-3 shrink-0 hidden md:block">
+                    <img th:src="@{/img/logo-odontologia.png}" src="/img/logo-odontologia.png" alt="Odontología" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
+                </div>
                 <div class="text-right">
                     <span class="block text-xs font-bold text-white leading-tight" sec:authentication="name">Usuario</span>
                     <span sec:authorize="hasRole('PEDIATRA')" class="bg-amber-100 text-amber-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">PEDIATRÍA</span>
