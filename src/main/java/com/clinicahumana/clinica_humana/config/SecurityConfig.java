@@ -34,8 +34,8 @@ public class SecurityConfig {
                 // Módulo CU01 (Pacientes y Tutores): Acceso para todos los roles autorizados
                 .requestMatchers("/pacientes/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOPEDIATRA")
                 
-                // Módulo CU02 (Citas / Agenda): Acceso para todos los roles autenticados
-                .requestMatchers("/citas/**").authenticated()
+                // Módulo CU02 (Citas / Agenda): Acceso por rol, sin cruce entre paneles clínicos
+                .requestMatchers("/citas/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "RECEPCIONISTA", "ADMIN")
                 
                 // Módulo CU03 (Consulta Pediátrica): Pediatra y Admin
                 .requestMatchers("/consultas/pediatria/**").hasAnyRole("PEDIATRA", "ADMIN")
