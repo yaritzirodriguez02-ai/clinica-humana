@@ -49,10 +49,10 @@
                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Especialidad Requerida *</label>
                 
                 <!-- Para Recepción y Odontopediatría: Solo opción Odontopediatría -->
-                <select th:if="${rolUsuario == 'RECEPCIONISTA' or rolUsuario == 'ODONTOLOGIA'}" 
+                <select th:if="${rolUsuario == 'RECEPCIONISTA' or rolUsuario == 'ODONTOPEDIATRIA'}" 
                         th:field="*{especialidad}" required 
                         class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800">
-                    <option value="ODONTOLOGIA" selected>CISO - Odontologia Dental</option>
+                    <option value="ODONTOPEDIATRIA" selected>CISO - Odontopediatría Dental</option>
                 </select>
 
                 <!-- Para Pediatría: Solo opción Pediatría -->
@@ -67,7 +67,7 @@
                         th:field="*{especialidad}" required 
                         class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm font-medium">
                     <option value="">-- Selecciona Especialidad --</option>
-                    <option value="ODONTOLOGIA">CISO - Odontologia Dental</option>
+                    <option value="ODONTOPEDIATRIA">CISO - Odontopediatría Dental</option>
                     <option value="PEDIATRIA">Pediatría General</option>
                 </select>
             </div>

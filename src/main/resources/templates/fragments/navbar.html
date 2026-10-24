@@ -10,7 +10,7 @@
             <!-- Logo y Nombre Clínico -->
             <a th:href="@{/citas}" class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-slate-100 shadow-sm">
-                    <img th:srcset="@{/img/logo-ciso.png}, @{/img/logo-ciso.jpg}" src="/img/logo-ciso.png" alt="CISO" class="w-8 h-8 object-contain" onerror="this.style.display='none'">
+                    <img th:src="@{/img/logo-ciso.png}" src="/img/logo-ciso.png" alt="CISO" class="w-8 h-8 object-contain" onerror="this.style.display='none'">
                     <i class="fa-solid fa-hospital-user text-xl"></i>
                 </div>
                 <div>
@@ -25,14 +25,14 @@
                 <a sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')" 
                    th:href="@{/admin/dashboard}" 
                    class="px-3 py-2 rounded-lg text-xs font-bold hover:bg-indigo-800 transition flex items-center gap-1.5 text-amber-300 bg-amber-950/30 border border-amber-500/30">
-                    <i class="fa-solid fa-gauge-high"></i> Panel Admin
+                    <i class="fa-solid fa-gauge-high"></i> PANEL ADMIN
                 </a>
 
                 <!-- 1. PERSONAL / EMPLEADOS (Solo Administrador) -->
                 <a sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')" 
                    th:href="@{/empleados}" 
-                   class="px-3 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-800 transition flex items-center gap-1.5 text-indigo-100">
-                    <i class="fa-solid fa-user-doctor text-indigo-300"></i> Personal
+                   class="px-3 py-2 rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-blue-900 transition flex items-center gap-1.5 text-blue-100">
+                    <i class="fa-solid fa-user-doctor text-blue-300"></i> PERSONAL
                 </a>
 
                 <!-- 2. AGENDA / CITAS (Todos la ven, pero filtrada a su rol) -->

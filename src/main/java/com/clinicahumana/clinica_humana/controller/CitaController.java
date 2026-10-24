@@ -141,9 +141,7 @@ public class CitaController {
         String rol = usuarioConectado != null ? usuarioConectado.getRol() : "";
 
         // Asignación de seguridad según el rol
-        if ("RECEPCIONISTA".equals(rol)) {
-            cita.setEspecialidad("ODONTOPEDIATRIA");
-        } else if ("ODONTOPEDIATRA".equals(rol)) {
+        if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
             cita.setEspecialidad("ODONTOPEDIATRIA");
             if (cita.getMedico() == null || cita.getMedico().getIdUsuario() == null) {
                 cita.setMedico(usuarioConectado);
