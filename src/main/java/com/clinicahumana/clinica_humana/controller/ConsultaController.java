@@ -30,7 +30,7 @@ public class ConsultaController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Atender Cita (redirige a Pediatría u Odontopediatría según la especialidad)
+    // Atender Cita (redirige a Pediatría u Odontología según la especialidad)
     @GetMapping("/atender/{idCita}")
     public String atenderCita(@PathVariable("idCita") Long idCita,
                               java.security.Principal principal,

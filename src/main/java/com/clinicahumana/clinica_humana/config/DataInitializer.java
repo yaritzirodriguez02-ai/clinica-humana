@@ -97,19 +97,26 @@ public class DataInitializer implements CommandLineRunner {
             {"Salbutamol", "Salbutamol", "Solución para inhalación", "5 mg/ml", "PEDIATRIA"},
             {"SRO (Suero Oral)", "Sales de rehidratación oral", "Polvo para solución", "26.4 g/L", "PEDIATRIA"},
             // Odontopediatría
-            {"Lidocaína 2%", "Lidocaína con epinefrina", "Solución inyectable", "2% (1:80,000)", "ODONTOPEDIATRIA"},
-            {"Clorexidina 0.12%", "Clorexidina digluconato", "Enjuague bucal", "0.12%", "ODONTOPEDIATRIA"},
-            {"Flúor barniz", "Flúoruro de sodio", "Barniz tópico", "5%", "ODONTOPEDIATRIA"},
-            {"Flúor gel", "Flúoruro de sodio", "Gel tópico para aplicación", "1.23%", "ODONTOPEDIATRIA"},
-            {"Nitrato de plata", "Nitrato de plata", "Solución tópica", "25%", "ODONTOPEDIATRIA"},
-            {"Amoxicilina/clavulanato", "Amoxicilina + clavulanato de potasio", "Suspensión oral", "400/57 mg/5 ml", "ODONTOPEDIATRIA"},
-            {"Metronidazol", "Metronidazol", "Suspensión oral", "250 mg/5 ml", "ODONTOPEDIATRIA"},
-            {"Hidróxido de calcio", "Hidróxido de calcio", "Pasta pulpocida", "Uso profesional", "ODONTOPEDIATRIA"}
+            {"Lidocaína 2%", "Lidocaína con epinefrina", "Solución inyectable", "2% (1:80,000)", "ODONTOLOGIA"},
+            {"Clorexidina 0.12%", "Clorexidina digluconato", "Enjuague bucal", "0.12%", "ODONTOLOGIA"},
+            {"Flúor barniz", "Flúoruro de sodio", "Barniz tópico", "5%", "ODONTOLOGIA"},
+            {"Flúor gel", "Flúoruro de sodio", "Gel tópico para aplicación", "1.23%", "ODONTOLOGIA"},
+            {"Nitrato de plata", "Nitrato de plata", "Solución tópica", "25%", "ODONTOLOGIA"},
+            {"Amoxicilina/clavulanato", "Amoxicilina + clavulanato de potasio", "Suspensión oral", "400/57 mg/5 ml", "ODONTOLOGIA"},
+            {"Metronidazol", "Metronidazol", "Suspensión oral", "250 mg/5 ml", "ODONTOLOGIA"},
+            {"Hidróxido de calcio", "Hidróxido de calcio", "Pasta pulpocida", "Uso profesional", "ODONTOLOGIA"}
         };
 
         int creados = 0;
         for (String[] f : catalogo) {
-            if (medicamentoRepo.findByNombreComercialIgnoreCase(f[0]).isPresent()) {
+            java.util.Optional<Medicamento> existente = medicamentoRepo.findByNombreComercialIgnoreCase(f[0]);
+            if (existente.isPresent()) {
+                // Normaliza la categoría legada al valor canónico usado por el backend
+                Medicamento m = existente.get();
+                if ("ODONTOPEDIATRIA".equalsIgnoreCase(m.getCategoria())) {
+                    m.setCategoria("ODONTOLOGIA");
+                    medicamentoRepo.save(m);
+                }
                 continue;
             }
             Medicamento m = new Medicamento();

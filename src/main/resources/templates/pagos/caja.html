@@ -10,7 +10,21 @@
 <body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
 
     <!-- Barra de Navegación Global Unificada -->
-    <div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
+    <div th:replace="~{fragments/navbar :: barraNavegacion}">    </div>
+
+    <!-- Filtro de especialidad para administrador -->
+    <form th:action="@{/pagos}" method="get" class="max-w-7xl mx-auto px-4 pt-4 flex flex-wrap gap-3 items-end">
+        <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Filtrar por especialidad:</label>
+        <select th:if="${esAdmin}" name="especialidad"
+                class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+            <option value="">Todas las especialidades</option>
+            <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>
+            <option value="ODONTOLOGIA" th:selected="${filtroEspecialidad == 'ODONTOLOGIA'}">CISO - Odontologia</option>
+        </select>
+        <button type="submit" class="px-4 py-1.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-lg text-xs font-bold shadow">
+            <i class="fa-solid fa-filter"></i> Filtrar
+        </button>
+    </form>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
         
@@ -94,7 +108,7 @@
                             <td class="py-3 px-4 text-slate-600" th:text="${cp.paciente.tutor.nombre + ' ' + cp.paciente.tutor.apellidos + ' (' + cp.paciente.tutor.telefono + ')'}">Tutor</td>
                             <td class="py-3 px-4 text-slate-700">
                                 <span class="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded"
-                                      th:classappend="${cp.especialidad == 'PEDIATRIA'} ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'"
+                                      th:classappend="${cp.especialidad == 'PEDIATRIA'} ? 'bg-amber-100 text-amber-800' : 'bg-teal-100 text-teal-800'"
                                       th:text="${cp.medico.nombreCompleto}">Dra.</span>
                             </td>
                             <td class="py-3 px-4 text-slate-600" th:text="${cp.fecha + ' ' + cp.hora}">Fecha</td>

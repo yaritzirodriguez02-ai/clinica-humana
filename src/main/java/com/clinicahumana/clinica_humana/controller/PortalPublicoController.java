@@ -64,7 +64,7 @@ public class PortalPublicoController {
     @ResponseBody
     public List<Map<String, Object>> medicosPorEspecialidad(@RequestParam("especialidad") String especialidad) {
         String rol = "PEDIATRIA".equalsIgnoreCase(especialidad) ? "PEDIATRA"
-                : "ODONTOPEDIATRIA".equalsIgnoreCase(especialidad) ? "ODONTOPEDIATRA" : "";
+                : "ODONTOLOGIA".equalsIgnoreCase(especialidad) ? "ODONTOPEDIATRA" : "";
 
         if (rol.isEmpty()) {
             return List.of();
@@ -166,8 +166,8 @@ public class PortalPublicoController {
 
         // ---------- Validaciones de la cita (mismas reglas que el sistema interno) ----------
         String espNorm = especialidad == null ? "" : especialidad.trim().toUpperCase();
-        if (!"PEDIATRIA".equals(espNorm) && !"ODONTOPEDIATRIA".equals(espNorm)) {
-            return error(redirectAttributes, "Debe seleccionar una especialidad válida (Pediatría u Odontopediatría).");
+        if (!"PEDIATRIA".equals(espNorm) && !"ODONTOLOGIA".equals(espNorm)) {
+            return error(redirectAttributes, "Debe seleccionar una especialidad válida (Pediatría u Odontología).");
         }
 
         String rolEsperado = "PEDIATRIA".equals(espNorm) ? "PEDIATRA" : "ODONTOPEDIATRA";

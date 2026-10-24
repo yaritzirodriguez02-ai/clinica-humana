@@ -39,7 +39,8 @@ public class PagoController {
 
     // Panel Principal de Caja: Muestra historial de pagos y citas listas para cobro
     @GetMapping
-    public String panelCaja(Principal principal, Model model) {
+    public String panelCaja(@RequestParam(name = "especialidad", required = false) String especialidad,
+                            Principal principal, Model model) {
         String username = principal.getName();
         Usuario usuarioActual = usuarioService.buscarPorUsername(username).orElse(null);
 
@@ -67,16 +68,28 @@ public class PagoController {
                     .filter(c -> c.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
                     .toList();
         }
-        // RECEPCIÓN: trabaja exclusivamente con citas y cobros de ODONTOPEDIATRÍA
+        // RECEPCIÓN: trabaja exclusivamente con citas y cobros de Odontología
         else if ("RECEPCIONISTA".equals(rolActual)) {
             todosLosPagos = todosLosPagos.stream()
-                    .filter(p -> p.getCita() != null && "ODONTOPEDIATRIA".equalsIgnoreCase(p.getCita().getEspecialidad()))
+                    .filter(p -> p.getCita() != null && "ODONTOLOGIA".equalsIgnoreCase(p.getCita().getEspecialidad()))
                     .toList();
             citasPendientesCobro = citasPendientesCobro.stream()
-                    .filter(c -> "ODONTOPEDIATRIA".equalsIgnoreCase(c.getEspecialidad()))
+                    .filter(c -> "ODONTOLOGIA".equalsIgnoreCase(c.getEspecialidad()))
                     .toList();
         }
-        // ADMIN: vista global sin filtros
+        // ADMIN: vista global con filtro opcional por especialidad
+        boolean esAdmin = "ADMIN".equals(rolActual);
+        String filtroEspecialidad = (especialidad != null && !especialidad.isBlank())
+                ? especialidad.trim().toUpperCase() : null;
+
+        if (esAdmin && filtroEspecialidad != null) {
+            todosLosPagos = todosLosPagos.stream()
+                    .filter(p -> p.getCita() != null && filtroEspecialidad.equalsIgnoreCase(p.getCita().getEspecialidad()))
+                    .toList();
+            citasPendientesCobro = citasPendientesCobro.stream()
+                    .filter(c -> filtroEspecialidad.equalsIgnoreCase(c.getEspecialidad()))
+                    .toList();
+        }
 
         BigDecimal totalRecaudado = todosLosPagos.stream()
                 .map(Pago::getMontoTotal)
@@ -86,6 +99,8 @@ public class PagoController {
         model.addAttribute("citasPendientes", citasPendientesCobro);
         model.addAttribute("totalRecaudado", totalRecaudado);
         model.addAttribute("usuarioActual", usuarioActual);
+        model.addAttribute("esAdmin", esAdmin);
+        model.addAttribute("filtroEspecialidad", filtroEspecialidad);
 
         return "pagos/caja";
     }
@@ -192,10 +207,10 @@ public class PagoController {
                     .filter(p -> p.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
                     .toList();
         }
-        // Recepción: el corte se limita a la especialidad de Odontopediatría
+        // Recepción: el corte se limita a la especialidad de Odontología
         else if (usuarioActual != null && "RECEPCIONISTA".equals(usuarioActual.getRol())) {
             pagosDia = pagosDia.stream()
-                    .filter(p -> p.getCita() != null && "ODONTOPEDIATRIA".equalsIgnoreCase(p.getCita().getEspecialidad()))
+                    .filter(p -> p.getCita() != null && "ODONTOLOGIA".equalsIgnoreCase(p.getCita().getEspecialidad()))
                     .toList();
         }
 

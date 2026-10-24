@@ -101,8 +101,13 @@ public class ExpedienteClinicoController {
     @PostMapping("/pediatria/expediente/actualizar")
     public String actualizarExpedientePediatrico(@Valid @ModelAttribute("expediente") ExpedientePediatrico expediente,
                                                  BindingResult result,
+                                                 Model model,
                                                  RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("tituloFormulario", "Editar Atención Pediátrica");
+            model.addAttribute("urlAction", "/consultas/pediatria/expediente/actualizar");
+            model.addAttribute("linkVolver", expediente.getPaciente() != null && expediente.getPaciente().getIdPaciente() != null
+                    ? "/pacientes/expediente/" + expediente.getPaciente().getIdPaciente() : "/pacientes");
             return "consultas/expediente_pediatrico_form";
         }
 
@@ -115,6 +120,7 @@ public class ExpedienteClinicoController {
         ExpedientePediatrico existente = expOpt.get();
         existente.setDiagnostico(expediente.getDiagnostico());
         existente.setTratamiento(expediente.getTratamiento());
+        existente.setRecetaMedica(expediente.getRecetaMedica());
         existente.setPeso(expediente.getPeso());
         existente.setTalla(expediente.getTalla());
         existente.setTemperatura(expediente.getTemperatura());
@@ -224,8 +230,13 @@ public class ExpedienteClinicoController {
     @PostMapping("/odontopediatria/expediente/actualizar")
     public String actualizarExpedienteOdontopediatrico(@Valid @ModelAttribute("expediente") ExpedienteOdontopediatrico expediente,
                                                       BindingResult result,
+                                                      Model model,
                                                       RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
+            model.addAttribute("tituloFormulario", "Editar Atención Odontopediátrica");
+            model.addAttribute("urlAction", "/consultas/odontopediatria/expediente/actualizar");
+            model.addAttribute("linkVolver", expediente.getPaciente() != null && expediente.getPaciente().getIdPaciente() != null
+                    ? "/pacientes/expediente/" + expediente.getPaciente().getIdPaciente() : "/pacientes");
             return "consultas/expediente_odontopediatrico_form";
         }
 

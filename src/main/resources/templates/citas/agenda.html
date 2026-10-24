@@ -41,7 +41,7 @@
                     </div>
                 </div>
                 <!-- Vista para Odontología / CISO -->
-                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOLOGIA'}" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 overflow-hidden">
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOPEDIATRA'}" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 overflow-hidden">
                     <div class="absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl from-blue-200/40 to-transparent rounded-full -mr-10 -mt-10 blur-2xl"></div>
                     <div class="flex items-start gap-4 relative">
                         <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-900 to-blue-600 flex items-center justify-center text-white shadow-md shrink-0">
@@ -61,8 +61,8 @@
                 </div>
             </div>
 
-            <!-- Botón Agendar Cita (Habilitado para ODONTOLOGIA, PEDIATRA, RECEPCIONISTA y ADMIN) -->
-            <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'ODONTOLOGIA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
+            <!-- Botón Agendar Cita (Habilitado para ODONTOPEDIATRA, PEDIATRA, RECEPCIONISTA y ADMIN) -->
+            <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'ODONTOPEDIATRA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
                th:href="@{/citas/nueva}" class="group relative inline-flex items-center gap-2 px-6 py-2.5 rounded-xl shadow-md text-sm font-extrabold uppercase tracking-wide border border-white/30 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 hover:from-blue-800 hover:via-blue-700 hover:to-blue-600 text-white transition-all duration-200">
                 <span class="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                 <i class="fa-solid fa-calendar-plus text-base"></i> Agendar Cita
@@ -83,7 +83,7 @@
                         class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                     <option value="">Todas las especialidades</option>
                     <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>
-                    <option value="ODONTOPEDIATRIA" th:selected="${filtroEspecialidad == 'ODONTOPEDIATRIA'}">CISO - Odontopediatría</option>
+                    <option value="ODONTOLOGIA" th:selected="${filtroEspecialidad == 'ODONTOLOGIA'}">CISO - Odontologia</option>
                 </select>                        <button type="submit" class="px-4 py-1.5 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow transition">Buscar</button>
                 <a th:href="@{/citas}"                          class="group relative inline-flex items-center gap-1 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-slate-200 to-slate-100 hover:from-slate-300 hover:to-slate-200 text-slate-800 shadow-sm transition">Ver próximas
                           <span class="absolute inset-0 rounded-lg bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>

@@ -30,7 +30,7 @@ public class Cita {
 
     @NotBlank(message = "La especialidad es obligatoria")
     @Column(name = "especialidad", nullable = false, length = 30)
-    private String especialidad; // 'PEDIATRIA' o 'ODONTOPEDIATRIA'
+    private String especialidad; // 'PEDIATRIA' o 'ODONTOLOGIA'
 
     @NotNull(message = "La fecha de la cita es obligatoria")
     @FutureOrPresent(message = "La fecha de la cita debe ser a partir del día de hoy en adelante")

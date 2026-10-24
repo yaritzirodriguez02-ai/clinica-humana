@@ -37,7 +37,7 @@ public class Medicamento {
 
     @NotBlank(message = "La categoría es obligatoria")
     @Column(name = "categoria", nullable = false, length = 20)
-    private String categoria = "GENERAL"; // 'GENERAL', 'PEDIATRIA', 'ODONTOPEDIATRIA'
+    private String categoria = "GENERAL"; // 'GENERAL', 'PEDIATRIA', 'ODONTOLOGIA'
 
     public Medicamento() {
     }

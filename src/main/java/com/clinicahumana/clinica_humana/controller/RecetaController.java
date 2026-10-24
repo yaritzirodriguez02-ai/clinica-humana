@@ -93,7 +93,7 @@ if (!recetasExistentes.isEmpty()) {
 
     // Carga el datalist del catálogo según la especialidad de la cita
     private void cargarCatalogo(Model model, Cita cita) {
-        String categoriaCatalogo = "PEDIATRIA".equalsIgnoreCase(cita.getEspecialidad()) ? "PEDIATRIA" : "ODONTOPEDIATRIA";
+        String categoriaCatalogo = "PEDIATRIA".equalsIgnoreCase(cita.getEspecialidad()) ? "PEDIATRIA" : "ODONTOLOGIA";
         model.addAttribute("medicamentosCatalogo",
                 medicamentoRepo.findByCategoriaInOrderByNombreComercialAsc(List.of("GENERAL", categoriaCatalogo)));
     }

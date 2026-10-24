@@ -7,14 +7,19 @@
     <div class="max-w-7xl mx-auto px-4">
         <div class="flex justify-between items-center h-16">
             
-            <!-- Logo y Nombre Clínico -->
+            <!-- Marca y Nombre del Consultorio -->
             <a th:href="@{/citas}" class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-slate-100 shadow-sm">
-                    <img th:src="@{/img/logo-ciso.png}" src="/img/logo-ciso.png" alt="CISO" class="w-8 h-8 object-contain" onerror="this.style.display='none'">
+                    <img th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="CISO" class="w-8 h-8 object-contain" onerror="this.style.display='none'">
                     <i class="fa-solid fa-hospital-user text-xl"></i>
                 </div>
                 <div>
-                    <span class="font-extrabold text-base uppercase tracking-tight block leading-tight">Clínica Dental (CISO)</span>
+                    <span sec:authorize="hasRole('PEDIATRA')"
+                          class="font-extrabold text-base uppercase tracking-tight block leading-tight">Clínica Médica Pediátrica</span>
+                    <span sec:authorize="hasAnyRole('ODONTOPEDIATRA', 'ODONTOLOGIA')"
+                          class="font-extrabold text-[13px] uppercase tracking-tight block leading-tight">Odontología de la Dra. Gloria González Herrera</span>
+                    <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR', 'RECEPCIONISTA')"
+                          class="font-extrabold text-base uppercase tracking-tight block leading-tight">Clínica Humana</span>
                 </div>
             </a>
 
@@ -73,10 +78,10 @@
             <div class="flex items-center gap-3">
                 <!-- Logo de especialidad en cabecera, se muestra según rol -->
                 <div sec:authorize="hasRole('PEDIATRA')" class="mr-3 shrink-0 hidden md:block">
-                    <img th:src="@{/img/logo-pediatria.png}" src="/img/logo-pediatria.png" alt="Pediatría" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
+                    <img th:src="@{/img/logo-pediatra.jpg}" src="/img/logo-pediatra.jpg" alt="Pediatría" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
                 </div>
-                <div sec:authorize="hasRole('ODONTOLOGIA')" class="mr-3 shrink-0 hidden md:block">
-                    <img th:src="@{/img/logo-odontologia.png}" src="/img/logo-odontologia.png" alt="Odontología" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
+                <div sec:authorize="hasAnyRole('ODONTOPEDIATRA', 'ODONTOLOGIA')" class="mr-3 shrink-0 hidden md:block">
+                    <img th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="Odontología" class="h-8 w-auto object-contain" onerror="this.style.display='none'">
                 </div>
                 <div class="text-right">
                     <span class="block text-xs font-bold text-white leading-tight" sec:authentication="name">Usuario</span>

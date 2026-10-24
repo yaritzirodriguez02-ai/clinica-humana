@@ -58,11 +58,11 @@ public class CitaController {
                     ? citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha)
                     : citaService.listarProximasPorMedico(usuarioConectado.getIdUsuario(), hoy);
         }
-        // 3. RECEPCIONISTA: exclusivamente agenda de ODONTOPEDIATRÍA — próximas por defecto
+        // 3. RECEPCIONISTA: exclusivamente agenda de Odontología — próximas por defecto
         else if ("RECEPCIONISTA".equals(rol)) {
             lista = (fecha != null)
-                    ? citaService.listarPorEspecialidadYFecha("ODONTOPEDIATRIA", fecha)
-                    : citaService.listarProximasPorEspecialidad("ODONTOPEDIATRIA", hoy);
+                    ? citaService.listarPorEspecialidadYFecha("ODONTOLOGIA", fecha)
+                    : citaService.listarProximasPorEspecialidad("ODONTOLOGIA", hoy);
         }
         // 4. ADMIN: vista global — próximas por defecto, con filtros opcionales de fecha y especialidad
         else {
@@ -96,9 +96,9 @@ public class CitaController {
         Cita cita = new Cita();
         List<Usuario> medicosPermitidos;
 
-        // RECEPCIONISTA u ODONTOPEDIATRA: Solo Odontopediatría
+        // RECEPCIONISTA u Odontopediatría: Solo Odontología
         if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
-            cita.setEspecialidad("ODONTOPEDIATRIA");
+            cita.setEspecialidad("ODONTOLOGIA");
             medicosPermitidos = usuarioService.listarTodos().stream()
                     .filter(u -> "ODONTOPEDIATRA".equals(u.getRol()))
                     .toList();
@@ -142,7 +142,7 @@ public class CitaController {
 
         // Asignación de seguridad según el rol
         if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
-            cita.setEspecialidad("ODONTOPEDIATRIA");
+            cita.setEspecialidad("ODONTOLOGIA");
             if (cita.getMedico() == null || cita.getMedico().getIdUsuario() == null) {
                 cita.setMedico(usuarioConectado);
             }
