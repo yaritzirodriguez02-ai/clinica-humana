@@ -18,7 +18,7 @@
                 </span>
 
                 <!-- PANEL ODONTOLOGÍA (CISO) -->
-                <span sec:authorize="hasAnyRole('ODONTOPEDIATRA', 'ODONTOLOGIA')"
+                <span sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOLOGIA')"
                       class="flex items-center justify-center h-16 px-3 rounded-xl bg-white shadow-md ring-1 ring-white/50 transition group-hover:ring-2 group-hover:ring-sky-300">
                     <img th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="Clínica Integral de Servicios Odontológicos"
                          class="h-12 w-auto object-contain">
@@ -39,7 +39,7 @@
                     <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR', 'RECEPCIONISTA')"
                           class="font-extrabold text-[15px] uppercase tracking-tight block leading-tight">Clínica Humana</span>
                     <span sec:authorize="hasRole('PEDIATRA')" class="block text-[10px] font-semibold uppercase tracking-widest text-amber-300/90">Consulta pediátrica</span>
-                    <span sec:authorize="hasAnyRole('ODONTOPEDIATRA', 'ODONTOLOGIA')" class="block text-[10px] font-semibold uppercase tracking-widest text-sky-300/90">Odontopediatría</span>
+                    <span sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOLOGIA')" class="block text-[10px] font-semibold uppercase tracking-widest text-sky-300/90">Odontologia</span>
                     <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR', 'RECEPCIONISTA')" class="block text-[10px] font-semibold uppercase tracking-widest text-purple-300/90">Admisión y caja</span>
                 </span>
             </a>
