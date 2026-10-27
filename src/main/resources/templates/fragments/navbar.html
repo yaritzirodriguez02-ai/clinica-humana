@@ -18,7 +18,7 @@
                 </span>
 
                 <!-- PANEL ODONTOLOGÍA (CISO) -->
-                <span sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOLOGIA')"
+                <span sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA')"
                       class="flex items-center justify-center h-16 px-3 rounded-xl bg-white shadow-md ring-1 ring-white/50 transition group-hover:ring-2 group-hover:ring-sky-300">
                     <img th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="Clínica Integral de Servicios Odontológicos"
                          class="h-12 w-auto object-contain">
@@ -34,12 +34,12 @@
                 <span class="hidden sm:block leading-tight">
                     <span sec:authorize="hasRole('PEDIATRA')"
                           class="font-extrabold text-[15px] uppercase tracking-tight block leading-tight">Clínica Médica Pediátrica</span>
-                    <span sec:authorize="hasAnyRole('ODONTOPEDIATRA', 'ODONTOLOGIA')"
+                    <span sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA')"
                           class="font-extrabold text-[15px] uppercase tracking-tight block leading-tight">Clínica Dental CISO</span>
                     <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR', 'RECEPCIONISTA')"
                           class="font-extrabold text-[15px] uppercase tracking-tight block leading-tight">Clínica Humana</span>
                     <span sec:authorize="hasRole('PEDIATRA')" class="block text-[10px] font-semibold uppercase tracking-widest text-amber-300/90">Consulta pediátrica</span>
-                    <span sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOLOGIA')" class="block text-[10px] font-semibold uppercase tracking-widest text-sky-300/90">Odontologia</span>
+                    <span sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA')" class="block text-[10px] font-semibold uppercase tracking-widest text-sky-300/90">Odontología</span>
                     <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR', 'RECEPCIONISTA')" class="block text-[10px] font-semibold uppercase tracking-widest text-purple-300/90">Admisión y caja</span>
                 </span>
             </a>
@@ -72,14 +72,14 @@
                 </a>
 
                 <!-- 3b. CATÁLOGO DE MEDICAMENTOS (Personal médico y Admin) -->
-                <a sec:authorize="hasAnyRole('PEDIATRA', 'ODONTOPEDIATRA', 'ADMIN')"
+                <a sec:authorize="hasAnyRole('PEDIATRA', 'ODONTOLOGIA', 'ODONTOPEDIATRA', 'ADMIN')"
                    th:href="@{/medicamentos}"
                    class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-100">
                     <i class="fa-solid fa-pills text-blue-300"></i> Medicamentos
                 </a>
 
                 <!-- 4. AGENDAR NUEVA CITA -->
-                <a sec:authorize="hasAnyRole('PEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+                <a sec:authorize="hasAnyRole('PEDIATRA', 'ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
                    th:href="@{/citas/nueva}" class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-100">
                     <i class="fa-solid fa-calendar-plus text-blue-300"></i> Agendar Cita
                 </a>
@@ -100,7 +100,7 @@
                 <div class="text-right">
                     <span class="block text-xs font-bold text-white leading-tight" sec:authentication="name">Usuario</span>
                     <span sec:authorize="hasRole('PEDIATRA')" class="bg-amber-100 text-amber-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">PEDIATRÍA</span>
-                    <span sec:authorize="hasRole('ODONTOPEDIATRA')" class="bg-blue-800/50 text-blue-50 border border-blue-400/40 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block">CISO Especialista Dental</span>
+                    <span sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA')" class="bg-blue-800/50 text-blue-50 border border-blue-400/40 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block">CISO Especialista Dental</span>
                     <span sec:authorize="hasRole('RECEPCIONISTA')" class="bg-sky-100 text-sky-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Recepción y Caja</span>
                     <span sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')" class="bg-purple-100 text-purple-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Administrador General</span>
                 </div>
