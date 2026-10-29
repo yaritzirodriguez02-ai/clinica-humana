@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${informe.idInforme != null ? 'Editar Informe - CISO' : 'Nuevo Informe - CISO'}">Nuevo Informe - CISO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
+
+<div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+            <nav class="text-[11px] text-slate-400 mb-1">
+                <a th:href="@{/informes}" class="hover:text-sky-700">Informes</a>
+                <span class="mx-1">/</span>
+                <span th:text="${informe.idInforme != null ? 'Editar' : 'Nuevo'}">Nuevo</span>
+            </nav>
+            <h2 class="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-pen-nib text-sky-700"></i>
+                <span th:text="${informe.idInforme != null ? 'Editar informe' : 'Redactar informe'}">Redactar informe</span>
+            </h2>
+            <p class="text-xs text-slate-500">El texto se imprime tal cual en la hoja membretada oficial de CISO (tamaño carta).</p>
+        </div>
+        <a th:href="@{/informes}" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i> Volver al historial
+        </a>
+    </div>
+
+    <!-- Errores de validación -->
+    <div th:if="${errores != null and !#lists.isEmpty(errores)}" class="mb-6 p-4 bg-rose-50 border-l-4 border-rose-500 text-rose-800 rounded shadow-sm">
+        <div class="flex items-center gap-2 font-semibold text-sm mb-1">
+            <i class="fa-solid fa-triangle-exclamation"></i> No se pudo guardar el informe
+        </div>
+        <ul class="list-disc list-inside text-xs space-y-0.5">
+            <li th:each="e : ${errores}" th:text="${e}"></li>
+        </ul>
+    </div>
+
+    <form th:action="@{/informes/guardar}" th:object="${informe}" method="post">
+        <input type="hidden" th:field="*{idInforme}">
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Columna principal -->
+            <section class="lg:col-span-2 space-y-5">
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5">
+                    <div class="flex items-center gap-2 pb-3 border-b border-slate-200">
+                        <i class="fa-solid fa-file-lines text-sky-700"></i>
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Documento</h3>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo de documento *</label>
+                            <select th:field="*{tipo}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500">
+                                <option th:each="t : ${tiposInforme}" th:value="${t.key}" th:text="${t.value}">Informe clínico</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Dirigido a</label>
+                            <input type="text" th:field="*{destinatario}" maxlength="150"
+                                   placeholder="A QUIEN CORRESPONDA / nombre del tutor"
+                                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500">
+                            <p class="text-[11px] text-slate-400 mt-1">Si lo dejas vacío se imprimirá «A QUIEN CORRESPONDA».</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Asunto *</label>
+                        <input type="text" th:field="*{asunto}" required maxlength="200"
+                               placeholder="Ej. Explicación del diagnóstico y plan de tratamiento dental"
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500">
+                        <p class="text-[11px] text-slate-400 mt-1">Frase corta que resume el documento; aparece debajo del título.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Cuerpo del informe *</label>
+                        <textarea th:field="*{contenido}" rows="15" required
+                                  placeholder="Redacta aquí el informe: motivo de la consulta, hallazgos, explicación del diagnóstico, tratamiento realizado, indicaciones y pronóstico..."
+                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm leading-relaxed focus:ring-2 focus:ring-sky-500"></textarea>
+                        <div class="flex items-start gap-2 mt-2 text-[11px] text-slate-500">
+                            <i class="fa-solid fa-circle-info mt-0.5 text-sky-600"></i>
+                            <p>Los saltos de línea y los párrafos se conservan en la impresión, con texto justificado. Un informe de una cuartilla cabe completo en una hoja carta.</p>
+                        </div>
+                        <div class="flex items-center justify-between mt-2 text-[11px]">
+                            <span id="contadorInforme" class="text-slate-400">0 palabras</span>
+                            <span id="avisoExtension" class="hidden text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-0.5">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Texto extenso: podría continuar en una segunda hoja.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-end gap-3">
+                    <a th:href="@{/informes}" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-semibold transition">Cancelar</a>
+                    <button type="submit" class="px-5 py-2.5 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-sm font-bold shadow flex items-center gap-2 transition">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span th:text="${informe.idInforme != null ? 'Guardar cambios' : 'Guardar y ver documento'}">Guardar y ver documento</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Columna lateral: paciente y referencia -->
+            <aside class="space-y-5">
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex items-center gap-2 pb-2 border-b border-slate-200">
+                        <i class="fa-solid fa-user-injured text-sky-700"></i>
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Paciente</h3>
+                    </div>
+
+                    <!-- Paciente fijo al editar -->
+                    <div th:if="${informe.idInforme != null}" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        <p class="text-[11px] uppercase font-semibold text-slate-400">Paciente del informe</p>
+                        <p class="text-sm font-bold text-slate-900" th:text="${informe.paciente.nombre + ' ' + informe.paciente.apellidos}">Paciente</p>
+                        <p class="text-[11px] text-slate-500 font-mono" th:text="${informe.paciente.curp}"></p>
+                    </div>
+
+                    <!-- Selección de paciente al crear -->
+                    <div th:if="${informe.idInforme == null}">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Paciente *</label>
+                        <select name="idPaciente" required
+                                onchange="if (this.value) { window.location.href = '/informes/nuevo?paciente=' + this.value; }"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500">
+                            <option value="" th:selected="${informe.paciente == null}">-- Selecciona un paciente --</option>
+                            <option th:each="p : ${pacientes}" th:value="${p.idPaciente}"
+                                    th:text="${p.apellidos + ' ' + p.nombre}"
+                                    th:selected="${informe.paciente != null and p.idPaciente == informe.paciente.idPaciente}"></option>
+                        </select>
+                        <p class="text-[11px] text-slate-400 mt-1">Al elegir al paciente se cargan sus consultas registradas.</p>
+                    </div>
+
+                    <div th:if="${informe.paciente != null}" class="text-[11px] text-slate-500 space-y-1">
+                        <p class="flex justify-between gap-2">
+                            <span class="text-slate-400">Nacimiento:</span>
+                            <span class="font-medium text-slate-700" th:text="${informe.paciente.fechaNacimiento != null ? informe.paciente.fechaNacimiento : 'No registrado'}"></span>
+                        </p>
+                        <p class="flex justify-between gap-2" th:if="${informe.paciente.tutor != null}">
+                            <span class="text-slate-400">Tutor:</span>
+                            <span class="font-medium text-slate-700 text-right" th:text="${informe.paciente.tutor.nombre + ' ' + informe.paciente.tutor.apellidos}"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex items-center gap-2 pb-2 border-b border-slate-200">
+                        <i class="fa-solid fa-tooth text-sky-700"></i>
+                        <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wide">Referencia y firma</h3>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Consulta de referencia</label>
+                        <select name="idCita" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500"
+                                th:disabled="${informe.paciente == null}">
+                            <option value="">Sin consulta específica</option>
+                            <option th:each="c : ${citasPaciente}" th:value="${c.idCita}"
+                                    th:selected="${informe.cita != null and informe.cita.idCita == c.idCita}"
+                                    th:text="${#temporals.format(c.fecha, 'dd/MM/yyyy') + ' · ' + #temporals.format(c.hora, 'HH:mm') + ' · ' + #strings.abbreviate(c.motivo, 42) + ' (' + c.especialidad + ')'}"></option>
+                        </select>
+                        <p class="text-[11px] text-slate-400 mt-1" th:if="${informe.paciente == null}">Selecciona primero al paciente.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sede (lugar y fecha)</label>
+                        <select th:field="*{lugar}" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500">
+                            <option th:each="s : ${sedes}" th:value="${s}" th:text="${s}">Chilpancingo, Gro.</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-sky-50 border border-sky-200 rounded-lg px-3 py-2">
+                        <p class="text-[11px] uppercase font-semibold text-sky-700">Suscribe</p>
+                        <p class="text-sm font-bold text-slate-900" th:text="${informe.medico != null ? informe.nombreSuscriptor : 'Por asignar'}"></p>
+                        <p class="text-[11px] text-slate-500">Cirujana Dentista · Céd. Prof. 3672461</p>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500 flex items-start gap-2">
+                        <i class="fa-solid fa-image mt-0.5 text-slate-400"></i>
+                        <span>Si el expediente del paciente ya tiene firma digital, se estampa automáticamente; si no, se imprime el espacio para firmar a mano.</span>
+                    </p>
+                </div>
+
+            </aside>
+        </div>
+    </form>
+
+</main>
+
+<script>
+    (function () {
+        const area = document.querySelector('textarea[name="contenido"]');
+        const contador = document.getElementById('contadorInforme');
+        const aviso = document.getElementById('avisoExtension');
+        if (!area) return;
+
+        function actualizar() {
+            const texto = area.value.trim();
+            const palabras = texto ? texto.split(/\s+/).length : 0;
+            contador.textContent = palabras + (palabras === 1 ? ' palabra' : ' palabras') + ' · ' + texto.length + ' caracteres';
+            aviso.classList.toggle('hidden', texto.length <= 2200);
+        }
+
+        area.addEventListener('input', actualizar);
+        actualizar();
+    })();
+</script>
+
+</body>
+</html>

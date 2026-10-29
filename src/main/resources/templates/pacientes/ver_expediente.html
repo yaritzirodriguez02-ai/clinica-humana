@@ -32,9 +32,20 @@
             <p class="text-sm text-slate-500"
                th:text="${esAdmin ? 'Historial completo de todas las atenciones previas.' : (esPediatra ? 'Historial de atenciones pediátricas.' : 'Historial de atenciones odontopediátricas.')}"></p>
         </div>
-        <a th:href="@{/pacientes}" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
-            <i class="fa-solid fa-arrow-left"></i> Volver a Pacientes
-        </a>
+        <div class="flex flex-wrap items-center gap-2">
+            <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+               th:href="@{/informes/nuevo(paciente=${idPaciente})}"
+               class="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                <i class="fa-solid fa-file-signature"></i> Redactar informe
+            </a>
+            <a th:href="@{/informes}" sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+               class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                <i class="fa-solid fa-folder-open"></i> Informes
+            </a>
+            <a th:href="@{/pacientes}" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i> Volver a Pacientes
+            </a>
+        </div>
     </div>
 
     <!-- Ficha del Paciente -->
@@ -253,6 +264,11 @@
                 </div>
 
                 <div class="mt-4 ml-0 sm:ml-[110px] flex flex-wrap gap-2 justify-end">
+                    <a th:href="@{/informes/nuevo(paciente=${idPaciente}, cita=${exp.cita.idCita})}"
+                       sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+                       class="text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
+                        <i class="fa-solid fa-file-signature"></i> Informe
+                    </a>
                     <a th:href="@{/consultas/odontopediatria/expediente/editar/{idExpediente}(idExpediente=${exp.idExpedienteOdonto}, idPaciente=${idPaciente})}"
                        class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
                         <i class="fa-solid fa-pen-to-square"></i> Editar

@@ -52,6 +52,11 @@
                 </div>
 
                 <div class="mt-4 ml-0 sm:ml-[110px] flex flex-wrap gap-2 justify-end">
+                    <a th:href="@{/informes/nuevo(paciente=${idPaciente}, cita=${exp.cita.idCita})}"
+                       sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+                       class="text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
+                        <i class="fa-solid fa-file-signature"></i> Informe
+                    </a>
                     <a th:href="@{/consultas/odontopediatria/expediente/editar/{idExpediente}(idPaciente=${idPaciente}, idExpediente=${exp.idExpedienteOdonto})}"
                        class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
                         <i class="fa-solid fa-pen-to-square"></i> Editar

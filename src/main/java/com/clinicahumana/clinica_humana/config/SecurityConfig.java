@@ -49,6 +49,10 @@ public class SecurityConfig {
                 // Recetas médicas: solo personal médico (Recepción no emite recetas)
                 .requestMatchers("/recetas/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
 
+                // Informes en hoja membretada de CISO: la odontóloga los redacta,
+                // recepción los consulta/imprime y el administrador tiene acceso total
+                .requestMatchers("/informes/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "ADMIN")
+
                 // Catálogo de medicamentos (Vademécum interno): personal médico y admin
                 .requestMatchers("/medicamentos/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
 

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title th:text="${'Informe ' + informe.folio + ' · CISO'}">Informe CISO</title>
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;600;700&family=Great+Vibes&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  @page { size: letter portrait; margin: 0; }
+
+  :root {
+    --az: #3a56a5;
+    --az2: #8fa0cc;
+    --az3: #2b4aa0;
+    --tinta: #1f2a44;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: #dfe5ee;
+    font-family: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+    color: var(--tinta);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---------- Barra de acciones (no se imprime) ---------- */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 6px 18px rgba(15,23,42,.28);
+  }
+  .toolbar .grupo { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .toolbar .titulo { color: #e2e8f0; font-family: Arial, Helvetica, sans-serif; }
+  .toolbar .titulo b { display: block; font-size: 13px; letter-spacing: .3px; }
+  .toolbar .titulo span { display: block; font-size: 11px; color: #94a3b8; }
+  .btn {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.14);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: translateY(1px) scale(.98); }
+  .btn-print { background: linear-gradient(135deg,#2563eb,#1d4ed8); color: #fff; box-shadow: 0 8px 18px rgba(37,99,235,.3); }
+  .btn-ghost { background: #1e293b; color: #e2e8f0; }
+  .btn-warn  { background: #92400e; color: #fff; }
+
+  .aviso {
+    max-width: 21.59cm;
+    margin: 14px auto 0;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-left: 4px solid var(--az);
+    border-radius: 8px;
+    padding: 9px 12px;
+  }
+  .aviso i { color: var(--az); }
+
+  /* ---------- Hoja carta ---------- */
+  .hoja {
+    position: relative;
+    width: 21.59cm;
+    min-height: 27.94cm;
+    margin: 16px auto 40px;
+    background: #fff;
+    box-shadow: 0 14px 34px rgba(15,23,42,.32);
+    padding: 4.6cm 2.05cm 4.35cm;
+    overflow: hidden;
+  }
+
+  /* Marca de agua: la "G" caligráfica + el sello CISO al pie */
+  .marca { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .marca .g {
+    position: absolute;
+    left: 50%;
+    top: 5.1cm;
+    transform: translateX(-50%);
+    font-family: 'Great Vibes', 'Segoe Script', cursive;
+    font-size: 14.6cm;
+    line-height: .9;
+    color: #dde5f7;
+    user-select: none;
+  }
+  .marca .sello {
+    position: absolute;
+    left: 50%;
+    bottom: 4.3cm;
+    transform: translateX(-50%);
+    width: 8.4cm;
+    opacity: .1;
+    mix-blend-mode: multiply;
+  }
+
+  /* ---------- Encabezado membretado ---------- */
+  .lh-top {
+    position: absolute;
+    top: .9cm;
+    left: 1.6cm;
+    right: 1.6cm;
+    height: 2.85cm;
+    z-index: 2;
+  }
+  .lh-top .logo {
+    position: absolute;
+    left: .1cm;
+    bottom: .18cm;
+    height: 2.45cm;
+    mix-blend-mode: multiply;
+  }
+  .lh-top .sellos {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: .28cm;
+  }
+  .lh-top .escudo { height: 1.95cm; mix-blend-mode: multiply; }
+  .lh-top .qr { height: 2.2cm; mix-blend-mode: multiply; }
+  .filete {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--az2);
+  }
+  .filete .dot {
+    position: absolute;
+    top: -2.5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--az2);
+  }
+
+  /* ---------- Pie membretado ---------- */
+  .lh-bottom {
+    position: absolute;
+    left: 1.6cm;
+    right: 1.6cm;
+    bottom: .7cm;
+    z-index: 2;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  .foot-box {
+    display: grid;
+    grid-template-columns: 2.35cm 4.5cm 4.75cm 1fr;
+    border: 1px solid var(--az2);
+    border-bottom: none;
+    min-height: 2.35cm;
+  }
+  .cell {
+    padding: .16cm .18cm;
+    border-left: 1px solid var(--az2);
+    display: flex;
+    align-items: flex-start;
+    gap: .14cm;
+    font-size: 7.6px;
+    line-height: 1.3;
+    color: var(--az3);
+  }
+  .cell:first-child { border-left: none; align-items: center; gap: .16cm; }
+  .cell.stack { flex-direction: column; gap: .18cm; justify-content: center; }
+  .line { display: flex; align-items: flex-start; gap: .14cm; }
+  .cell .lbl { font-weight: 700; font-size: 8.4px; }
+  .cell .txt { font-weight: 600; }
+  .cell.dirs .txt { font-weight: 400; font-size: 7.2px; }
+  .ico { flex: 0 0 auto; }
+  .barra { height: .34cm; background: var(--az3); }
+
+  /* ---------- Cuerpo del informe ---------- */
+  .cuerpo {
+    position: relative;
+    z-index: 1;
+    font-size: 13px;
+    line-height: 1.72;
+    color: #172033;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 10px;
+    letter-spacing: .3px;
+    color: #4b5872;
+    margin-bottom: 1.05cm;
+  }
+  .meta .folio { font-family: Arial, Helvetica, sans-serif; font-weight: 700; color: var(--az); }
+  .meta .lugar { text-align: right; }
+
+  .destinatario { margin: 0 0 .5cm; font-size: 12.4px; }
+  .etiqueta {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8.6px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: var(--az);
+    margin-right: .2cm;
+  }
+
+  .tipo-doc {
+    font-family: 'Antonio', 'Arial Narrow', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2.4px;
+    text-transform: uppercase;
+    color: var(--az3);
+    margin: .1cm 0 .12cm;
+  }
+  .asunto { font-size: 12.8px; font-weight: 700; margin: 0 0 .55cm; }
+  .regla { height: 1px; background: #c9d4ea; margin: 0 0 .45cm; }
+
+  .datos {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 9.6px;
+    color: #3f4c66;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .15cm .7cm;
+    padding-bottom: .3cm;
+    margin-bottom: .65cm;
+    border-bottom: 1px dotted #c9d4ea;
+  }
+  .datos b { color: var(--az3); letter-spacing: .3px; text-transform: uppercase; font-size: 7.8px; }
+
+  .texto {
+    white-space: pre-wrap;
+    text-align: justify;
+    hyphens: auto;
+    min-height: 7.2cm;
+    orphans: 3;
+    widows: 3;
+  }
+
+  .cierre { margin-top: 1.1cm; }
+  .despedida { margin: 0 0 1.35cm; font-size: 12.6px; }
+  .bloque-firma { width: 9cm; }
+  .firma-img { max-height: 1.5cm; max-width: 8cm; object-fit: contain; display: block; margin-bottom: .12cm; }
+  .firma-linea { width: 7.4cm; border-bottom: 1px solid var(--az3); height: 1.35cm; margin-bottom: .18cm; }
+  .firma-nombre {
+    font-family: 'Antonio', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13.6px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--az3);
+    margin: 0;
+    white-space: nowrap;
+  }
+  .firma-cargo { font-size: 10.4px; margin: .1cm 0 0; color: #33415c; }
+  .firma-ced {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 8.6px;
+    color: #5b6880;
+    margin: .12cm 0 0;
+    letter-spacing: .2px;
+  }
+
+  /* ---------- Impresión ---------- */
+  @media print {
+    html, body { background: #fff !important; }
+    .toolbar, .aviso { display: none !important; }
+    .hoja {
+      width: auto;
+      min-height: 0;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+      overflow: visible;
+    }
+    .marca, .lh-top, .lh-bottom { position: fixed; }
+    .marca { inset: 0; }
+    .lh-top { top: .9cm; left: 1.6cm; right: 1.6cm; }
+    .lh-bottom { left: 1.6cm; right: 1.6cm; bottom: .7cm; }
+    .cuerpo { padding: 4.6cm 2.05cm 4.35cm; }
+    .texto { min-height: 0; }
+    .cierre { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Acciones en pantalla -->
+<div class="toolbar">
+  <div class="grupo">
+    <a th:href="@{/informes}" class="btn btn-ghost">← Historial</a>
+    <div class="titulo">
+      <b th:text="${informe.tipoEtiqueta}">Informe clínico</b>
+      <span th:text="${informe.folio + ' · ' + informe.paciente.nombre + ' ' + informe.paciente.apellidos}">CISO-INF-0001/2026</span>
+    </div>
+  </div>
+  <div class="grupo">
+    <a th:href="@{/informes/editar/{id}(id=${informe.idInforme})}" class="btn btn-warn">Editar texto</a>
+    <button type="button" onclick="window.print()" class="btn btn-print">Imprimir / Guardar PDF</button>
+  </div>
+</div>
+
+<div class="aviso">
+  <span><b>Hoja membretada oficial · tamaño carta.</b> En el diálogo de impresión elige la impresora o «Guardar como PDF», tamaño Carta, escala 100 % y márgenes «Ninguno» para que el membrete y el pie queden completos.</span>
+</div>
+
+<div class="hoja">
+
+  <!-- Marca de agua -->
+  <div class="marca" aria-hidden="true">
+    <span class="g">G</span>
+    <img class="sello" th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="">
+  </div>
+
+  <!-- Encabezado -->
+  <header class="lh-top">
+    <img class="logo" th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="Clínica Integral de Servicios Odontológicos">
+    <div class="sellos">
+      <img class="escudo" th:src="@{/img/logo-unam.jpg}" src="/img/logo-unam.jpg" alt="Escudo">
+      <img class="qr" th:src="@{/img/qr.jpg}" src="/img/qr.jpg" alt="Código QR">
+    </div>
+    <div class="filete">
+      <span class="dot" style="left:0"></span>
+      <span class="dot" style="left:31%"></span>
+      <span class="dot" style="left:62%"></span>
+      <span class="dot" style="right:0"></span>
+    </div>
+  </header>
+
+  <!-- Cuerpo -->
+  <main class="cuerpo">
+
+    <div class="meta">
+      <span class="folio" th:text="${'Folio: ' + informe.folio}">Folio: CISO-INF-0001/2026</span>
+      <span class="lugar" th:text="${informe.lugar + ', a ' + fechaLarga}">Chilpancingo, Gro., a 27 de octubre de 2026</span>
+    </div>
+
+    <p class="destinatario">
+      <span class="etiqueta">Para</span><span th:text="${informe.destinatario}">A QUIEN CORRESPONDA</span>
+    </p>
+
+    <p class="tipo-doc" th:text="${informe.tipoEtiqueta}">Informe clínico</p>
+    <p class="asunto"><span class="etiqueta">Asunto</span><span th:text="${informe.asunto}">Asunto del informe</span></p>
+    <div class="regla"></div>
+
+    <div class="datos">
+      <span><b>Paciente:</b> <span th:text="${informe.paciente.nombre + ' ' + informe.paciente.apellidos}">Nombre</span></span>
+      <span th:if="${edadCalculada != null}"><b>Edad:</b> <span th:text="${edadCalculada}">8 años</span></span>
+      <span th:if="${informe.paciente.curp != null and !#strings.isEmpty(informe.paciente.curp)}"><b>CURP:</b> <span th:text="${informe.paciente.curp}"></span></span>
+      <span th:if="${informe.cita != null}"><b>Consulta:</b> <span th:text="${#temporals.format(informe.cita.fecha, 'dd/MM/yyyy')}">27/10/2026</span></span>
+    </div>
+
+    <div class="texto" th:text="${informe.contenido}">Contenido del informe.</div>
+
+    <div class="cierre">
+      <p class="despedida">Sin otro particular, quedo a sus órdenes para cualquier aclaración.</p>
+
+      <div class="bloque-firma">
+        <img th:if="${firmaDigital != null}" class="firma-img" th:src="${firmaDigital}" alt="Firma de la especialista">
+        <div th:unless="${firmaDigital != null}" class="firma-linea"></div>
+        <p class="firma-nombre" th:text="${informe.nombreSuscriptor}">DRA. GLORIA GONZÁLEZ HERRERA</p>
+        <p class="firma-cargo">Cirujana Dentista · Odontología</p>
+        <p class="firma-ced">Céd. Prof. 3672461 · Céd. Esp. 13962591</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Pie -->
+  <footer class="lh-bottom">
+    <div class="foot-box">
+
+      <div class="cell">
+        <svg class="ico" width="18" height="16" viewBox="0 0 30 26" fill="none" stroke="#2b4aa0" stroke-width="2">
+          <rect x="2" y="7" width="20" height="17"/>
+          <path d="M5 13L12 21L28 3" stroke-width="5"/>
+        </svg>
+        <span class="lbl">Firma</span>
+      </div>
+
+      <div class="cell">
+        <svg class="ico" width="17" height="12" viewBox="0 0 24 16">
+          <rect x="1" y="1" width="22" height="14" fill="#2b4aa0"/>
+          <path d="M1 1L12 9L23 1" fill="none" stroke="#fff" stroke-width="1.5"/>
+        </svg>
+        <span class="txt">azaglez1@hotmail.com</span>
+      </div>
+
+      <div class="cell stack">
+        <div class="line">
+          <svg class="ico" width="13" height="13" viewBox="0 0 18 18">
+            <rect width="18" height="18" rx="4" fill="#2b4aa0"/>
+            <path d="M5 4C5 11 7 13 14 13L14 10L11.5 9L10.5 10.5C8.5 9.5 8 8.5 7.5 6.5L9 5.5L8 3Z" fill="#fff"/>
+          </svg>
+          <span class="txt">Tels. 47 2 41 00 / 47 2 9051</span>
+        </div>
+        <div class="line">
+          <svg class="ico" width="13" height="13" viewBox="0 0 18 18">
+            <rect width="18" height="18" rx="4" fill="#2b4aa0"/>
+            <path d="M5 4C5 11 7 13 14 13L14 10L11.5 9L10.5 10.5C8.5 9.5 8 8.5 7.5 6.5L9 5.5L8 3Z" fill="#fff"/>
+          </svg>
+          <span class="txt">Cel. 7474 9905 38</span>
+        </div>
+      </div>
+
+      <div class="cell stack dirs">
+        <div class="line">
+          <svg class="ico" width="15" height="12" viewBox="0 0 34 20" fill="none" stroke="#2b4aa0" stroke-width="1.5">
+            <circle cx="10" cy="10" r="8"/><ellipse cx="10" cy="10" rx="3.5" ry="8"/><path d="M2 10H18"/><circle cx="21" cy="11" r="5" fill="#fff"/><path d="M25 15L32 19" stroke-width="2.5"/>
+          </svg>
+          <span class="txt">Clínica Médica Humana: Avenida Lázaro Cárdenas #59, Col. Haciendita, C.P. 39087, Chilpancingo, Gro.</span>
+        </div>
+        <div class="line">
+          <svg class="ico" width="15" height="12" viewBox="0 0 34 20" fill="none" stroke="#2b4aa0" stroke-width="1.5">
+            <circle cx="10" cy="10" r="8"/><ellipse cx="10" cy="10" rx="3.5" ry="8"/><path d="M2 10H18"/><circle cx="21" cy="11" r="5" fill="#fff"/><path d="M25 15L32 19" stroke-width="2.5"/>
+          </svg>
+          <span class="txt">Av. Vicente Guerrero #57 Planta alta, Col. Centro, C.P. 39000, Iguala, Gro.</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="barra"></div>
+  </footer>
+
+</div>
+
+</body>
+</html>

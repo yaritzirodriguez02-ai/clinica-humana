@@ -71,6 +71,13 @@
                     <i class="fa-solid fa-user-injured text-blue-300"></i> Pacientes y Tutores
                 </a>
 
+                <!-- 3a. INFORMES EN HOJA MEMBRETADA (Odontología, Recepción y Admin) -->
+                <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN', 'ADMINISTRADOR')"
+                   th:href="@{/informes}"
+                   class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-100">
+                    <i class="fa-solid fa-file-signature text-blue-300"></i> Informes
+                </a>
+
                 <!-- 3b. CATÁLOGO DE MEDICAMENTOS (Personal médico y Admin) -->
                 <a sec:authorize="hasAnyRole('PEDIATRA', 'ODONTOLOGIA', 'ODONTOPEDIATRA', 'ADMIN')"
                    th:href="@{/medicamentos}"
