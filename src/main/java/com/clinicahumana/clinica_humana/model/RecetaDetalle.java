@@ -3,6 +3,7 @@ package com.clinicahumana.clinica_humana.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import com.clinicahumana.clinica_humana.validation.ValidacionesClinicas;
 
 @Entity
@@ -27,7 +28,7 @@ public class RecetaDetalle {
     private String presentacion;
 
     @NotBlank(message = "La dosis es obligatoria")
-    @Pattern(regexp = ValidacionesClinicas.DOSIS_REGEX, message = "La dosis debe ser un número seguido de su unidad (ej. 5 ml, 10 mg, 2 gotas)")
+    @Size(max = 60, message = "La dosis no debe exceder 60 caracteres")
     @Column(nullable = false, length = 60)
     private String dosis;
 

@@ -27,12 +27,6 @@ public final class ValidacionesClinicas {
     // Recetas: formatos estructurados y obligatorios
     // ------------------------------------------------------------------
 
-    /** Dosis: número (o fracción) seguido de unidad (ej. "5 ml", "10 mg", "2 gotas", "1/2 cda"). */
-    public static final String DOSIS_REGEX =
-            "^(?:\\d{1,3}(?:[.,]\\d{1,2})?|\\d{1,3}\\s*/\\s*\\d{1,2})\\s*" +
-            "(?:ml/kg|mg/kg|mcg/kg|gotas?|gts?|comprimidos?|capsulas?|cucharaditas?|cucharadas?|sobres?|parches?" +
-            "|unidad(?:es)?|ml|mg|mcg|g|cg|ui|comp\\.?|caps\\.?|cda\\.?)$";
-
     /** Frecuencia ("Cada"): número + unidad de tiempo (ej. "cada 8 horas", "8 hrs", "c/8h", "q8h"). */
     public static final String FRECUENCIA_REGEX =
             "^(?:cada\\s+|c/\\s*|q)?\\d{1,3}(?:\\s*-\\s*\\d{1,3})?\\s*" +
@@ -47,7 +41,6 @@ public final class ValidacionesClinicas {
     public static final String MEDICAMENTO_REGEX =
             "^[\\p{L}\\d][\\p{L}\\d\\s\\-\\.\\(\\)%+,/']{2,119}$";
 
-    public static final Pattern DOSIS = Pattern.compile(DOSIS_REGEX, FLAGS);
     public static final Pattern FRECUENCIA = Pattern.compile(FRECUENCIA_REGEX, FLAGS);
     public static final Pattern DURACION = Pattern.compile(DURACION_REGEX, FLAGS);
     public static final Pattern MEDICAMENTO = Pattern.compile(MEDICAMENTO_REGEX);
@@ -125,10 +118,6 @@ public final class ValidacionesClinicas {
             }
         }
         return letras >= 4;
-    }
-
-    public static boolean dosisValida(String dosis) {
-        return dosis != null && DOSIS.matcher(dosis.trim()).matches();
     }
 
     public static boolean frecuenciaValida(String frecuencia) {

@@ -132,7 +132,7 @@ if (!recetasExistentes.isEmpty()) {
             }
         }
 
-        // 2. Renglones de medicamentos: fármaco real + dosis/frecuencia/duración estructuradas
+        // 2. Renglones de medicamentos: fármaco real, dosis en texto libre y frecuencia/duración estructuradas
         if (medicamentos == null || medicamentos.length == 0) {
             errores.add("Debe prescribir al menos un medicamento.");
         } else {
@@ -150,8 +150,8 @@ if (!recetasExistentes.isEmpty()) {
                 if (!ValidacionesClinicas.medicamentoValido(med)) {
                     errores.add(prefijo + "el medicamento '" + med + "' no es un nombre de fármaco válido. Use el catálogo interno o un nombre real del vademécum (letras, espacios y signos básicos), sin texto aleatorio.");
                 }
-                if (!ValidacionesClinicas.dosisValida(dosisValor)) {
-                    errores.add(prefijo + "la dosis '" + dosisValor + "' no tiene un formato coherente. Use un número seguido de la unidad (ej. 5 ml, 10 mg, 2 gotas).");
+                if (dosisValor.isEmpty()) {
+                    errores.add(prefijo + "debe indicar la dosis (ej. 1 pastilla, 1 ampolleta, 5 ml).");
                 }
                 if (!ValidacionesClinicas.frecuenciaValida(frecValor)) {
                     errores.add(prefijo + "la frecuencia '" + frecValor + "' no tiene un formato coherente. Use por ejemplo: cada 8 horas, 8 hrs o c/8h.");
