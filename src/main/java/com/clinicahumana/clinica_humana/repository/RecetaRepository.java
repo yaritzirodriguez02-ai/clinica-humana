@@ -10,4 +10,11 @@ import java.util.List;
 public interface RecetaRepository extends JpaRepository<Receta, Long> {
     List<Receta> findByCitaIdCitaOrderByIdRecetaDesc(Long idCita);
     List<Receta> findByPacienteIdPacienteOrderByFechaEmisionDesc(Long idPaciente);
+
+    // Depuración de registros
+    List<Receta> findByCitaIdCita(Long idCita);
+
+    List<Receta> findByCitaIdCitaIn(java.util.Collection<Long> idsCita);
+
+    List<Receta> findByPacienteIdPacienteIn(java.util.Collection<Long> idsPaciente);
 }

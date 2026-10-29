@@ -11,4 +11,7 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByCurp(String curp);
     boolean existsByCurp(String curp);
     List<Paciente> findByNombreContainingIgnoreCaseOrApellidosContainingIgnoreCase(String nombre, String apellidos);
+
+    // Depuración de registros: tutor sin pacientes pendientes
+    boolean existsByTutorIdTutor(Long idTutor);
 }

@@ -13,4 +13,9 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
     List<Pago> findByPacienteIdPaciente(Long idPaciente);
 
     List<Pago> findByFechaPagoBetween(java.time.LocalDateTime inicio, java.time.LocalDateTime fin);
+
+    // Depuración de registros
+    List<Pago> findByCitaIdCitaIn(java.util.Collection<Long> idsCita);
+
+    List<Pago> findByPacienteIdPacienteIn(java.util.Collection<Long> idsPaciente);
 }

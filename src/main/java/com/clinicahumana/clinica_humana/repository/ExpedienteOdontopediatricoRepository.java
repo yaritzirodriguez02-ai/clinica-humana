@@ -15,4 +15,9 @@ public interface ExpedienteOdontopediatricoRepository extends JpaRepository<Expe
     List<ExpedienteOdontopediatrico> findByPacienteIdPacienteAndMedicoIdUsuarioOrderByFechaAtencionDesc(Long idPaciente, Long idMedico);
 
     boolean existsByPacienteIdPacienteAndIdExpedienteOdonto(Long idPaciente, Long idExpedienteOdonto);
+
+    // Depuración de registros
+    List<ExpedienteOdontopediatrico> findByCitaIdCitaIn(java.util.Collection<Long> idsCita);
+
+    boolean existsByPacienteIdPaciente(Long idPaciente);
 }

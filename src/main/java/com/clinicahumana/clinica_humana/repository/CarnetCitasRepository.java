@@ -30,4 +30,7 @@ public interface CarnetCitasRepository extends JpaRepository<CarnetCitas, Long> 
      * Cuenta de carnets por paciente.
      */
     long countByPacienteIdPaciente(Long idPaciente);
+
+    // Depuración de registros
+    List<CarnetCitas> findByPacienteIdPacienteIn(java.util.Collection<Long> idsPaciente);
 }

@@ -12,4 +12,11 @@ public interface InformeOdontologicoRepository extends JpaRepository<InformeOdon
     List<InformeOdontologico> findAllByOrderByFechaEmisionDescIdInformeDesc();
 
     List<InformeOdontologico> findByPacienteIdPacienteOrderByFechaEmisionDescIdInformeDesc(Long idPaciente);
+
+    // Depuración de registros
+    List<InformeOdontologico> findByCitaIdCita(Long idCita);
+
+    List<InformeOdontologico> findByCitaIdCitaIn(java.util.Collection<Long> idsCita);
+
+    List<InformeOdontologico> findByPacienteIdPaciente(Long idPaciente);
 }

@@ -53,6 +53,10 @@ public class SecurityConfig {
                 // recepción los consulta/imprime y el administrador tiene acceso total
                 .requestMatchers("/informes/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "ADMIN")
 
+                // Limpieza de registros por área: odontología y recepción comparten el
+                // área dental, pediatría administra la suya y el admin controla ambas
+                .requestMatchers("/registros/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "PEDIATRA", "ADMIN")
+
                 // Catálogo de medicamentos (Vademécum interno): personal médico y admin
                 .requestMatchers("/medicamentos/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
 
