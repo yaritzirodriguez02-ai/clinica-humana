@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.controller;
 
+import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.model.Tutor;
@@ -59,9 +60,14 @@ public class PortalTutorController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            // 1. Buscar o Registrar Tutor
-            Tutor tutor = tutorRepo.findAll().stream()
-                    .filter(t -> t.getTelefono() != null && t.getTelefono().equals(telefonoTutor))
+            // La solicitud cae en el área de la especialidad elegida: los paneles no se mezclan
+            AreaClinica area = AreaClinica.paraEspecialidad(especialidad);
+            if (area == null) {
+                throw new IllegalArgumentException("Debe seleccionar una especialidad válida (Pediatría u Odontología).");
+            }
+
+            // 1. Buscar o Registrar Tutor dentro del área
+            Tutor tutor = tutorRepo.findByTelefonoAndArea(telefonoTutor.trim(), area).stream()
                     .findFirst()
                     .orElseGet(() -> {
                         Tutor nuevo = new Tutor();
@@ -69,11 +75,12 @@ public class PortalTutorController {
                         nuevo.setApellidos(apellidosTutor.trim());
                         nuevo.setTelefono(telefonoTutor.trim());
                         nuevo.setParentesco(parentesco.trim());
+                        nuevo.setArea(area);
                         return tutorRepo.save(nuevo);
                     });
 
-            // 2. Buscar o Registrar Paciente por CURP
-            Optional<Paciente> optPaciente = pacienteRepo.findByCurp(curp.trim().toUpperCase());
+            // 2. Buscar o Registrar Paciente por CURP dentro del área
+            Optional<Paciente> optPaciente = pacienteRepo.findByCurpAndArea(curp.trim().toUpperCase(), area);
             Paciente paciente;
             if (optPaciente.isPresent()) {
                 paciente = optPaciente.get();
@@ -88,6 +95,7 @@ public class PortalTutorController {
                String sexoNormalizado = (sexo != null && !sexo.isEmpty()) ? String.valueOf(sexo.trim().toUpperCase().charAt(0)) : "M";
 paciente.setSexo(sexoNormalizado);
                 paciente.setTutor(tutor);
+                paciente.setArea(area);
                 paciente = pacienteRepo.save(paciente);
             }
 

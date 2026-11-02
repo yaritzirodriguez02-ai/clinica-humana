@@ -41,7 +41,8 @@
                 <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Seleccionar Paciente *</label>
                 <select th:field="*{paciente.idPaciente}" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm font-medium">
                     <option value="">-- Selecciona un paciente registrado --</option>
-                    <option th:each="pac : ${pacientes}" th:value="${pac.idPaciente}" th:text="${pac.nombre + ' ' + pac.apellidos + ' (CURP: ' + pac.curp + ')'}"></option>
+                    <option th:each="pac : ${pacientes}" th:value="${pac.idPaciente}"
+                            th:text="${pac.nombre + ' ' + pac.apellidos + ' (CURP: ' + pac.curp + ')' + ((esAdmin and pac.area != null) ? ' - ' + pac.area.etiqueta : '')}"></option>
                 </select>
             </div>
 <!-- Especialidad Requerida Condicionada según Rol -->

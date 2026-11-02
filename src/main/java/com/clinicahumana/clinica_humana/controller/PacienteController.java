@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.controller;
 
+import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
 import com.clinicahumana.clinica_humana.model.ExpedientePediatrico;
 import com.clinicahumana.clinica_humana.model.Paciente;
@@ -34,17 +35,38 @@ public class PacienteController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Listar todos los pacientes con opción de búsqueda (RF02)
+    // Listar los pacientes del área del usuario con opción de búsqueda (RF02)
     @GetMapping
-    public String listarPacientes(@RequestParam(name = "buscar", required = false) String buscar, Model model) {
-        List<Paciente> lista;
-        if (buscar != null && !buscar.trim().isEmpty()) {
-            lista = pacienteService.buscarPorNombreOApellido(buscar.trim());
-        } else {
-            lista = pacienteService.listarTodos();
+    public String listarPacientes(@RequestParam(name = "buscar", required = false) String buscar,
+                                  @RequestParam(name = "area", required = false) String slug,
+                                  Principal principal,
+                                  Model model) {
+        String rol = rolActual(principal);
+        boolean esAdmin = esAdmin(rol);
+        AreaClinica areaRol = AreaClinica.paraRol(rol);
+
+        // Cada panel ve sólo su área; el administrador alterna entre las dos con pestañas
+        List<AreaClinica> areasPermitidas = esAdmin
+                ? List.of(AreaClinica.values())
+                : (areaRol != null ? List.of(areaRol) : List.of());
+
+        AreaClinica area = esAdmin ? AreaClinica.desdeSlug(slug) : areaRol;
+        if (area == null) {
+            area = areasPermitidas.isEmpty() ? AreaClinica.ODONTOLOGIA : areasPermitidas.get(0);
         }
+        if (!areasPermitidas.isEmpty() && !areasPermitidas.contains(area)) {
+            area = areasPermitidas.get(0);
+        }
+
+        List<Paciente> lista = (buscar != null && !buscar.trim().isEmpty())
+                ? pacienteService.buscarPorNombreOApellido(buscar.trim(), area)
+                : pacienteService.listarPorArea(area);
+
         model.addAttribute("pacientes", lista);
         model.addAttribute("buscar", buscar);
+        model.addAttribute("areaActual", area);
+        model.addAttribute("areasPermitidas", areasPermitidas);
+        model.addAttribute("esAdmin", esAdmin);
         return "pacientes/lista_pacientes";
     }
 
@@ -64,7 +86,17 @@ public class PacienteController {
 
         Usuario usuarioActual = usuarioService.buscarPorUsername(principal != null ? principal.getName() : "").orElse(null);
         String rol = usuarioActual != null ? usuarioActual.getRol() : "";
-        boolean esAdmin = "ADMIN".equals(rol);
+        boolean esAdmin = esAdmin(rol);
+
+        // Un paciente sólo puede abrirse desde el panel del área donde fue registrado
+        AreaClinica areaRol = AreaClinica.paraRol(rol);
+        if (!esAdmin && areaRol != null && paciente.getArea() != null && paciente.getArea() != areaRol) {
+            redirectAttributes.addFlashAttribute("mensajeError",
+                    "El paciente " + paciente.getNombre() + " " + paciente.getApellidos()
+                            + " pertenece al área de " + paciente.getArea().getEtiqueta() + ".");
+            return "redirect:/pacientes";
+        }
+
         boolean esPediatra = "PEDIATRA".equals(rol);
         boolean esOdontopediatra = "ODONTOPEDIATRA".equals(rol);
         boolean esRecepcionista = "RECEPCIONISTA".equals(rol);
@@ -105,11 +137,18 @@ public class PacienteController {
 
     // Mostrar formulario de nuevo paciente (RF01, RF03)
     @GetMapping("/nuevo")
-    public String formularioNuevoPaciente(Model model) {
+    public String formularioNuevoPaciente(@RequestParam(name = "area", required = false) String slug,
+                                          Principal principal,
+                                          Model model) {
+        String rol = rolActual(principal);
+        AreaClinica area = areaDeAlta(rol, slug);
+
         Paciente paciente = new Paciente();
+        paciente.setArea(area);
         paciente.setTutor(new Tutor()); // Instanciar para el formulario anidado
-        model.addAttribute("paciente", paciente);
-        model.addAttribute("tutoresExistentes", pacienteService.listarTutores());
+        paciente.getTutor().setArea(area);
+
+        prepararFormulario(model, paciente, area, esAdmin(rol));
         return "pacientes/formulario";
     }
 
@@ -119,8 +158,13 @@ public class PacienteController {
                                  BindingResult result,
                                  @RequestParam(name = "tieneAlergias", required = false) String tieneAlergias,
                                  @RequestParam(name = "tieneAntecedentes", required = false) String tieneAntecedentes,
+                                 @RequestParam(name = "areaSlug", required = false) String slug,
+                                 Principal principal,
                                  Model model,
                                  RedirectAttributes redirectAttributes) {
+        // El área se fija en el servidor: el rol la impone y el administrador crea desde su pestaña
+        String rol = rolActual(principal);
+        AreaClinica area = areaDeAlta(rol, slug);
         // Condicionales Sí/No del formulario: si la respuesta es "No", se limpia el detalle
         if (!"S".equals(tieneAlergias)) {
             paciente.setAlergias("");
@@ -134,32 +178,85 @@ public class PacienteController {
             paciente.setAntecedentes(paciente.getAntecedentes().trim());
         }
 
+        paciente.setArea(area);
+
         if (result.hasErrors()) {
-            model.addAttribute("tutoresExistentes", pacienteService.listarTutores());
+            prepararFormulario(model, paciente, area, esAdmin(rol));
             return "pacientes/formulario";
         }
 
         try {
             pacienteService.registrarOActualizarPaciente(paciente);
-            redirectAttributes.addFlashAttribute("mensajeExito", "¡Paciente y tutor guardados exitosamente!");
-            return "redirect:/pacientes";
+            redirectAttributes.addFlashAttribute("mensajeExito", "¡Paciente y tutor guardados exitosamente en "
+                    + area.getEtiqueta() + "!");
+            return "redirect:/pacientes?area=" + area.getSlug();
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorCurp", e.getMessage());
-            model.addAttribute("tutoresExistentes", pacienteService.listarTutores());
+            prepararFormulario(model, paciente, area, esAdmin(rol));
             return "pacientes/formulario";
         }
     }
 
     // Editar paciente existente
     @GetMapping("/editar/{id}")
-    public String editarPaciente(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String editarPaciente(@PathVariable("id") Long id,
+                                 Principal principal,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+        String rol = rolActual(principal);
+        boolean esAdmin = esAdmin(rol);
+        AreaClinica areaRol = AreaClinica.paraRol(rol);
+
         return pacienteService.buscarPorId(id).map(paciente -> {
-            model.addAttribute("paciente", paciente);
-            model.addAttribute("tutoresExistentes", pacienteService.listarTutores());
+            AreaClinica area = paciente.getArea() != null
+                    ? paciente.getArea()
+                    : (areaRol != null ? areaRol : AreaClinica.ODONTOLOGIA);
+
+            if (!esAdmin && areaRol != null && area != areaRol) {
+                redirectAttributes.addFlashAttribute("mensajeError",
+                        "El paciente pertenece al área de " + area.getEtiqueta() + ".");
+                return "redirect:/pacientes";
+            }
+
+            if (paciente.getTutor() == null) {
+                paciente.setTutor(new Tutor());
+            }
+            prepararFormulario(model, paciente, area, esAdmin);
             return "pacientes/formulario";
         }).orElseGet(() -> {
             redirectAttributes.addFlashAttribute("mensajeError", "El paciente con ID " + id + " no existe.");
             return "redirect:/pacientes";
         });
+    }
+
+    // ===================== APOYO =====================
+
+    private void prepararFormulario(Model model, Paciente paciente, AreaClinica area, boolean esAdmin) {
+        model.addAttribute("paciente", paciente);
+        model.addAttribute("areaActual", area);
+        model.addAttribute("esAdmin", esAdmin);
+        model.addAttribute("tutoresExistentes", pacienteService.listarTutoresPorArea(area));
+    }
+
+    /** Área de alta: el rol la impone; el administrador la elige desde la pestaña activa. */
+    private AreaClinica areaDeAlta(String rol, String slug) {
+        AreaClinica areaRol = AreaClinica.paraRol(rol);
+        if (areaRol != null) {
+            return areaRol;
+        }
+        AreaClinica elegida = AreaClinica.desdeSlug(slug);
+        return elegida != null ? elegida : AreaClinica.ODONTOLOGIA;
+    }
+
+    private boolean esAdmin(String rol) {
+        return "ADMIN".equalsIgnoreCase(rol) || "ADMINISTRADOR".equalsIgnoreCase(rol);
+    }
+
+    private String rolActual(Principal principal) {
+        if (principal == null) {
+            return "";
+        }
+        Usuario usuario = usuarioService.buscarPorUsername(principal.getName()).orElse(null);
+        return usuario != null && usuario.getRol() != null ? usuario.getRol().toUpperCase() : "";
     }
 }

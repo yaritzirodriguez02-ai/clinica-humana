@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.service;
 
+import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.DisponibilidadHorario;
 import com.clinicahumana.clinica_humana.repository.CitaRepository;
@@ -66,6 +67,16 @@ public class CitaService {
 
     @Transactional
     public Cita agendarCita(Cita cita) {
+        // Los paneles no se mezclan: el paciente debe estar registrado en el área de la especialidad
+        AreaClinica areaCita = AreaClinica.paraEspecialidad(cita.getEspecialidad());
+        if (areaCita != null && cita.getPaciente() != null
+                && cita.getPaciente().getArea() != null
+                && cita.getPaciente().getArea() != areaCita) {
+            throw new IllegalStateException("El paciente está registrado en el área de "
+                    + cita.getPaciente().getArea().getEtiqueta() + ". Regístrelo también en "
+                    + areaCita.getEtiqueta() + " para atenderlo en esa especialidad.");
+        }
+
         // Regla de Negocio: Validar que no exista choque de citas en la misma fecha y hora con el mismo médico
         Long idMedico = cita.getMedico().getIdUsuario();
         boolean horarioOcupado = (cita.getIdCita() == null)

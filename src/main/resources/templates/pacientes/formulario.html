@@ -14,9 +14,9 @@
         <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-lg font-bold flex items-center gap-2">
                 <i class="fa-solid fa-hospital-user text-indigo-200"></i>
-                <span th:text="${paciente.idPaciente == null ? 'Nuevo Paciente Pediátrico' : 'Modificar Datos de Paciente'}"></span>
+                <span th:text="${paciente.idPaciente == null ? ('Nuevo Paciente - ' + areaActual.etiqueta) : ('Modificar Datos de Paciente - ' + areaActual.etiqueta)}"></span>
             </h1>
-            <a th:href="@{/pacientes}" class="text-sm bg-indigo-800 hover:bg-indigo-900 px-3 py-1.5 rounded-lg transition border border-indigo-500">
+            <a th:href="@{/pacientes(area=${areaActual.slug})}" class="text-sm bg-indigo-800 hover:bg-indigo-900 px-3 py-1.5 rounded-lg transition border border-indigo-500">
                 <i class="fa-solid fa-arrow-left"></i> Volver a la lista
             </a>
         </div>
@@ -32,11 +32,17 @@
 
         <form th:action="@{/pacientes/guardar}" th:object="${paciente}" method="post" class="space-y-6">
             <input type="hidden" th:field="*{idPaciente}" />
+            <input type="hidden" name="areaSlug" th:value="${areaActual.slug}" />
+
+            <div class="bg-indigo-50 border border-indigo-200 text-indigo-900 rounded-xl px-4 py-3 text-xs font-semibold flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i>
+                <span th:text="${'Área clínica: ' + areaActual.etiqueta + ' (este registro no se comparte con el otro panel)'}">Área clínica</span>
+            </div>
 
             <!-- BLOQUE 1: DATOS DEL PACIENTE -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h2 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-child text-indigo-600"></i> Datos del Infante (Paciente)
+                    <i class="fa-solid fa-user text-indigo-600"></i> Datos del Paciente
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -176,7 +182,7 @@
 
             <!-- Botones de Acción -->
             <div class="flex justify-end gap-3">
-                <a th:href="@{/pacientes}" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-semibold transition">
+                <a th:href="@{/pacientes(area=${areaActual.slug})}" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-semibold transition">
                     Cancelar
                 </a>
                 <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow transition flex items-center gap-2">

@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.controller;
 
+import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.model.Tutor;
@@ -217,9 +218,12 @@ public class PortalPublicoController {
             return error(redirectAttributes, "El motivo no es válido: describa una causa real con palabras coherentes (ej. 'Revisión por dolor dental', 'Control de niño sano').");
         }
 
+        // Cada especialidad tiene su propio panel: el alta cae en el área elegida
+        AreaClinica area = AreaClinica.paraEspecialidad(espNorm);
+
         try {
-            // 1. Buscar o registrar Tutor (por teléfono; si no existe, se crea)
-            Tutor tutor = tutorRepo.findByTelefono(telefonoNorm).stream()
+            // 1. Buscar o registrar Tutor dentro del área (los tutores no se comparten entre paneles)
+            Tutor tutor = tutorRepo.findByTelefonoAndArea(telefonoNorm, area).stream()
                     .findFirst()
                     .orElseGet(() -> {
                         Tutor nuevo = new Tutor();
@@ -228,11 +232,12 @@ public class PortalPublicoController {
                         nuevo.setParentesco(parentescoNorm);
                         nuevo.setTelefono(telefonoNorm);
                         nuevo.setEmail(emailNorm);
+                        nuevo.setArea(area);
                         return tutorRepo.save(nuevo);
                     });
 
-            // 2. Buscar o registrar Paciente por CURP (si ya existe, se reutiliza sin tocar su tutor actual)
-            Paciente paciente = pacienteRepo.findByCurp(curpNorm).orElseGet(() -> {
+            // 2. Buscar o registrar Paciente por CURP dentro del área (si ya existe ahí, se reutiliza)
+            Paciente paciente = pacienteRepo.findByCurpAndArea(curpNorm, area).orElseGet(() -> {
                 Paciente nuevo = new Paciente();
                 nuevo.setCurp(curpNorm);
                 nuevo.setNombre(nombrePaciente.trim());
@@ -240,6 +245,7 @@ public class PortalPublicoController {
                 nuevo.setFechaNacimiento(fNacimiento);
                 nuevo.setSexo(sexoNorm);
                 nuevo.setTutor(tutor);
+                nuevo.setArea(area);
                 return pacienteRepo.save(nuevo);
             });
 

@@ -44,6 +44,14 @@ public class Tutor {
     @Column(name = "direccion", length = 255)
     private String direccion;
 
+    /**
+     * Área clínica en la que se registró el tutor.
+     * Igual que los pacientes, los tutores no se comparten entre odontología y pediatría.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "area", length = 20)
+    private AreaClinica area;
+
     // Relación de 1 Tutor a Muchos Pacientes
     @OneToMany(mappedBy = "tutor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Paciente> pacientes = new ArrayList<>();
@@ -106,6 +114,14 @@ public class Tutor {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public AreaClinica getArea() {
+        return area;
+    }
+
+    public void setArea(AreaClinica area) {
+        this.area = area;
     }
 
     public List<Paciente> getPacientes() {

@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.service;
 
+import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.CarnetCitas;
 import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
@@ -35,11 +36,10 @@ import java.util.Set;
 /**
  * Depuración de registros por área clínica.
  *
- * El sistema comparte el catálogo de pacientes entre los dos paneles, por lo que
- * "vaciar un área" significa borrar únicamente los registros clínicos de esa
- * especialidad (citas, consultas, recetas, pagos, informes, carnets) y, además,
- * a los pacientes que no tengan historial en la otra área. Los pacientes que
- * acuden a ambas especialidades se conservan con su historial de la otra área.
+ * Cada área clínica tiene su propio directorio de pacientes y tutores, de modo que
+ * "vaciar un área" borra sus registros clínicos (citas, consultas, recetas, pagos,
+ * informes, carnets) y los pacientes dados de alta en ella. Los pacientes que por
+ * datos heredados tuvieran historial en la otra área se conservan con ese historial.
  */
 @Service
 public class DepuracionService {
@@ -184,6 +184,10 @@ public class DepuracionService {
         for (CarnetCitas c : carnets) {
             pacientes.putIfAbsent(c.getPaciente().getIdPaciente(), c.getPaciente());
         }
+        // También los dados de alta en el área que aún no tienen cita ni consulta
+        for (Paciente p : pacienteRepo.findByArea(areaClinica(area))) {
+            pacientes.putIfAbsent(p.getIdPaciente(), p);
+        }
 
         List<Paciente> listaPacientes = new ArrayList<>(pacientes.values());
         listaPacientes.sort(Comparator.comparing(Paciente::getNombre, String.CASE_INSENSITIVE_ORDER)
@@ -227,9 +231,13 @@ public class DepuracionService {
             for (InformeOdontologico i : informes) {
                 pacientesDelArea.putIfAbsent(i.getPaciente().getIdPaciente(), i.getPaciente());
             }
-            for (CarnetCitas c : carnets) {
-                pacientesDelArea.putIfAbsent(c.getPaciente().getIdPaciente(), c.getPaciente());
-            }
+        for (CarnetCitas c : carnets) {
+            pacientesDelArea.putIfAbsent(c.getPaciente().getIdPaciente(), c.getPaciente());
+        }
+        // Pacientes dados de alta en el área aunque todavía no tengan registros clínicos
+        for (Paciente p : pacienteRepo.findByArea(areaClinica(area))) {
+            pacientesDelArea.putIfAbsent(p.getIdPaciente(), p);
+        }
         }
 
         // Los compartidos se calculan ANTES de borrar: si el paciente también tiene
@@ -412,7 +420,8 @@ public class DepuracionService {
         Paciente paciente = pacienteRepo.findById(idPaciente)
                 .orElseThrow(() -> new IllegalArgumentException("El paciente ya no existe."));
 
-        if (!tieneRegistrosEn(paciente, area)) {
+        boolean registradoEnElArea = paciente.getArea() == areaClinica(area);
+        if (!registradoEnElArea && !tieneRegistrosEn(paciente, area)) {
             throw new IllegalArgumentException("El paciente no tiene registros en esta área.");
         }
 
@@ -465,6 +474,11 @@ public class DepuracionService {
             }
         }
         return eliminados;
+    }
+
+    /** Área clínica de pacientes/tutores equivalente al área que se está depurando. */
+    private AreaClinica areaClinica(Area area) {
+        return AreaClinica.desdeSlug(area.getSlug());
     }
 
     private void validarArea(Area area, String especialidad) {

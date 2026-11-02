@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.controller;
 
+import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.Usuario;
 import com.clinicahumana.clinica_humana.service.CitaService;
@@ -121,10 +122,14 @@ public class CitaController {
                     .toList();
         }
 
+        // El combo de pacientes sólo muestra los del área del panel (el admin, que supervisa ambas, ve todos)
+        AreaClinica areaPacientes = AreaClinica.paraRol(rol);
+
         model.addAttribute("cita", cita);
-        model.addAttribute("pacientes", pacienteService.listarTodos());
+        model.addAttribute("pacientes", pacienteService.listarPorArea(areaPacientes));
         model.addAttribute("medicos", medicosPermitidos);
         model.addAttribute("rolUsuario", rol);
+        model.addAttribute("esAdmin", areaPacientes == null);
 
         return "citas/formulario";
     }
@@ -153,8 +158,11 @@ public class CitaController {
             }
         }
 
+        AreaClinica areaPacientes = AreaClinica.paraRol(rol);
+
         Runnable recargarCombos = () -> {
-            model.addAttribute("pacientes", pacienteService.listarTodos());
+            model.addAttribute("pacientes", pacienteService.listarPorArea(areaPacientes));
+            model.addAttribute("esAdmin", areaPacientes == null);
             List<Usuario> medicos;
             if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
                 medicos = usuarioService.listarTodos().stream()
@@ -172,6 +180,25 @@ public class CitaController {
             model.addAttribute("medicos", medicos);
             model.addAttribute("rolUsuario", rol);
         };
+
+        // El paciente debe pertenecer al área de la especialidad agendada: no se mezclan los paneles
+        AreaClinica areaCita = AreaClinica.paraEspecialidad(cita.getEspecialidad());
+        if (cita.getPaciente() != null && cita.getPaciente().getIdPaciente() != null && areaCita != null) {
+            var paciente = pacienteService.buscarPorId(cita.getPaciente().getIdPaciente()).orElse(null);
+            if (paciente == null) {
+                recargarCombos.run();
+                model.addAttribute("errorHorario", "El paciente seleccionado no existe. Regístrelo primero en su panel.");
+                return "citas/formulario";
+            }
+            if (paciente.getArea() != null && paciente.getArea() != areaCita) {
+                recargarCombos.run();
+                model.addAttribute("errorHorario", "El paciente pertenece al área de "
+                        + paciente.getArea().getEtiqueta() + ". Regístrelo también en "
+                        + areaCita.getEtiqueta() + " para atenderlo en esa especialidad.");
+                return "citas/formulario";
+            }
+            cita.setPaciente(paciente);
+        }
 
         // Si hay errores de validación de Bean Validation (campos obligatorios)
         if (result.hasErrors()) {

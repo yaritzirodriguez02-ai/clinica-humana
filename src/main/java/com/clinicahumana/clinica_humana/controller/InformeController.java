@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.controller;
 
+import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.Cita;
 import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
 import com.clinicahumana.clinica_humana.model.InformeOdontologico;
@@ -259,7 +260,8 @@ public class InformeController {
 
     private void prepararFormulario(Model model, InformeOdontologico informe) {
         model.addAttribute("informe", informe);
-        model.addAttribute("pacientes", pacienteService.listarTodos());
+        // Los informes membretados son exclusivos de odontología: el combo sólo lista pacientes de esa área
+        model.addAttribute("pacientes", pacienteService.listarPorArea(AreaClinica.ODONTOLOGIA));
         model.addAttribute("tiposInforme", InformeOdontologico.TIPOS);
         model.addAttribute("sedes", SEDES);
         model.addAttribute("citasPaciente", informe.getPaciente() != null

@@ -1,14 +1,25 @@
 package com.clinicahumana.clinica_humana.config;
 
+import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.Medicamento;
+import com.clinicahumana.clinica_humana.model.Paciente;
+import com.clinicahumana.clinica_humana.model.Tutor;
 import com.clinicahumana.clinica_humana.model.Usuario;
+import com.clinicahumana.clinica_humana.repository.CitaRepository;
 import com.clinicahumana.clinica_humana.repository.MedicamentoRepository;
+import com.clinicahumana.clinica_humana.repository.PacienteRepository;
+import com.clinicahumana.clinica_humana.repository.TutorRepository;
 import com.clinicahumana.clinica_humana.repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Siembra las cuentas iniciales del sistema en una base de datos limpia de MySQL.
@@ -40,13 +51,25 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final MedicamentoRepository medicamentoRepo;
+    private final PacienteRepository pacienteRepo;
+    private final TutorRepository tutorRepo;
+    private final CitaRepository citaRepo;
+    private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(UsuarioRepository usuarioRepository,
                            MedicamentoRepository medicamentoRepo,
+                           PacienteRepository pacienteRepo,
+                           TutorRepository tutorRepo,
+                           CitaRepository citaRepo,
+                           JdbcTemplate jdbcTemplate,
                            PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.medicamentoRepo = medicamentoRepo;
+        this.pacienteRepo = pacienteRepo;
+        this.tutorRepo = tutorRepo;
+        this.citaRepo = citaRepo;
+        this.jdbcTemplate = jdbcTemplate;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -73,6 +96,90 @@ public class DataInitializer implements CommandLineRunner {
 
         // Catálogo base de medicamentos (Vademécum interno)
         sembrarMedicamentos();
+
+        // Separación de pacientes y tutores por área clínica
+        migrarAreasClinicas();
+    }
+
+    /**
+     * Deja lista la separación de paneles (odontología / pediatría) sobre una base ya existente:
+     *
+     * 1. La CURP era única en todo el sistema; ahora es única dentro de cada área, porque una misma
+     *    persona puede registrarse por separado en odontología y en pediatría.
+     * 2. A los pacientes y tutores anteriores se les asigna el área que corresponde a su historial
+     *    (pediatría sólo si su historial es exclusivamente pediátrico; en cualquier otro caso, dental).
+     *
+     * Es idempotente: si ya está todo migrado no hace nada.
+     */
+    private void migrarAreasClinicas() {
+        try {
+            List<String> indices = jdbcTemplate.queryForList(
+                    "SELECT INDEX_NAME FROM information_schema.STATISTICS "
+                            + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pacientes' "
+                            + "AND COLUMN_NAME = 'curp' AND NON_UNIQUE = 0 AND SEQ_IN_INDEX = 1",
+                    String.class);
+
+            if (!indices.isEmpty() && !indices.contains("uk_paciente_curp_area")) {
+                Integer compuesto = jdbcTemplate.queryForObject(
+                        "SELECT COUNT(*) FROM information_schema.STATISTICS "
+                                + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pacientes' "
+                                + "AND INDEX_NAME = 'uk_paciente_curp_area' AND SEQ_IN_INDEX = 2",
+                        Integer.class);
+                if (compuesto == null || compuesto == 0) {
+                    jdbcTemplate.execute("ALTER TABLE pacientes "
+                            + "ADD CONSTRAINT uk_paciente_curp_area UNIQUE (curp, area)");
+                }
+                for (String indice : indices) {
+                    if (!"uk_paciente_curp_area".equalsIgnoreCase(indice)) {
+                        jdbcTemplate.execute("ALTER TABLE pacientes DROP INDEX `" + indice + "`");
+                        log.info("Índice único global de CURP '{}' eliminado: ahora es único por área.", indice);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("No se pudo ajustar el índice único de CURP por área: {}", e.getMessage());
+        }
+
+        Map<Long, AreaClinica> areaPorTutor = new HashMap<>();
+        int pacientesMigrados = 0;
+
+        for (Paciente paciente : pacienteRepo.findAll()) {
+            if (paciente.getArea() != null) {
+                if (paciente.getTutor() != null && paciente.getTutor().getIdTutor() != null) {
+                    areaPorTutor.putIfAbsent(paciente.getTutor().getIdTutor(), paciente.getArea());
+                }
+                continue;
+            }
+
+            Long id = paciente.getIdPaciente();
+            boolean soloPediatria = citaRepo.existsByPacienteIdPacienteAndEspecialidadIn(id, List.of("PEDIATRIA"))
+                    && !citaRepo.existsByPacienteIdPacienteAndEspecialidadIn(id,
+                            List.of("ODONTOLOGIA", "ODONTOPEDIATRIA"));
+            AreaClinica area = soloPediatria ? AreaClinica.PEDIATRIA : AreaClinica.ODONTOLOGIA;
+
+            paciente.setArea(area);
+            pacienteRepo.save(paciente);
+            pacientesMigrados++;
+
+            if (paciente.getTutor() != null && paciente.getTutor().getIdTutor() != null) {
+                areaPorTutor.putIfAbsent(paciente.getTutor().getIdTutor(), area);
+            }
+        }
+
+        int tutoresMigrados = 0;
+        for (Tutor tutor : tutorRepo.findAll()) {
+            if (tutor.getArea() != null) {
+                continue;
+            }
+            tutor.setArea(areaPorTutor.getOrDefault(tutor.getIdTutor(), AreaClinica.ODONTOLOGIA));
+            tutorRepo.save(tutor);
+            tutoresMigrados++;
+        }
+
+        if (pacientesMigrados > 0 || tutoresMigrados > 0) {
+            log.info("Áreas clínicas asignadas a {} paciente(s) y {} tutor(es) previos.",
+                    pacientesMigrados, tutoresMigrados);
+        }
     }
 
     /**

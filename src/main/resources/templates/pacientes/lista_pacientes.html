@@ -28,13 +28,28 @@
             </div>
         </div>
 
+        <!-- Pestañas de área (sólo administrador: cada panel ve únicamente la suya) -->
+        <div th:if="${#lists.size(areasPermitidas) > 1}" class="flex flex-wrap items-center gap-2 mb-5">
+            <a th:each="a : ${areasPermitidas}"
+               th:href="@{/pacientes(area=${a.slug})}"
+               class="px-4 py-2 rounded-lg text-xs font-bold border transition"
+               th:classappend="${a.slug == areaActual.slug} ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'">
+                <i class="fa-solid fa-layer-group mr-1"></i>
+                <span th:text="${'Pacientes de ' + a.etiqueta}">Pacientes</span>
+            </a>
+        </div>
+
         <!-- Encabezado de la Sección -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-                <h2 class="text-2xl font-bold text-slate-900">Directorio de Pacientes Infantiles</h2>
-                <p class="text-sm text-slate-500">Consulta, búsqueda y registro de infantes y sus tutores legales.</p>
+                <h2 class="text-2xl font-bold text-slate-900"
+                    th:text="${'Directorio de Pacientes - ' + areaActual.etiqueta}">Directorio de Pacientes</h2>
+                <p class="text-sm text-slate-500"
+                   th:text="${'Registros propios del área de ' + areaActual.etiqueta + '. No se mezclan con los del otro panel.'}">
+                    Consulta, búsqueda y registro de pacientes y sus tutores legales.
+                </p>
             </div>
-            <a th:href="@{/pacientes/nuevo}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow font-medium flex items-center gap-2 transition text-sm">
+            <a th:href="@{/pacientes/nuevo(area=${areaActual.slug})}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow font-medium flex items-center gap-2 transition text-sm">
                 <i class="fa-solid fa-user-plus"></i> Registrar Nuevo Paciente
             </a>
         </div>
@@ -42,6 +57,7 @@
         <!-- Barra de Búsqueda -->
         <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
             <form th:action="@{/pacientes}" method="get" class="flex gap-3">
+                <input type="hidden" name="area" th:value="${areaActual.slug}">
                 <div class="relative flex-1">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
                         <i class="fa-solid fa-magnifying-glass"></i>
@@ -52,7 +68,7 @@
                 <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2 rounded-lg text-sm font-medium transition">
                     Buscar
                 </button>
-                <a th:if="${buscar != null and !buscar.isEmpty()}" th:href="@{/pacientes}" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center">
+                <a th:if="${buscar != null and !buscar.isEmpty()}" th:href="@{/pacientes(area=${areaActual.slug})}" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center">
                     Limpiar
                 </a>
             </form>
@@ -77,7 +93,7 @@
                         <tr th:if="${#lists.isEmpty(pacientes)}">
                             <td colspan="7" class="py-8 text-center text-slate-400">
                                 <i class="fa-solid fa-folder-open text-3xl mb-2 block"></i>
-                                No se encontraron pacientes registrados.
+                                <span th:text="${'No se encontraron pacientes registrados en ' + areaActual.etiqueta + '.'}">No se encontraron pacientes registrados.</span>
                             </td>
                         </tr>
                         <tr th:each="p : ${pacientes}" class="hover:bg-slate-50 transition">
@@ -94,10 +110,12 @@
                                       th:text="${p.sexo == 'M' ? 'Masculino' : 'Femenino'}">M</span>
                             </td>
                             <td class="py-3 px-4">
-                                <div class="font-medium text-slate-800" th:text="${p.tutor.nombre + ' ' + p.tutor.apellidos}">Nombre Mamá</div>
-                                <span class="text-xs text-slate-500" th:text="'(' + ${p.tutor.parentesco} + ')'">(Madre)</span>
+                                <div class="font-medium text-slate-800"
+                                     th:text="${p.tutor != null ? (p.tutor.nombre + ' ' + p.tutor.apellidos) : 'Sin tutor registrado'}">Nombre Mamá</div>
+                                <span th:if="${p.tutor != null}" class="text-xs text-slate-500" th:text="'(' + ${p.tutor.parentesco} + ')'">(Madre)</span>
                             </td>
-                            <td class="py-3 px-4 font-mono text-slate-700" th:text="${p.tutor.telefono}">7471234567</td>
+                            <td class="py-3 px-4 font-mono text-slate-700"
+                                th:text="${p.tutor != null and p.tutor.telefono != null ? p.tutor.telefono : '—'}">7471234567</td>
                             <td class="py-3 px-4 text-center">
                                 <a th:href="@{/pacientes/expediente/{id}(id=${p.idPaciente})}" 
                                    class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">

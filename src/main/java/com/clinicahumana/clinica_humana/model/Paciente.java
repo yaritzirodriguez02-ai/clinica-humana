@@ -72,6 +72,15 @@ public class Paciente {
     @Column(name = "foto_ruta")
     private String fotoRuta;
 
+    /**
+     * Área clínica en la que se registró al paciente.
+     * Los pacientes de odontología (incluida recepción) no se mezclan con los de pediatría:
+     * una misma persona que acude a las dos especialidades se registra en cada área.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "area", length = 20)
+    private AreaClinica area;
+
     public Paciente() {
     }
 
@@ -162,5 +171,13 @@ public class Paciente {
 
     public void setFotoRuta(String fotoRuta) {
         this.fotoRuta = fotoRuta;
+    }
+
+    public AreaClinica getArea() {
+        return area;
+    }
+
+    public void setArea(AreaClinica area) {
+        this.area = area;
     }
 }
