@@ -82,11 +82,12 @@
   /* Marca de agua: la "G" en cursiva de la papelería original de CISO.
      Va por encima de los recuadros, muy tenue, como el papel preimpreso. */
   .marca {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
+    position: absolute;
+    top: -1.3cm;
+    right: -2.2cm;
     font-family: 'Great Vibes', 'Segoe Script', Georgia, cursive;
-    font-size: 9.5cm;
-    line-height: .9;
+    font-size: 15cm;
+    line-height: 1;
     color: #a8c6e8;
     opacity: .3;
     mix-blend-mode: multiply;
@@ -307,6 +308,7 @@
 <div class="hoja">
 
   <div class="marca" aria-hidden="true">G</div>
+
 
   <div class="contenido">
 
