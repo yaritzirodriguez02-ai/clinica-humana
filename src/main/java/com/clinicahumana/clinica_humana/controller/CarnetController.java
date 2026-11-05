@@ -29,18 +29,22 @@ import java.util.Objects;
 /**
  * Carnet de citas del consultorio odontológico (CISO).
  *
- * Es la copia que se queda la doctora, una por paciente, con el control de
- * próximas citas, tratamiento a realizar y total cobrado; distinta del carnet
- * que se lleva el paciente para su propio seguimiento.
+ * Es la copia digital que conserva la doctora, una por paciente, con el control
+ * de próximas citas, tratamiento a realizar y total cobrado; distinta del carnet
+ * físico que se lleva el paciente para su propio seguimiento.
+ *
+ * El documento está armado como tarjeta plegable horizontal de media carta:
+ * primero la portada, después la relación de próximas citas y, al final, el
+ * aviso "¡¡IMPORTANTE!!" que cierra el carnet.
  */
 @Controller
 @RequestMapping("/carnets")
 public class CarnetController {
 
-    /** Renglones impresos por página interior del carnet (como el formato físico). */
+    /** Renglones impresos en cada panel de próximas citas. */
     private static final int RENGLONES_POR_PANEL = 6;
 
-    /** Paneles interiores por hoja carta. */
+    /** Paneles (media carta horizontal) por hoja tamaño carta. */
     private static final int PANELES_POR_HOJA = 2;
 
     @Autowired
@@ -97,7 +101,7 @@ public class CarnetController {
         model.addAttribute("doctora", nombreDoctora(citas));
         model.addAttribute("sitioWeb", sitioWeb != null ? sitioWeb.trim() : "");
         model.addAttribute("fechaHoy", LocalDate.now());
-        model.addAttribute("paginas", agruparEnHojas(filas));
+        model.addAttribute("hojas", armarHojas(filas));
         model.addAttribute("totalGeneral", filas.stream()
                 .map(FilaCarnet::getTotal)
                 .filter(Objects::nonNull)
@@ -117,24 +121,56 @@ public class CarnetController {
         return "DRA. GLORIA GONZÁLEZ HERRERA";
     }
 
-    /** Reparte los renglones en paneles de 6 y los paneles en hojas de 2. */
-    private List<List<List<FilaCarnet>>> agruparEnHojas(List<FilaCarnet> filas) {
-        List<List<FilaCarnet>> paneles = new ArrayList<>();
+    /**
+     * Arma el carnet en el orden del formato físico:
+     * portada → relación de próximas citas (una o varias tarjetas) → IMPORTANTE al final.
+     */
+    private List<List<PanelCarnet>> armarHojas(List<FilaCarnet> filas) {
+        List<PanelCarnet> paneles = new ArrayList<>();
+        paneles.add(new PanelCarnet(PanelCarnet.PORTADA, List.of(), BigDecimal.ZERO));
+
         for (int i = 0; i < filas.size(); i += RENGLONES_POR_PANEL) {
-            paneles.add(new ArrayList<>(filas.subList(i, Math.min(i + RENGLONES_POR_PANEL, filas.size()))));
+            List<FilaCarnet> tramo = new ArrayList<>(filas.subList(i, Math.min(i + RENGLONES_POR_PANEL, filas.size())));
+            BigDecimal subtotal = tramo.stream()
+                    .map(FilaCarnet::getTotal)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            paneles.add(new PanelCarnet(PanelCarnet.CITAS, tramo, subtotal));
         }
-        if (paneles.isEmpty()) {
-            paneles.add(new ArrayList<>());
-        }
-        while (paneles.size() % PANELES_POR_HOJA != 0) {
-            paneles.add(new ArrayList<>());
+        if (filas.isEmpty()) {
+            paneles.add(new PanelCarnet(PanelCarnet.CITAS, List.of(), BigDecimal.ZERO));
         }
 
-        List<List<List<FilaCarnet>>> hojas = new ArrayList<>();
+        // El aviso cierra siempre el carnet (queda en la última tarjeta).
+        paneles.add(new PanelCarnet(PanelCarnet.IMPORTANTE, List.of(), BigDecimal.ZERO));
+
+        List<List<PanelCarnet>> hojas = new ArrayList<>();
         for (int i = 0; i < paneles.size(); i += PANELES_POR_HOJA) {
-            hojas.add(paneles.subList(i, i + PANELES_POR_HOJA));
+            hojas.add(paneles.subList(i, Math.min(i + PANELES_POR_HOJA, paneles.size())));
         }
         return hojas;
+    }
+
+    /** Tarjeta impresa del carnet: portada, próximas citas o aviso importante. */
+    public static class PanelCarnet {
+
+        public static final String PORTADA = "PORTADA";
+        public static final String CITAS = "CITAS";
+        public static final String IMPORTANTE = "IMPORTANTE";
+
+        private final String tipo;
+        private final List<FilaCarnet> filas;
+        private final BigDecimal subtotal;
+
+        public PanelCarnet(String tipo, List<FilaCarnet> filas, BigDecimal subtotal) {
+            this.tipo = tipo;
+            this.filas = filas;
+            this.subtotal = subtotal;
+        }
+
+        public String getTipo() { return tipo; }
+        public List<FilaCarnet> getFilas() { return filas; }
+        public BigDecimal getSubtotal() { return subtotal; }
     }
 
     /** Renglón impreso en el carnet: próxima cita, tratamiento y total cobrado. */

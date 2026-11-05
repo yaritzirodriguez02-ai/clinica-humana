@@ -59,7 +59,7 @@
     padding: 9px 12px;
   }
 
-  /* ---------- Hoja carta con dos paneles (se corta a la mitad) ---------- */
+  /* ---------- Hoja carta con dos tarjetas de media carta (horizontal) ---------- */
   .hoja {
     width: 21.59cm;
     height: 27.9cm;
@@ -83,36 +83,34 @@
   }
   .panel + .panel { border-top: 1px dashed #b9c7e2; }
 
+  /* Cada tarjeta ocupa todo su panel (el pie de contacto queda al fondo) */
+  .panel > div { flex: 1; display: flex; flex-direction: column; }
+
   /* ---------- Portada ---------- */
   .cabecera { text-align: center; }
-  .cabecera .logo { height: 3.3cm; width: auto; }
-  .lema {
-    font-size: 7.2px; font-weight: 700; letter-spacing: .55px;
-    color: var(--azul); margin-top: .1cm;
-  }
+  .cabecera .logo { display: block; height: 4.1cm; width: auto; margin: 0 auto .12cm; }
   .lema-caja {
     display: inline-block;
     background: var(--azul); color: #fff;
     font-size: 7.4px; font-weight: 700; letter-spacing: .8px;
-    padding: .06cm .32cm; margin-top: .08cm;
+    padding: .06cm .32cm; margin-top: .1cm;
   }
 
-  .campos { margin-top: .5cm; padding: 0 .35cm; }
+  .campos { margin-top: .65cm; padding: 0 .35cm; }
   .campo {
     display: flex; align-items: flex-end; gap: .2cm;
-    margin-bottom: .3cm;
+    margin-bottom: .42cm;
   }
   .campo .etq { white-space: nowrap; font-size: 10.5px; color: var(--tinta); }
   .campo .linea {
     flex: 1;
     border-bottom: 1px solid var(--azul-linea);
-    min-height: .48cm;
-    padding: 0 .15cm .04cm;
+    min-height: .58cm;
+    padding: 0 .15cm .06cm;
     font-size: 10.5px;
     font-weight: 700;
     color: #1e3268;
   }
-  .campo.ancho .linea { flex: 0 0 7.4cm; }
 
   .sitio {
     text-align: center;
@@ -135,7 +133,7 @@
   }
   .pie-contacto .fuerte { color: var(--azul); font-weight: 700; font-size: 7.4px; }
 
-  /* ---------- Páginas interiores (PRÓXIMA CITA) ---------- */
+  /* ---------- Tarjeta de próximas citas ---------- */
   table.agenda {
     width: 100%;
     border-collapse: collapse;
@@ -156,15 +154,15 @@
     text-transform: uppercase;
     text-align: center;
     color: var(--azul);
-    height: .8cm;
+    height: .78cm;
   }
   table.agenda td.num { text-align: right; font-family: 'Courier New', Courier, monospace; font-weight: 700; }
-  table.agenda tr.renglon { height: 1.55cm; }
+  table.agenda tr.renglon { height: 1.5cm; }
   table.agenda th.vertical {
-    width: 1.4cm;
+    width: 1.35cm;
     padding: 0;
     letter-spacing: 2px;
-    font-size: 8px;
+    font-size: 7.6px;
     text-align: center;
   }
   table.agenda th.vertical span {
@@ -175,30 +173,30 @@
   }
   table.agenda td.total-lbl {
     text-align: right;
-    font-size: 8.4px;
+    font-size: 8.2px;
     font-weight: 700;
     letter-spacing: .8px;
     color: var(--azul);
   }
 
   .nota-panel {
-    margin-top: .2cm;
+    margin-top: .18cm;
     font-size: 6.9px;
     color: #7a86a3;
     display: flex;
     justify-content: space-between;
   }
 
-  /* ---------- Reverso (IMPORTANTE) ---------- */
-  .reverso { text-align: center; justify-content: flex-start; }
-  .reverso h2 {
-    margin: .55cm 0 .75cm;
+  /* ---------- Tarjeta final: IMPORTANTE ---------- */
+  .importante { text-align: center; justify-content: flex-start; }
+  .importante h2 {
+    margin: .5cm 0 .7cm;
     font-size: 17px;
     font-weight: 700;
     letter-spacing: .4px;
     color: var(--azul);
   }
-  .reverso ul {
+  .importante ul {
     list-style: none;
     margin: 0 auto;
     padding: 0;
@@ -208,12 +206,12 @@
     line-height: 1.55;
     color: #2c3f6b;
   }
-  .reverso li {
+  .importante li {
     position: relative;
     padding-left: .42cm;
     margin-bottom: .3cm;
   }
-  .reverso li::before {
+  .importante li::before {
     content: "●";
     position: absolute;
     left: 0;
@@ -245,104 +243,104 @@
 </div>
 
 <div class="aviso">
-  Se imprime en <b>hoja carta</b>, escala <b>100 %</b> y márgenes <b>Ninguno</b>. Cada hoja trae dos paneles:
-  córtala por la línea punteada y obtendrás las páginas del carnet (portada, reverso y hojas interiores).
+  Cada hoja carta trae <b>dos tarjetas horizontales de media carta</b>: córtala por la línea punteada y ordénalas
+  como un carnet plegable (portada, próximas citas y, al final, el aviso IMPORTANTE). Imprime en carta,
+  escala <b>100 %</b> y márgenes <b>Ninguno</b>.
 </div>
 
-<!-- ===================== HOJA 1: PORTADA Y REVERSO ===================== -->
-<div class="hoja">
+<div class="hoja" th:each="hoja : ${hojas}">
 
-  <!-- Portada -->
-  <div class="panel portada">
-    <div class="cabecera">
-      <img class="logo" th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="Clínica Integral de Servicios Odontológicos">
-      <div class="lema-caja">NUESTRO COMPROMISO ES SU SALUD</div>
-    </div>
+  <div class="panel" th:each="panel : ${hoja}">
 
-    <div class="campos">
-      <div class="campo">
-        <span class="etq">Paciente:</span>
-        <span class="linea" th:text="${paciente.nombre + ' ' + paciente.apellidos}">Nombre del paciente</span>
+    <!-- ============ PORTADA ============ -->
+    <div th:if="${panel.tipo == 'PORTADA'}">
+      <div class="cabecera">
+        <img class="logo" th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="Clínica Integral de Servicios Odontológicos">
+        <div class="lema-caja">NUESTRO COMPROMISO ES SU SALUD</div>
       </div>
-      <div class="campo">
-        <span class="etq">Dr. (a):</span>
-        <span class="linea" th:text="${doctora}">Dra. Gloria González Herrera</span>
+
+      <div class="campos">
+        <div class="campo">
+          <span class="etq">Paciente:</span>
+          <span class="linea" th:text="${paciente.nombre + ' ' + paciente.apellidos}">Nombre del paciente</span>
+        </div>
+        <div class="campo">
+          <span class="etq">Dr. (a):</span>
+          <span class="linea" th:text="${doctora}">Dra. Gloria González Herrera</span>
+        </div>
+        <div class="campo">
+          <span class="etq">Fecha:</span>
+          <span class="linea" th:text="${#temporals.format(fechaHoy, 'dd/MM/yyyy')}">04/11/2026</span>
+          <span class="etq" style="margin-left:.5cm">Firma:</span>
+          <span class="linea" style="flex:0 0 6.6cm"></span>
+        </div>
       </div>
-      <div class="campo">
-        <span class="etq">Fecha:</span>
-        <span class="linea" th:text="${#temporals.format(fechaHoy, 'dd/MM/yyyy')}">04/11/2026</span>
-        <span class="etq" style="margin-left:.5cm">Firma:</span>
-        <span class="linea" style="flex:0 0 6.6cm"></span>
+
+      <!-- Sitio web: queda en blanco hasta publicar el sitio (propiedad ciso.sitio.web) -->
+      <div class="sitio" th:if="${!#strings.isEmpty(sitioWeb)}" th:text="${sitioWeb}">www.cisodontologicos.com</div>
+      <div class="sitio" th:if="${#strings.isEmpty(sitioWeb)}">&nbsp;</div>
+
+      <div class="pie-contacto">
+        <div class="fuerte">Tels. 47 241 00 47 y 47 290 51 · Cel. 74 74 99 05 38</div>
+        <div><b>Chilpancingo, Gro., Centro Médico Humano:</b> Av. Lázaro Cárdenas No. 59, Col. La Haciendita, C.P. 39087</div>
+        <div>e-mail: azaglez1@hotmail.com</div>
+        <div><b>Iguala Guerrero:</b> Av. Guerrero 91-A, Interior 7, 1er Piso · Teléfono: 01 (733) 33 2 93 22</div>
       </div>
     </div>
 
-    <!-- Sitio web: en blanco hasta que se publique (propiedad ciso.sitio.web) -->
-    <div class="sitio" th:if="${!#strings.isEmpty(sitioWeb)}" th:text="${sitioWeb}">www.cisodontologicos.com</div>
-    <div class="sitio" th:if="${#strings.isEmpty(sitioWeb)}">&nbsp;</div>
+    <!-- ============ RELACIÓN DE PRÓXIMAS CITAS ============ -->
+    <div th:if="${panel.tipo == 'CITAS'}" style="display:flex;flex-direction:column;flex:1">
+      <table class="agenda">
+        <colgroup>
+          <col style="width:2.9cm">
+          <col style="width:2.1cm">
+          <col>
+          <col style="width:3.1cm">
+          <col style="width:1.35cm">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Tratamiento a realizar</th>
+            <th>Total $</th>
+            <th class="vertical" rowspan="8"><span>Próxima cita</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="renglon" th:each="i : ${#numbers.sequence(0, 5)}"
+              th:with="f=${i lt panel.filas.size() ? panel.filas[i] : null}">
+            <td th:text="${f != null and f.fecha != null ? #temporals.format(f.fecha, 'dd/MM/yyyy') : ''}">01/01/2026</td>
+            <td th:text="${f != null and f.hora != null ? #temporals.format(f.hora, 'HH:mm') : ''}">10:00</td>
+            <td th:text="${f != null and f.tratamiento != null ? f.tratamiento : ''}">Limpieza dental</td>
+            <td class="num" th:text="${f != null and f.total != null ? '$ ' + #numbers.formatDecimal(f.total, 1, 'COMMA', 2, 'POINT') : ''}">$ 0.00</td>
+          </tr>
+          <tr>
+            <td colspan="3" class="total-lbl">Total $</td>
+            <td class="num" th:text="${'$ ' + #numbers.formatDecimal(panel.subtotal, 1, 'COMMA', 2, 'POINT')}">$ 0.00</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <div class="pie-contacto">
-      <div class="fuerte">Tels. 47 241 00 47 y 47 290 51 · Cel. 74 74 99 05 38</div>
-      <div><b>Chilpancingo, Gro., Centro Médico Humano:</b> Av. Lázaro Cárdenas No. 59, Col. La Haciendita, C.P. 39087</div>
-      <div>e-mail: azaglez1@hotmail.com</div>
-      <div><b>Iguala Guerrero:</b> Av. Guerrero 91-A, Interior 7, 1er Piso · Teléfono: 01 (733) 33 2 93 22</div>
+      <div class="nota-panel">
+        <span th:text="${'Paciente: ' + paciente.nombre + ' ' + paciente.apellidos}">Paciente</span>
+        <span>Carnet del consultorio · CISO</span>
+      </div>
     </div>
-  </div>
 
-  <!-- Reverso -->
-  <div class="panel reverso">
-    <h2>¡¡IMPORTANTE!!</h2>
-    <ul>
-      <li>El tratamiento no debe interrumpirse.</li>
-      <li>En caso de cancelar el tratamiento no habrá reembolso económico.</li>
-      <li>Después de 4 ausencias el paciente será dado de baja.</li>
-      <li>No se dará consulta si no está al corriente con sus pagos.</li>
-      <li>En caso de cancelar su cita, es importante que se notifique al consultorio por lo menos dos horas antes de la misma.</li>
-      <li>El Odontólogo tiene la obligación de explicar cada tratamiento realizado.</li>
-    </ul>
-  </div>
-
-</div>
-
-<!-- ===================== HOJAS INTERIORES: PRÓXIMA CITA ===================== -->
-<div class="hoja" th:each="pagina : ${paginas}">
-
-  <div class="panel interior" th:each="panel : ${pagina}">
-    <table class="agenda">
-      <colgroup>
-        <col style="width:2.9cm">
-        <col style="width:2.1cm">
-        <col>
-        <col style="width:3.1cm">
-        <col style="width:1.4cm">
-      </colgroup>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Hora</th>
-          <th>Tratamiento a realizar</th>
-          <th>Total $</th>
-          <th class="vertical" rowspan="8"><span>Próxima cita</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="renglon" th:each="i : ${#numbers.sequence(0, 5)}"
-            th:with="f=${i lt panel.size() ? panel[i] : null}">
-          <td th:text="${f != null and f.fecha != null ? #temporals.format(f.fecha, 'dd/MM/yyyy') : ''}">01/01/2026</td>
-          <td th:text="${f != null and f.hora != null ? #temporals.format(f.hora, 'HH:mm') : ''}">10:00</td>
-          <td th:text="${f != null and f.tratamiento != null ? f.tratamiento : ''}">Limpieza dental</td>
-          <td class="num" th:text="${f != null and f.total != null ? '$ ' + #numbers.formatDecimal(f.total, 1, 'COMMA', 2, 'POINT') : ''}">$ 0.00</td>
-        </tr>
-        <tr>
-          <td colspan="3" class="total-lbl">Total $</td>
-          <td class="num" th:text="${'$ ' + #numbers.formatDecimal(totalGeneral, 1, 'COMMA', 2, 'POINT')}">$ 0.00</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="nota-panel">
-      <span th:text="${'Paciente: ' + paciente.nombre + ' ' + paciente.apellidos}">Paciente</span>
-      <span>Carnet del consultorio · CISO</span>
+    <!-- ============ AVISO FINAL ============ -->
+    <div class="importante" th:if="${panel.tipo == 'IMPORTANTE'}">
+      <h2>¡¡IMPORTANTE!!</h2>
+      <ul>
+        <li>El tratamiento no debe interrumpirse.</li>
+        <li>En caso de cancelar el tratamiento no habrá reembolso económico.</li>
+        <li>Después de 4 ausencias el paciente será dado de baja.</li>
+        <li>No se dará consulta si no está al corriente con sus pagos.</li>
+        <li>En caso de cancelar su cita, es importante que se notifique al consultorio por lo menos dos horas antes de la misma.</li>
+        <li>El Odontólogo tiene la obligación de explicar cada tratamiento realizado.</li>
+      </ul>
     </div>
+
   </div>
 
 </div>
