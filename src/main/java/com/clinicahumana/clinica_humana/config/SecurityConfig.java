@@ -53,6 +53,10 @@ public class SecurityConfig {
                 // recepción los consulta/imprime y el administrador tiene acceso total
                 .requestMatchers("/informes/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "ADMIN")
 
+                // Carnet de citas del consultorio (CISO): lo imprime la odontóloga,
+                // recepción y el administrador también pueden reimprimirlo
+                .requestMatchers("/carnets/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "ADMIN")
+
                 // Limpieza de registros por área: odontología y recepción comparten el
                 // área dental, pediatría administra la suya y el admin controla ambas
                 .requestMatchers("/registros/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "PEDIATRA", "ADMIN")

@@ -34,6 +34,12 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+               th:if="${paciente.area != null and paciente.area.name() == 'ODONTOLOGIA'}"
+               th:href="@{/carnets/odontologia/{id}(id=${idPaciente})}" target="_blank"
+               class="bg-blue-800 hover:bg-blue-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                <i class="fa-regular fa-id-card"></i> Carnet de citas
+            </a>
+            <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
                th:href="@{/informes/nuevo(paciente=${idPaciente})}"
                class="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                 <i class="fa-solid fa-file-signature"></i> Redactar informe
