@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title th:text="${'Presupuesto N° ' + folioPresupuesto + ' · CISO'}">Presupuesto CISO</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
   @page { size: letter landscape; margin: 0; }
 
@@ -78,16 +79,22 @@
     flex-direction: column;
   }
 
-  /* Marca de agua tenue de la papelería original */
+  /* Marca de agua: la "G" en cursiva de la papelería original de CISO.
+     Va por encima de los recuadros, muy tenue, como el papel preimpreso. */
   .marca {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Great Vibes', 'Segoe Script', Georgia, serif;
-    font-size: 10cm; color: #f2f6fc;
-    pointer-events: none; user-select: none; z-index: 0;
+    font-family: 'Great Vibes', 'Segoe Script', Georgia, cursive;
+    font-size: 9.5cm;
+    line-height: .9;
+    color: #a8c6e8;
+    opacity: .3;
+    mix-blend-mode: multiply;
+    transform: rotate(-4deg);
+    pointer-events: none; user-select: none; z-index: 3;
   }
 
-  .contenido { position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1; }
+  .contenido { position: relative; z-index: 2; display: flex; flex-direction: column; flex: 1; }
 
   /* ---------- Encabezado ---------- */
   .cab { display: flex; align-items: center; gap: .55cm; }
