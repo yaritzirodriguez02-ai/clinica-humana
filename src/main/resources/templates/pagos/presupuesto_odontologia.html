@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title th:text="${'Presupuesto N° ' + folioPresupuesto + ' · CISO'}">Presupuesto CISO</title>
+<style>
+  @page { size: letter landscape; margin: 0; }
+
+  :root {
+    --az: #5b86c5;
+    --az-osc: #2f4f8f;
+    --az-claro: #dbe6f5;
+    --linea: #a9c0e0;
+    --rojo: #c0392b;
+    --tinta: #1f2a44;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: #dfe5ee;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--tinta);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ---------- Barra de acciones (no se imprime) ---------- */
+  .toolbar {
+    position: sticky; top: 0; z-index: 60;
+    display: flex; flex-wrap: wrap; gap: 10px;
+    align-items: center; justify-content: space-between;
+    padding: 12px 18px;
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 6px 18px rgba(15,23,42,.28);
+  }
+  .toolbar .grupo { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .toolbar .titulo { color: #e2e8f0; }
+  .toolbar .titulo b { display: block; font-size: 13px; letter-spacing: .3px; }
+  .toolbar .titulo span { display: block; font-size: 11px; color: #94a3b8; }
+  .btn {
+    font-weight: 800; font-size: 12px; letter-spacing: .4px; text-transform: uppercase;
+    padding: 10px 16px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.14);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+    cursor: pointer; transition: transform .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-print { background: linear-gradient(135deg,#2563eb,#1d4ed8); color: #fff; box-shadow: 0 8px 18px rgba(37,99,235,.3); }
+  .btn-ghost { background: #1e293b; color: #e2e8f0; }
+
+  .aviso {
+    max-width: 27.94cm;
+    margin: 14px auto 0;
+    font-size: 12px;
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-left: 4px solid var(--az);
+    border-radius: 8px;
+    padding: 9px 12px;
+  }
+
+  /* ---------- Hoja horizontal (carta apaisada) ---------- */
+  .hoja {
+    position: relative;
+    width: 27.94cm;
+    min-height: 21.59cm;
+    margin: 16px auto 40px;
+    padding: 1.05cm 1.15cm .95cm;
+    background: #fff;
+    box-shadow: 0 14px 34px rgba(15,23,42,.32);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Marca de agua tenue de la papelería original */
+  .marca {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Great Vibes', 'Segoe Script', Georgia, serif;
+    font-size: 10cm; color: #f2f6fc;
+    pointer-events: none; user-select: none; z-index: 0;
+  }
+
+  .contenido { position: relative; z-index: 1; display: flex; flex-direction: column; flex: 1; }
+
+  /* ---------- Encabezado ---------- */
+  .cab { display: flex; align-items: center; gap: .55cm; }
+  .cab .logo { height: 2.75cm; width: auto; display: block; }
+  .cab .dentista { flex: 1; padding-left: .4cm; border-left: 1px solid #dfe7f4; }
+  .cab .dentista h1 {
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 21px; font-weight: 400; font-style: italic;
+    margin: 0; color: #2b3f6b; letter-spacing: .2px;
+  }
+  .cab .dentista p { margin: .06cm 0 0; font-size: 13.5px; color: #3d5379; }
+
+  /* Línea punteada con la cédula y la fecha */
+  .linea-ced {
+    position: relative;
+    margin-top: .5cm;
+    padding: 0 .1cm .16cm;
+    display: flex; align-items: baseline; justify-content: space-between;
+    font-size: 10.5px; color: #40567f;
+    border-bottom: 1px dotted #b9c8de;
+  }
+  .linea-ced .punto {
+    position: absolute; bottom: -2.5px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #9fb6d8;
+  }
+  .linea-ced .punto.i { left: -2px; }
+  .linea-ced .punto.d { right: -2px; }
+  .linea-ced .fecha { letter-spacing: .3px; }
+  .linea-ced .fecha b { color: #22355c; font-weight: 700; }
+
+  /* Folio */
+  .folio {
+    align-self: flex-end;
+    margin: .38cm 0 .34cm;
+    display: flex; align-items: center; gap: .3cm;
+  }
+  .folio .lbl {
+    font-size: 13.5px; font-weight: 700; letter-spacing: 2px;
+    color: #3a4f78;
+  }
+  .folio .num {
+    border: 1px solid #b7c6dc;
+    border-radius: 4px;
+    padding: .1cm .42cm .14cm;
+    font-size: 15px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--rojo);
+  }
+
+  /* ---------- Tabla de servicios ---------- */
+  table.detalle {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    border: 1px solid var(--az);
+  }
+  table.detalle th {
+    background: var(--az);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: .16cm .18cm;
+    border-right: 1px solid rgba(255,255,255,.55);
+    text-align: left;
+    vertical-align: middle;
+  }
+  table.detalle th:last-child { border-right: none; }
+  table.detalle th.c, table.detalle td.c { text-align: center; }
+  table.detalle th.r, table.detalle td.r { text-align: right; }
+  table.detalle td {
+    font-size: 10.5px;
+    padding: .16cm .18cm;
+    vertical-align: top;
+    border-right: 1px solid var(--az-claro);
+    color: #22304d;
+  }
+  table.detalle td:last-child { border-right: none; }
+  table.detalle tbody tr { height: 4.0cm; }
+  table.detalle tbody td { background: #fff; }
+  table.detalle .mono { font-family: 'Courier New', Courier, monospace; font-weight: 700; }
+  table.detalle .desc small { display: block; font-size: 8.6px; color: #66748f; margin-top: .1cm; }
+
+  /* ---------- Sección inferior ---------- */
+  .inferior {
+    display: grid;
+    grid-template-columns: 15.4cm 1fr;
+    gap: .38cm;
+    margin-top: .3cm;
+    flex: 1;
+    break-inside: avoid;
+  }
+
+  .banda {
+    background: var(--az);
+    color: #fff;
+    font-size: 8.6px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: .15cm .2cm;
+    border: 1px solid var(--az);
+    border-bottom: none;
+  }
+  .caja {
+    border: 1px solid var(--az);
+    background: #fff;
+    font-size: 10px;
+    color: #22304d;
+    padding: .14cm .2cm;
+  }
+
+  .col-izq { display: flex; flex-direction: column; gap: .12cm; }
+  .caja.obs { min-height: 1.35cm; line-height: 1.45; }
+  .caja.obs .dato { display: block; }
+  .caja.obs .dato b { color: #2f4f8f; }
+  .caja.valor { min-height: .55cm; font-weight: 700; }
+  .caja.valor.mono { font-family: 'Courier New', Courier, monospace; }
+
+  .condiciones { margin-top: .06cm; }
+  .condiciones .etq {
+    font-size: 8.8px; font-style: italic; color: #3d5379;
+    margin: 0 0 .06cm .06cm;
+  }
+  .condiciones .caja { font-size: 7.6px; line-height: 1.4; color: #4a5878; min-height: .95cm; }
+
+  .barra-final { height: .18cm; background: var(--az); margin-top: -1px; }
+
+  .col-der { display: flex; flex-direction: column; justify-content: space-between; }
+  .totales .banda { text-align: center; }
+  .totales .caja.tot {
+    min-height: .82cm;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+    padding-right: .3cm;
+    margin-bottom: .22cm;
+  }
+
+  .firmas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .5cm;
+    margin-top: .3cm;
+  }
+  .firma { text-align: center; font-size: 9.5px; color: #33415c; }
+  .firma .raya { border-bottom: 1px solid #8fa3c2; height: 1.15cm; margin-bottom: .1cm; }
+
+  /* ---------- Pie ---------- */
+  .pie {
+    margin-top: .26cm;
+    display: grid;
+    grid-template-columns: 2.1cm 5.6cm 4.9cm 1fr;
+    border: 1px solid var(--az);
+    font-size: 7.6px;
+    color: #33415c;
+  }
+  .pie .cell {
+    display: flex; align-items: center; gap: .16cm;
+    padding: .12cm .18cm;
+    border-left: 1px solid var(--az);
+    line-height: 1.35;
+  }
+  .pie .cell:first-child { border-left: none; }
+  .pie .cell.stack { flex-direction: column; align-items: flex-start; gap: .12cm; justify-content: center; }
+  .pie .chk {
+    width: .42cm; height: .42cm;
+    border: 1px solid var(--az-osc);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; color: var(--az-osc); font-size: 10px;
+  }
+  .pie .lbl { font-weight: 700; color: var(--az-osc); font-size: 8.4px; }
+  .pie .linea { display: flex; align-items: flex-start; gap: .14cm; }
+  .pie .barra { height: .2cm; background: var(--az); border: 1px solid var(--az); border-top: none; }
+
+  /* ---------- Impresión ---------- */
+  @media print {
+    html, body { background: #fff !important; }
+    .toolbar, .aviso { display: none !important; }
+    .hoja {
+      width: auto; min-height: 0; margin: 0; padding: 1.05cm 1.15cm .95cm;
+      box-shadow: none; overflow: visible;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="grupo">
+    <a th:href="@{/pagos}" class="btn btn-ghost">← Volver a Caja</a>
+    <div class="titulo">
+      <b>Presupuesto odontológico · CISO</b>
+      <span th:text="${pago.paciente.nombre + ' ' + pago.paciente.apellidos + ' · folio ' + folioPresupuesto}">Paciente</span>
+    </div>
+  </div>
+  <div class="grupo">
+    <button type="button" onclick="window.print()" class="btn btn-print">Imprimir / Guardar PDF</button>
+  </div>
+</div>
+
+<div class="aviso">
+  Impresión oficial de CISO: elige tamaño <b>Carta (apaisado)</b>, escala <b>100 %</b> y márgenes <b>Ninguno</b> para que el marco y el pie salgan completos.
+</div>
+
+<div class="hoja">
+
+  <div class="marca" aria-hidden="true">G</div>
+
+  <div class="contenido">
+
+    <!-- Encabezado membretado -->
+    <header class="cab">
+      <img class="logo" th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg" alt="Clínica Integral de Servicios Odontológicos">
+      <div class="dentista">
+        <h1>Dra. Gloria González Herrera</h1>
+        <p>Cirujana Dentista</p>
+      </div>
+    </header>
+
+    <!-- Cédula y lugar / fecha -->
+    <div class="linea-ced">
+      <span class="punto i"></span>
+      <span>Cédula profesional. 4578914</span>
+      <span class="fecha">
+        Chilpancingo, Gro., a <b th:text="${#temporals.format(pago.fechaPago, 'dd')}">04</b> de
+        <b th:text="${#temporals.format(pago.fechaPago, 'MM')}">11</b> del
+        <b th:text="${#temporals.format(pago.fechaPago, 'yyyy')}">2026</b>
+      </span>
+      <span class="punto d"></span>
+    </div>
+
+    <!-- Folio -->
+    <div class="folio">
+      <span class="lbl">PRESUPUESTO</span>
+      <span class="num" th:text="${'N° ' + folioPresupuesto}">N° 000381</span>
+    </div>
+
+    <!-- Detalle de servicios -->
+    <table class="detalle">
+      <colgroup>
+        <col style="width:11%">
+        <col style="width:34%">
+        <col style="width:22%">
+        <col style="width:16.5%">
+        <col style="width:16.5%">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="c">No. Proc</th>
+          <th>Descripción</th>
+          <th>TX proyectado</th>
+          <th class="r">Valor unitario</th>
+          <th class="r">Valor final</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="c mono">1</td>
+          <td class="desc">
+            <span th:text="${pago.concepto}">Consulta odontológica</span>
+            <small th:if="${pago.cita != null}"
+                   th:text="${'Cita del ' + #temporals.format(pago.cita.fecha, 'dd/MM/yyyy') + ' · ' + #temporals.format(pago.cita.hora, 'HH:mm') + ' hrs'}">Cita del 04/11/2026</small>
+          </td>
+          <td th:text="${pago.cita != null and pago.cita.motivo != null and !#strings.isEmpty(pago.cita.motivo) ? pago.cita.motivo : 'Tratamiento dental'}">Tratamiento dental</td>
+          <td class="r mono" th:text="${'$ ' + #numbers.formatDecimal(pago.montoBase, 1, 'COMMA', 2, 'POINT')}">$ 850.00</td>
+          <td class="r mono" th:text="${'$ ' + #numbers.formatDecimal(pago.montoBase, 1, 'COMMA', 2, 'POINT')}">$ 850.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Observaciones, abonos y totales -->
+    <section class="inferior">
+
+      <div class="col-izq">
+
+        <div>
+          <div class="banda">Observaciones</div>
+          <div class="caja obs">
+            <span class="dato"><b>Paciente:</b> <span th:text="${pago.paciente.nombre + ' ' + pago.paciente.apellidos}">Nombre</span></span>
+            <span class="dato"><b>Tutor / representante:</b>
+              <span th:text="${pago.paciente.tutor != null ? (pago.paciente.tutor.nombre + ' ' + pago.paciente.tutor.apellidos) : 'N/A'}">Tutor</span>
+            </span>
+            <span class="dato"><b>Forma de pago:</b> <span th:text="${pago.metodoPago}">EFECTIVO</span></span>
+          </div>
+        </div>
+
+        <div>
+          <div class="banda">Valor abonado</div>
+          <div class="caja valor mono" th:text="${'$ ' + #numbers.formatDecimal(pago.montoTotal, 1, 'COMMA', 2, 'POINT')}">$ 850.00</div>
+        </div>
+
+        <div>
+          <div class="banda">Trabajo realizado</div>
+          <div class="caja valor"
+               th:text="${pago.cita != null ? 'Atención odontológica · Cita #' + pago.cita.idCita : 'Atención odontológica'}">Atención odontológica</div>
+        </div>
+
+        <div>
+          <div class="banda">Saldo</div>
+          <div class="caja valor mono">$ 0.00</div>
+        </div>
+
+        <div class="condiciones">
+          <p class="etq">Condiciones Generales:</p>
+          <div class="caja">
+            Este presupuesto tiene una vigencia de 6 meses. - UPI - Puede haber modificación durante el transcurso de su
+            tratamiento. Antes de comenzar el tratamiento debe acordar la forma de pago.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-der">
+
+        <div class="totales">
+          <div class="banda">Sub-total</div>
+          <div class="caja tot" th:text="${'$ ' + #numbers.formatDecimal(pago.montoBase, 1, 'COMMA', 2, 'POINT')}">$ 850.00</div>
+
+          <div class="banda">Total presupuesto</div>
+          <div class="caja tot" th:text="${'$ ' + #numbers.formatDecimal(pago.montoTotal, 1, 'COMMA', 2, 'POINT')}">$ 850.00</div>
+        </div>
+
+        <div class="firmas">
+          <div class="firma">
+            <div class="raya"></div>
+            <span>Dr. Tratante</span>
+          </div>
+          <div class="firma">
+            <div class="raya"></div>
+            <span>Paciente o Representante</span>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Pie oficial -->
+    <div class="pie">
+      <div class="cell">
+        <span class="chk">✓</span>
+        <span class="lbl">Firma</span>
+      </div>
+      <div class="cell">
+        <svg width="16" height="11" viewBox="0 0 24 16"><rect x="1" y="1" width="22" height="14" fill="#2f4f8f"/><path d="M1 1L12 9L23 1" fill="none" stroke="#fff" stroke-width="1.5"/></svg>
+        <span>azaglez1@hotmail.com</span>
+      </div>
+      <div class="cell stack">
+        <div class="linea">
+          <svg width="12" height="12" viewBox="0 0 18 18"><rect width="18" height="18" rx="4" fill="#2f4f8f"/><path d="M5 4C5 11 7 13 14 13L14 10L11.5 9L10.5 10.5C8.5 9.5 8 8.5 7.5 6.5L9 5.5L8 3Z" fill="#fff"/></svg>
+          <span>Tels. 47 2 41 00 / 47 2 9051</span>
+        </div>
+        <div class="linea">
+          <svg width="12" height="12" viewBox="0 0 18 18"><rect width="18" height="18" rx="4" fill="#2f4f8f"/><path d="M5 4C5 11 7 13 14 13L14 10L11.5 9L10.5 10.5C8.5 9.5 8 8.5 7.5 6.5L9 5.5L8 3Z" fill="#fff"/></svg>
+          <span>Cel. 7474 9905 38</span>
+        </div>
+      </div>
+      <div class="cell">
+        <svg width="15" height="12" viewBox="0 0 34 20" fill="none" stroke="#2f4f8f" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><ellipse cx="10" cy="10" rx="3.5" ry="8"/><path d="M2 10H18"/><circle cx="21" cy="11" r="5" fill="#fff"/><path d="M25 15L32 19" stroke-width="2.5"/></svg>
+        <span>Clínica Médica Humana · Avenida Lázaro Cárdenas #59, Col. Haciendita, C.P. 39087, Chilpancingo, Gro.</span>
+      </div>
+    </div>
+    <div class="barra-final"></div>
+
+  </div>
+</div>
+
+</body>
+</html>

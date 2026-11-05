@@ -124,7 +124,10 @@ public class PagoController {
         pago.setCita(cita);
         pago.setPaciente(cita.getPaciente());
         pago.setMedico(cita.getMedico());
-        pago.setConcepto("Consulta " + cita.getEspecialidad().toLowerCase() + " - " + cita.getPaciente().getNombre() + " " + cita.getPaciente().getApellidos());
+        // En odontología el concepto es el servicio dental: el presupuesto ya identifica al paciente.
+        pago.setConcepto("ODONTOLOGIA".equalsIgnoreCase(cita.getEspecialidad())
+                ? "Atención odontológica integral"
+                : "Consulta " + cita.getEspecialidad().toLowerCase() + " - " + cita.getPaciente().getNombre() + " " + cita.getPaciente().getApellidos());
         pago.setMontoBase(new BigDecimal("500.00")); // Valor sugerido estándar
         pago.setAplicaIva(false);
         pago.setMetodoPago("EFECTIVO");
@@ -185,6 +188,15 @@ public class PagoController {
         }
 
         model.addAttribute("pago", pago);
+
+        // Odontología (CISO) cobra con el presupuesto oficial de la Dra. Gloria González;
+        // Pediatría conserva su comprobante institucional.
+        String especialidad = (pago.getCita() != null) ? pago.getCita().getEspecialidad() : "";
+        if ("ODONTOLOGIA".equalsIgnoreCase(especialidad)) {
+            model.addAttribute("folioPresupuesto", String.format("%06d", pago.getIdPago()));
+            return "pagos/presupuesto_odontologia";
+        }
+
         return "pagos/comprobante_pago";
     }
 
