@@ -89,8 +89,8 @@
         </div>
     </div>
 
-    <!-- Historia Pediátrica -->
-    <section th:if="${esAdmin or esPediatra}" class="mb-8">
+    <!-- Historia Pediátrica: solo para pacientes del área de Pediatría -->
+    <section th:if="${(esAdmin or esPediatra) and paciente.area != null and paciente.area.name() == 'PEDIATRIA'}" class="mb-8">
         <div class="flex items-center gap-3 mb-4">
             <i class="fa-solid fa-stethoscope text-indigo-600 text-xl"></i>
             <h3 class="text-lg font-bold text-slate-900">Atenciones Pediátricas</h3>
@@ -222,8 +222,8 @@
 
     </section>
 
-    <!-- Historia Odontopediátrica -->
-    <section th:if="${esAdmin or (esOdontopediatra or esRecepcionista)}" class="mb-8">
+    <!-- Historia Odontopediátrica: solo para pacientes del área de Odontología -->
+    <section th:if="${(esAdmin or (esOdontopediatra or esRecepcionista)) and paciente.area != null and paciente.area.name() == 'ODONTOLOGIA'}" class="mb-8">
         <div class="flex items-center gap-3 mb-4">
             <i class="fa-solid fa-tooth text-teal-600 text-xl"></i>
             <h3 class="text-lg font-bold text-slate-900">Atenciones Odontopediátricas</h3>
@@ -383,8 +383,9 @@
         </div>
     </section>
 
-    <!-- Galería clínica dental -->
-    <section id="fotos-clinicas" class="mb-8">
+    <!-- Galería clínica dental: solo para pacientes del área de Odontología -->
+    <section id="fotos-clinicas" class="mb-8"
+             th:if="${paciente.area != null and paciente.area.name() == 'ODONTOLOGIA'}">
         <div class="flex items-center gap-3 mb-4">
             <i class="fa-solid fa-tooth text-teal-600 text-xl"></i>
             <h3 class="text-lg font-bold text-slate-900">Galería clínica dental</h3>

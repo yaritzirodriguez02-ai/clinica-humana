@@ -54,65 +54,7 @@
             <input type="hidden" th:field="*{paciente.idPaciente}" />
             <input type="hidden" th:field="*{medico.idUsuario}" />
 
-            <!-- 1. PADECIMIENTO ACTUAL -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-comment-medical text-indigo-600"></i> Padecimiento Actual
-                </h3>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Motivo de consulta y evolución</label>
-                <textarea th:field="*{padecimientoActual}" rows="4"
-                          placeholder="Síntomas referidos por el tutor, tiempo de evolución, tratamientos previos, antecedentes del padecimiento..."
-                          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
-            </div>
-
-            <!-- 2. EXPLORACIÓN FÍSICA -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-hand-holding-medical text-indigo-600"></i> Exploración Física
-                </h3>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Hallazgos de la exploración</label>
-                <textarea th:field="*{exploracionFisica}" rows="4"
-                          placeholder="Habitus exterior, cabeza y cuello, tórax, abdomen, extremidades, hallazgos relevantes..."
-                          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
-            </div>
-
-            <!-- 3. DIAGNÓSTICO Y TRATAMIENTO -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-notes-medical text-indigo-600"></i> Diagnóstico y Tratamiento
-                </h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Diagnóstico Médico *</label>
-                        <textarea th:field="*{diagnostico}" rows="3" required
-                                  placeholder="Detalle de hallazgos clínicos y diagnóstico..."
-                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
-                        <p id="err-diagnostico" class="hidden mt-1 text-xs font-semibold text-rose-600">
-                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba un diagnóstico real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tratamiento Indicado *</label>
-                        <textarea th:field="*{tratamiento}" rows="3" required
-                                  placeholder="Indicaciones médicas, reposo, cuidados..."
-                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
-                        <p id="err-tratamiento" class="hidden mt-1 text-xs font-semibold text-rose-600">
-                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba el tratamiento real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Receta Médica *</label>
-                        <textarea th:field="*{recetaMedica}" rows="3" required
-                                  placeholder="Medicamentos, dosis, frecuencia y duración..."
-                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
-                        <p id="err-recetaMedica" class="hidden mt-1 text-xs font-semibold text-rose-600">
-                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba la prescripción real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. SOMATOMETRÍA Y SIGNOS VITALES -->
+            <!-- 1. SOMATOMETRÍA Y SIGNOS VITALES -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-weight-scale text-indigo-600"></i> Somatometría y Signos Vitales
@@ -188,6 +130,64 @@
                     <p class="text-[10px] text-slate-400 mt-2">
                         Cálculo orientativo con las tablas de crecimiento CDC 2000 (LMS) para 2 a 20 años. No sustituye el juicio clínico.
                     </p>
+                </div>
+            </div>
+
+            <!-- 2. PADECIMIENTO ACTUAL -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-comment-medical text-indigo-600"></i> Padecimiento Actual
+                </h3>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Motivo de consulta y evolución</label>
+                <textarea th:field="*{padecimientoActual}" rows="4"
+                          placeholder="Síntomas referidos por el tutor, tiempo de evolución, tratamientos previos, antecedentes del padecimiento..."
+                          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+            </div>
+
+            <!-- 3. EXPLORACIÓN FÍSICA -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-hand-holding-medical text-indigo-600"></i> Exploración Física
+                </h3>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Hallazgos de la exploración</label>
+                <textarea th:field="*{exploracionFisica}" rows="4"
+                          placeholder="Habitus exterior, cabeza y cuello, tórax, abdomen, extremidades, hallazgos relevantes..."
+                          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+            </div>
+
+            <!-- 4. DIAGNÓSTICO Y TRATAMIENTO -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-notes-medical text-indigo-600"></i> Diagnóstico y Tratamiento
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Diagnóstico Médico *</label>
+                        <textarea th:field="*{diagnostico}" rows="3" required
+                                  placeholder="Detalle de hallazgos clínicos y diagnóstico..."
+                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <p id="err-diagnostico" class="hidden mt-1 text-xs font-semibold text-rose-600">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba un diagnóstico real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tratamiento Indicado *</label>
+                        <textarea th:field="*{tratamiento}" rows="3" required
+                                  placeholder="Indicaciones médicas, reposo, cuidados..."
+                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <p id="err-tratamiento" class="hidden mt-1 text-xs font-semibold text-rose-600">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba el tratamiento real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Receta Médica *</label>
+                        <textarea th:field="*{recetaMedica}" rows="3" required
+                                  placeholder="Medicamentos, dosis, frecuencia y duración..."
+                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <p id="err-recetaMedica" class="hidden mt-1 text-xs font-semibold text-rose-600">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba la prescripción real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -427,16 +427,90 @@
                 }
             });
 
-            // Punto del paciente
+            // Punto del paciente (se anima al capturar talla o peso)
+            let punto = null;
             if (isFinite(edadMeses) && valor > 0 && edadMeses >= 24 && edadMeses <= 240) {
                 const px = x(edadMeses / 12), py = y(valor);
-                if (py > mt && py < H - mb) {
-                    partes.push('<circle cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="4" fill="#4338ca" stroke="#ffffff" stroke-width="1.5"/>');
-                    partes.push('<line x1="' + px.toFixed(1) + '" y1="' + mt + '" x2="' + px.toFixed(1) + '" y2="' + (H - mb) + '" stroke="#4338ca" stroke-width="0.7" stroke-dasharray="3 3"/>');
-                }
+                if (py > mt && py < H - mb) punto = { px: px, py: py };
+            }
+            if (punto) {
+                partes.push('<line id="' + idSvg + '-guia" x1="' + punto.px.toFixed(1) + '" y1="' + mt + '" x2="' + punto.px.toFixed(1) + '" y2="' + (H - mb) + '" stroke="#4338ca" stroke-width="0.7" stroke-dasharray="3 3"/>');
+                partes.push('<circle id="' + idSvg + '-pulso" cx="' + punto.px.toFixed(1) + '" cy="' + punto.py.toFixed(1) + '" r="4" fill="none" stroke="#6366f1" stroke-width="2" opacity="0.85">'
+                    + '<animate attributeName="r" values="4;20" dur="1s" fill="freeze"/>'
+                    + '<animate attributeName="opacity" values="0.85;0" dur="1s" fill="freeze"/>'
+                    + '</circle>');
+                partes.push('<circle id="' + idSvg + '-punto" cx="' + punto.px.toFixed(1) + '" cy="' + punto.py.toFixed(1) + '" r="4.5" fill="#4338ca" stroke="#ffffff" stroke-width="1.5"/>');
             }
 
             svg.innerHTML = partes.join('');
+            animarCurvas(svg);
+            animarPunto(idSvg, punto);
+        }
+
+        // ---------- Movimiento de las gráficas de percentiles ----------
+        const ESTADO_GRAFICAS = {};
+
+        function estadoGrafica(idSvg) {
+            if (!ESTADO_GRAFICAS[idSvg]) {
+                ESTADO_GRAFICAS[idSvg] = { x: null, y: null, frame: null, curvasAnimadas: false };
+            }
+            return ESTADO_GRAFICAS[idSvg];
+        }
+
+        // Las curvas se trazan una sola vez, cuando aparece la gráfica
+        function animarCurvas(svg) {
+            const est = estadoGrafica(svg.id);
+            if (est.curvasAnimadas) return;
+            est.curvasAnimadas = true;
+            svg.querySelectorAll('polyline').forEach(function (curva, i) {
+                let largo = 0;
+                try { largo = curva.getTotalLength(); } catch (e) { return; }
+                if (!largo) return;
+                curva.style.strokeDasharray = largo + 'px';
+                curva.style.strokeDashoffset = largo + 'px';
+                curva.style.transition = 'stroke-dashoffset 1.1s ease-out ' + (i * 90) + 'ms';
+                requestAnimationFrame(function () { curva.style.strokeDashoffset = '0'; });
+            });
+        }
+
+        // El punto del paciente se desliza desde su posición anterior y late
+        function animarPunto(idSvg, destino) {
+            const est = estadoGrafica(idSvg);
+            const circulo = document.getElementById(idSvg + '-punto');
+            const pulso = document.getElementById(idSvg + '-pulso');
+            const guia = document.getElementById(idSvg + '-guia');
+            if (est.frame) { cancelAnimationFrame(est.frame); est.frame = null; }
+            if (!circulo || !destino) { est.x = null; est.y = null; return; }
+
+            const desdeX = est.x !== null ? est.x : destino.px;
+            const desdeY = est.y !== null ? est.y : destino.py + 24;
+            const inicio = performance.now();
+            const DURACION = 450;
+
+            function paso(ahora) {
+                const avance = Math.min(1, (ahora - inicio) / DURACION);
+                const suave = 1 - Math.pow(1 - avance, 3);
+                const cx = desdeX + (destino.px - desdeX) * suave;
+                const cy = desdeY + (destino.py - desdeY) * suave;
+                circulo.setAttribute('cx', cx.toFixed(1));
+                circulo.setAttribute('cy', cy.toFixed(1));
+                if (pulso) {
+                    pulso.setAttribute('cx', cx.toFixed(1));
+                    pulso.setAttribute('cy', cy.toFixed(1));
+                }
+                if (guia) {
+                    guia.setAttribute('x1', cx.toFixed(1));
+                    guia.setAttribute('x2', cx.toFixed(1));
+                }
+                if (avance < 1) {
+                    est.frame = requestAnimationFrame(paso);
+                } else {
+                    est.frame = null;
+                    est.x = destino.px;
+                    est.y = destino.py;
+                }
+            }
+            est.frame = requestAnimationFrame(paso);
         }
 
         function actualizarPercentiles() {
