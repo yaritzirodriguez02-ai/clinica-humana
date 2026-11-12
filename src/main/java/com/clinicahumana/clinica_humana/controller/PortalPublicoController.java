@@ -10,6 +10,7 @@ import com.clinicahumana.clinica_humana.repository.EmpleadoRepository;
 import com.clinicahumana.clinica_humana.repository.PacienteRepository;
 import com.clinicahumana.clinica_humana.repository.TutorRepository;
 import com.clinicahumana.clinica_humana.service.CitaService;
+import com.clinicahumana.clinica_humana.service.NotificacionCitaService;
 import com.clinicahumana.clinica_humana.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -58,6 +59,9 @@ public class PortalPublicoController {
 
     @Autowired
     private EmpleadoRepository empleadoRepo;
+
+    @Autowired
+    private NotificacionCitaService notificacionService;
 
     /** Número de la clínica para cuando una especialista no tenga WhatsApp registrado. */
     private static final String WHATSAPP_CLINICA = "7474729051";
@@ -142,6 +146,8 @@ public class PortalPublicoController {
             @RequestParam("horaCita") String horaCita,
             @RequestParam("motivo") String motivo,
             @RequestParam(value = "aceptaAvisoFotos", required = false) String aceptaAvisoFotos,
+            @RequestParam(value = "canalWhatsapp", required = false) String canalWhatsapp,
+            @RequestParam(value = "canalSms", required = false) String canalSms,
             RedirectAttributes redirectAttributes) {
 
         // ---------- Validaciones de los datos del infante ----------
@@ -189,6 +195,15 @@ public class PortalPublicoController {
         String emailNorm = emailTutor == null ? "" : emailTutor.trim();
         if (!PATRON_EMAIL.matcher(emailNorm).matches()) {
             return error(redirectAttributes, "Debe proporcionar un correo electrónico válido.");
+        }
+
+        // Canales de aviso elegidos (al menos uno): confirmación y recordatorio de la cita
+        boolean avisoWhatsapp = "true".equalsIgnoreCase(canalWhatsapp)
+                || "on".equalsIgnoreCase(canalWhatsapp) || "1".equals(canalWhatsapp);
+        boolean avisoSms = "true".equalsIgnoreCase(canalSms)
+                || "on".equalsIgnoreCase(canalSms) || "1".equals(canalSms);
+        if (!avisoWhatsapp && !avisoSms) {
+            return error(redirectAttributes, "Elija al menos un medio de contacto (WhatsApp o SMS) para enviarle la confirmación de su cita.");
         }
 
         // ---------- Validaciones de la cita (mismas reglas que el sistema interno) ----------
@@ -293,7 +308,16 @@ public class PortalPublicoController {
             cita.setHora(hCita);
             cita.setMotivo(motivoNorm);
             cita.setAceptaUsoFotosClinicas(aceptoFotos);
+            cita.setNotificarWhatsapp(avisoWhatsapp);
+            cita.setNotificarSms(avisoSms);
             Cita citaGuardada = citaService.agendarCita(cita);
+
+            // Confirmación inmediata por WhatsApp y/o SMS (si falla, la cita queda agendada igual)
+            try {
+                notificacionService.confirmar(citaGuardada);
+            } catch (Exception e) {
+                // El servicio ya registra el error; no se interrumpe el agendamiento
+            }
 
             String telefonoMedico = telefonoDe(medico);
             redirectAttributes.addFlashAttribute("mensajeExito",
@@ -313,6 +337,13 @@ public class PortalPublicoController {
             redirectAttributes.addFlashAttribute("whatsappTelefono",
                     telefonoMedico.isEmpty() ? WHATSAPP_CLINICA : telefonoMedico);
             redirectAttributes.addFlashAttribute("whatsappEsClinica", telefonoMedico.isEmpty());
+            redirectAttributes.addFlashAttribute("notificacionInfo",
+                    "Enviamos la confirmación de tu cita por "
+                            + (avisoWhatsapp && avisoSms ? "WhatsApp y SMS" : avisoWhatsapp ? "WhatsApp" : "SMS")
+                            + " al " + telefonoNorm
+                            + ". El día de la consulta recibirás un recordatorio con la hora de llegada (20 minutos antes)."
+                            + (notificacionService.estaConfigurado() ? ""
+                            : " (Aviso interno: la mensajería está en modo de prueba; configure Twilio para enviar los mensajes reales)."));
             return "redirect:/public/agendar-cita";
 
         } catch (IllegalStateException e) {

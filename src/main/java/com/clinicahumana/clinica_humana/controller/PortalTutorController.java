@@ -11,6 +11,7 @@ import com.clinicahumana.clinica_humana.repository.EmpleadoRepository;
 import com.clinicahumana.clinica_humana.repository.PacienteRepository;
 import com.clinicahumana.clinica_humana.repository.TutorRepository;
 import com.clinicahumana.clinica_humana.repository.UsuarioRepository;
+import com.clinicahumana.clinica_humana.service.NotificacionCitaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,6 +42,9 @@ public class PortalTutorController {
 
     @Autowired
     private EmpleadoRepository empleadoRepo;
+
+    @Autowired
+    private NotificacionCitaService notificacionService;
 
     private static final String WHATSAPP_CLINICA = "7474729051";
 
@@ -142,7 +146,16 @@ paciente.setSexo(sexoNormalizado);
             cita.setMotivo(motivo);
             cita.setEstado("PROGRAMADA");
             cita.setAceptaUsoFotosClinicas(aceptoFotos);
+            cita.setNotificarWhatsapp(Boolean.TRUE);
+            cita.setNotificarSms(Boolean.TRUE);
             citaRepo.save(cita);
+
+            // Confirmación inmediata por WhatsApp y SMS (un fallo no impide agendar)
+            try {
+                notificacionService.confirmar(cita);
+            } catch (Exception e) {
+                // El servicio registra el error en la bitácora
+            }
 
             String telefonoMedico = empleadoRepo.findByUsuarioIdUsuario(medico.getIdUsuario())
                     .map(Empleado::getTelefono)
@@ -161,6 +174,11 @@ paciente.setSexo(sexoNormalizado);
                             + "Motivo: " + motivo));
             redirectAttributes.addFlashAttribute("whatsappTelefono", telefonoContacto);
             redirectAttributes.addFlashAttribute("whatsappEsClinica", telefonoMedico.isEmpty());
+            redirectAttributes.addFlashAttribute("notificacionInfo",
+                    "También enviamos la confirmación por WhatsApp y SMS al " + telefonoTutor.trim()
+                            + ". El día de la consulta recibirás un recordatorio: llega 20 minutos antes."
+                            + (notificacionService.estaConfigurado() ? ""
+                            : " (Aviso interno: la mensajería está en modo de prueba; configure Twilio para enviar los mensajes reales)."));
             return "redirect:/portal-citas/confirmacion";
 
         } catch (Exception e) {

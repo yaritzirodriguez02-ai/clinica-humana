@@ -18,6 +18,11 @@
             Tu cita ha sido guardada en la agenda del consultorio.
         </p>
 
+        <div th:if="${notificacionInfo}" class="bg-sky-50 p-4 rounded-xl border border-sky-200 text-xs text-left mb-6 text-sky-900">
+            <i class="fa-solid fa-comment-dots text-sky-600"></i>
+            <span th:text="${notificacionInfo}"></span>
+        </div>
+
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-left mb-6 space-y-1 text-slate-700">
             <p><strong>Ubicación:</strong> Av. Lázaro Cárdenas #59, 3er Piso, Col. Haciendita, Chilpancingo, Gro.</p>
             <p><strong>Recomendación:</strong> Presentarse 10 minutos antes de la hora acordada.</p>

@@ -65,6 +65,13 @@ public class Cita {
     @Column(name = "acepta_uso_fotos_clinicas", columnDefinition = "BIT DEFAULT 0")
     private Boolean aceptaUsoFotosClinicas = Boolean.FALSE;
 
+    /** Canales elegidos por el tutor para recibir la confirmación y el recordatorio de la cita. */
+    @Column(name = "notificar_whatsapp", columnDefinition = "BIT DEFAULT 1")
+    private Boolean notificarWhatsapp = Boolean.TRUE;
+
+    @Column(name = "notificar_sms", columnDefinition = "BIT DEFAULT 1")
+    private Boolean notificarSms = Boolean.TRUE;
+
     @PrePersist
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();
@@ -167,5 +174,21 @@ public class Cita {
 
     public void setAceptaUsoFotosClinicas(Boolean aceptaUsoFotosClinicas) {
         this.aceptaUsoFotosClinicas = aceptaUsoFotosClinicas;
+    }
+
+    public Boolean getNotificarWhatsapp() {
+        return notificarWhatsapp;
+    }
+
+    public void setNotificarWhatsapp(Boolean notificarWhatsapp) {
+        this.notificarWhatsapp = notificarWhatsapp;
+    }
+
+    public Boolean getNotificarSms() {
+        return notificarSms;
+    }
+
+    public void setNotificarSms(Boolean notificarSms) {
+        this.notificarSms = notificarSms;
     }
 }
