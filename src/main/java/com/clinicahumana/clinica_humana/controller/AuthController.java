@@ -10,9 +10,18 @@ import java.security.Principal;
 @Controller
 public class AuthController {
 
+    /**
+     * La puerta de entrada del sistema es siempre la portada: si alguien escribe
+     * /login (o Spring Security manda aquí por una ruta protegida) se le lleva a la
+     * pantalla de bienvenida para que elija su panel. El formulario se muestra
+     * únicamente en /entrar/{panel}.
+     */
     @GetMapping("/login")
-    public String login() {
-        return "login";
+    public String login(Principal principal) {
+        if (principal != null) {
+            return "redirect:/citas";
+        }
+        return "redirect:/";
     }
 
     /**
@@ -24,7 +33,16 @@ public class AuthController {
         if (principal != null) {
             return "redirect:/citas";
         }
-        String area = "ODONTOLOGIA".equalsIgnoreCase(panel) ? "ODONTOLOGIA" : "PEDIATRIA";
+        // Pediatría y Odontología tienen su propio color; cualquier otra entrada
+        // (recepción / administración) usa el estilo neutro del sistema.
+        String area;
+        if ("ODONTOLOGIA".equalsIgnoreCase(panel)) {
+            area = "ODONTOLOGIA";
+        } else if ("PEDIATRIA".equalsIgnoreCase(panel)) {
+            area = "PEDIATRIA";
+        } else {
+            area = null;
+        }
         model.addAttribute("panel", area);
         return "login";
     }

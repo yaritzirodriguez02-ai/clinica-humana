@@ -96,11 +96,24 @@ public class SecurityConfig {
                         response.sendRedirect("/citas");
                     }
                 })
+                .failureHandler((request, response, exception) -> {
+                    // Un login fallido vuelve al mismo panel desde el que se intentó entrar
+                    String panel = request.getParameter("panel");
+                    String destino;
+                    if ("ODONTOLOGIA".equalsIgnoreCase(panel)) {
+                        destino = "/entrar/odontologia";
+                    } else if ("PEDIATRIA".equalsIgnoreCase(panel)) {
+                        destino = "/entrar/pediatria";
+                    } else {
+                        destino = "/entrar/recepcion";
+                    }
+                    response.sendRedirect(destino + "?error");
+                })
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
+                .logoutSuccessUrl("/")
                 .permitAll()
             )
             // CSRF queda ACTIVO (protección por defecto de Spring Security); los formularios
