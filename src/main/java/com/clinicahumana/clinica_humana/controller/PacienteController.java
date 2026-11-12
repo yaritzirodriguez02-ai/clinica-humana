@@ -143,12 +143,12 @@ public class PacienteController {
         List<ExpedienteOdontopediatrico> odontoCronologica = new ArrayList<>(historiaOdontopediatrica);
         Collections.reverse(odontoCronologica);
 
-        // Fotos clínicas del paciente y su retrato de perfil
-        List<FotoPaciente> fotos = fotoPacienteRepository.findByPacienteIdPacienteOrderByFechaSubidaDesc(idPaciente);
-        FotoPaciente fotoPerfil = fotos.stream()
-                .filter(f -> Boolean.TRUE.equals(f.getPerfil()))
-                .findFirst()
+        // Retrato de perfil y galería clínica (son apartados distintos)
+        FotoPaciente fotoPerfil = fotoPacienteRepository
+                .findFirstByPacienteIdPacienteAndPerfilTrue(idPaciente)
                 .orElse(null);
+        List<FotoPaciente> fotos = fotoPacienteRepository
+                .findByPacienteIdPacienteAndPerfilFalseOrderByFechaSubidaDesc(idPaciente);
         model.addAttribute("fotos", fotos);
         model.addAttribute("fotoPerfil", fotoPerfil);
 

@@ -57,8 +57,16 @@
     <!-- Ficha del Paciente -->
     <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap justify-between items-start gap-4">
         <div class="flex items-center gap-4">
-            <img th:if="${fotoPerfil != null}" th:src="${fotoPerfil.datosBase64}" alt="Foto del paciente"
-                 class="w-20 h-20 rounded-xl object-cover border-2 border-indigo-300 shadow-sm">
+            <button th:if="${fotoPerfil != null}" type="button" onclick="abrirVisor(this)"
+                    th:attr="data-src=${fotoPerfil.datosBase64},data-titulo=${'Foto de perfil · ' + paciente.nombre + ' ' + paciente.apellidos}"
+                    title="Ver foto en grande"
+                    class="group relative rounded-xl overflow-hidden border-2 border-indigo-300 shadow-sm hover:border-indigo-500 transition">
+                <img th:src="${fotoPerfil.datosBase64}" alt="Foto del paciente"
+                     class="w-20 h-20 object-cover">
+                <span class="absolute inset-0 bg-slate-900/50 text-white text-[10px] font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                    <i class="fa-solid fa-magnifying-glass-plus"></i>
+                </span>
+            </button>
             <div th:if="${fotoPerfil == null}"
                  class="w-20 h-20 rounded-xl bg-indigo-100 border-2 border-indigo-200 flex items-center justify-center text-2xl font-bold text-indigo-600"
                  th:text="${#strings.substring(paciente.nombre, 0, 1) + #strings.substring(paciente.apellidos, 0, 1)}">AA</div>
@@ -305,70 +313,126 @@
 
     </section>
 
-    <!-- Fotos y estudios del paciente -->
-    <section id="fotos" class="mb-8">
+    <!-- Foto de perfil del paciente -->
+    <section id="foto-perfil" class="mb-8">
         <div class="flex items-center gap-3 mb-4">
-            <i class="fa-solid fa-images text-indigo-600 text-xl"></i>
-            <h3 class="text-lg font-bold text-slate-900">Fotos y estudios</h3>
+            <i class="fa-solid fa-id-badge text-indigo-600 text-xl"></i>
+            <h3 class="text-lg font-bold text-slate-900">Foto de perfil</h3>
+            <span class="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-0.5 rounded-full">
+                Identifica al paciente en el expediente y el directorio
+            </span>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-5 items-start">
+            <button th:if="${fotoPerfil != null}" type="button" onclick="abrirVisor(this)"
+                    th:attr="data-src=${fotoPerfil.datosBase64},data-titulo=${'Foto de perfil · ' + paciente.nombre + ' ' + paciente.apellidos}"
+                    title="Ver en grande"
+                    class="group relative shrink-0 rounded-xl overflow-hidden border-2 border-indigo-200 hover:border-indigo-500 transition">
+                <img th:src="${fotoPerfil.datosBase64}" alt="Foto de perfil del paciente"
+                     class="w-40 h-40 object-cover">
+                <span class="absolute inset-0 bg-slate-900/50 text-white text-xs font-semibold flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                    <i class="fa-solid fa-magnifying-glass-plus text-lg"></i>
+                    Ver en grande
+                </span>
+            </button>
+            <div th:if="${fotoPerfil == null}"
+                 class="w-40 h-40 shrink-0 rounded-xl bg-slate-100 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 text-xs gap-1 text-center px-2">
+                <i class="fa-regular fa-image text-2xl"></i>
+                Sin foto de perfil
+            </div>
+
+            <div class="flex-1">
+                <p class="text-sm text-slate-600 mb-3">
+                    Este retrato es solo para identificar al paciente. No se mezcla con las fotos clínicas dentales.
+                </p>
+                <form th:action="@{/pacientes/fotos/{id}/perfil/subir(id=${idPaciente})}" method="post"
+                      enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3 items-start sm:items-end">
+                    <div class="flex-1 w-full">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Imagen (JPG, PNG o WEBP)</label>
+                        <input type="file" name="archivo" accept="image/*" required
+                               class="w-full text-sm text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-semibold hover:file:bg-indigo-100">
+                    </div>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center justify-center gap-2 shrink-0">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span th:text="${fotoPerfil != null ? 'Cambiar foto de perfil' : 'Subir foto de perfil'}"></span>
+                    </button>
+                </form>
+                <form th:if="${fotoPerfil != null}" th:action="@{/pacientes/fotos/{id}/eliminar(id=${fotoPerfil.idFoto})}" method="post"
+                      onsubmit="return confirm('¿Eliminar la foto de perfil?');" class="mt-2">
+                    <button type="submit" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1.5 rounded-lg font-semibold transition">
+                        <i class="fa-solid fa-trash-can"></i> Eliminar foto de perfil
+                    </button>
+                </form>
+                <p class="text-xs text-slate-400 mt-2">
+                    <i class="fa-solid fa-circle-info mr-1"></i>
+                    Al subir otra imagen se reemplaza la actual. Máximo 8 MB.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galería clínica dental -->
+    <section id="fotos-clinicas" class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+            <i class="fa-solid fa-tooth text-teal-600 text-xl"></i>
+            <h3 class="text-lg font-bold text-slate-900">Galería clínica dental</h3>
             <span class="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-0.5 rounded-full"
                   th:text="${'Total: ' + (fotos != null ? fotos.size() : 0)}"></span>
         </div>
 
-        <!-- Subir una foto nueva -->
+        <!-- Subir una foto clínica nueva -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-4">
             <form th:action="@{/pacientes/fotos/{id}/subir(id=${idPaciente})}" method="post"
                   enctype="multipart/form-data" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
                 <div class="sm:col-span-2">
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Imagen (JPG, PNG o WEBP)</label>
                     <input type="file" name="archivo" accept="image/*" required
-                           class="w-full text-sm text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-semibold hover:file:bg-indigo-100">
+                           class="w-full text-sm text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-teal-50 file:text-teal-700 file:font-semibold hover:file:bg-teal-100">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Descripción</label>
                     <input type="text" name="descripcion" maxlength="200"
                            placeholder="Ej. Radiografía panorámica, placa inicial..."
-                           class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                 </div>
-                <div class="flex flex-col gap-2">
-                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                        <input type="checkbox" name="perfil" value="S" class="accent-indigo-600">
-                        Usar como foto de perfil
-                    </label>
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Subir foto
-                    </button>
-                </div>
+                <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Subir a la galería
+                </button>
             </form>
             <p class="text-xs text-slate-400 mt-2">
                 <i class="fa-solid fa-circle-info mr-1"></i>
-                Puedes subir placas, radiografías, fotos de la atención dental o el retrato del paciente. Máximo 8 MB por imagen.
+                Placas, radiografías, fotografías de la atención dental y estudios. Para el retrato del paciente usa la sección “Foto de perfil”. Máximo 8 MB por imagen.
             </p>
         </div>
 
         <div th:if="${#lists.isEmpty(fotos)}" class="bg-white p-6 rounded-xl border border-dashed border-slate-300 text-slate-400 text-sm">
             <i class="fa-solid fa-image text-2xl mb-2 block opacity-50"></i>
-            Este paciente todavía no tiene fotos ni estudios en su expediente.
+            Este paciente todavía no tiene fotos ni estudios clínicos en su expediente.
         </div>
 
         <div th:if="${not #lists.isEmpty(fotos)}" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <div th:each="f : ${fotos}" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                <a th:href="${f.datosBase64}" target="_blank" class="block bg-slate-100">
+                <button type="button" onclick="abrirVisor(this)"
+                        th:attr="data-src=${f.datosBase64},data-titulo=${f.descripcion}"
+                        title="Ver en grande"
+                        class="group relative block bg-slate-100">
                     <img th:src="${f.datosBase64}" th:alt="${f.descripcion}" class="w-full h-40 object-contain">
-                </a>
-                <div class="p-3 flex flex-col gap-1 flex-1">
-                    <span th:if="${f.perfil}" class="self-start text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
-                        <i class="fa-solid fa-id-badge mr-1"></i> Foto de perfil
+                    <span class="absolute inset-0 bg-slate-900/50 text-white text-xs font-semibold flex flex-col items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                        <i class="fa-solid fa-magnifying-glass-plus text-lg"></i>
+                        Ver en grande
                     </span>
+                </button>
+                <div class="p-3 flex flex-col gap-1 flex-1">
                     <p class="text-sm font-semibold text-slate-800 leading-snug" th:text="${f.descripcion}">Descripción</p>
                     <p class="text-xs text-slate-400" th:text="${f.fechaSubida != null ? #temporals.format(f.fechaSubida, 'dd/MM/yyyy HH:mm') : ''}"></p>
                     <div class="flex flex-wrap gap-2 mt-auto pt-2">
-                        <form th:unless="${f.perfil}" th:action="@{/pacientes/fotos/{id}/perfil(id=${f.idFoto})}" method="post">
-                            <button type="submit" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2.5 py-1.5 rounded-lg font-semibold transition">
-                                <i class="fa-solid fa-id-badge"></i> Perfil
-                            </button>
-                        </form>
+                        <button type="button" onclick="abrirVisor(this)"
+                                th:attr="data-src=${f.datosBase64},data-titulo=${f.descripcion}"
+                                class="text-xs bg-teal-50 hover:bg-teal-100 text-teal-700 px-2.5 py-1.5 rounded-lg font-semibold transition">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i> Ver
+                        </button>
                         <form th:action="@{/pacientes/fotos/{id}/eliminar(id=${f.idFoto})}" method="post"
-                              onsubmit="return confirm('¿Eliminar esta foto del expediente?');">
+                              onsubmit="return confirm('¿Eliminar esta imagen de la galería clínica?');">
                             <button type="submit" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1.5 rounded-lg font-semibold transition">
                                 <i class="fa-solid fa-trash-can"></i> Eliminar
                             </button>
@@ -383,6 +447,45 @@
         <i class="fa-solid fa-clock mr-1"></i> Las fechas mostradas corresponden a la fecha de atención registrada en cada expediente.
     </p>
 </main>
+
+<!-- Visor de imágenes a tamaño completo -->
+<div id="visorFoto" class="fixed inset-0 z-50 hidden bg-slate-900/90 backdrop-blur-sm items-center justify-center p-4" onclick="cerrarVisor()">
+    <div class="relative max-w-5xl w-full" onclick="event.stopPropagation()">
+        <button type="button" onclick="cerrarVisor()" title="Cerrar"
+                class="absolute -top-4 -right-2 sm:-right-4 z-10 bg-white text-slate-700 hover:bg-slate-200 w-10 h-10 rounded-full shadow-lg flex items-center justify-center transition">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+        <img id="visorImagen" src="" alt="Imagen ampliada"
+             class="mx-auto max-h-[80vh] w-auto max-w-full rounded-xl bg-white shadow-2xl object-contain">
+        <p id="visorTitulo" class="text-center text-white/90 text-sm mt-3"></p>
+        <p class="text-center text-white/50 text-xs mt-1">Haz clic fuera de la imagen o presiona Esc para cerrar.</p>
+    </div>
+</div>
+
+<script>
+    function abrirVisor(el) {
+        var visor = document.getElementById('visorFoto');
+        document.getElementById('visorImagen').src = el.getAttribute('data-src');
+        document.getElementById('visorTitulo').textContent = el.getAttribute('data-titulo') || '';
+        visor.classList.remove('hidden');
+        visor.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrarVisor() {
+        var visor = document.getElementById('visorFoto');
+        visor.classList.add('hidden');
+        visor.classList.remove('flex');
+        document.getElementById('visorImagen').src = '';
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            cerrarVisor();
+        }
+    });
+</script>
 
 </body>
 </html>

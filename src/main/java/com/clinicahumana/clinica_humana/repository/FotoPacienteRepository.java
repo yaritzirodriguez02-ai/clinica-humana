@@ -13,6 +13,10 @@ public interface FotoPacienteRepository extends JpaRepository<FotoPaciente, Long
 
     List<FotoPaciente> findByPacienteIdPacienteOrderByFechaSubidaDesc(Long idPaciente);
 
+    List<FotoPaciente> findByPacienteIdPacienteAndPerfilFalseOrderByFechaSubidaDesc(Long idPaciente);
+
+    List<FotoPaciente> findByPacienteIdPacienteAndPerfilTrue(Long idPaciente);
+
     List<FotoPaciente> findByPacienteIdPacienteInAndPerfilTrue(Collection<Long> idsPaciente);
 
     Optional<FotoPaciente> findFirstByPacienteIdPacienteAndPerfilTrue(Long idPaciente);

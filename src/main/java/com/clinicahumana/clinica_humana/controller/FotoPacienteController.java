@@ -15,11 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Base64;
-import java.util.List;
 
 /**
- * Fotos clínicas del paciente (placas, radiografías, estudios y retrato).
- * La foto marcada como perfil se muestra en el expediente y en el directorio.
+ * Imágenes del paciente, en dos apartados independientes:
+ * <ul>
+ *   <li>Foto de perfil: un único retrato que identifica al paciente en el expediente y el directorio.</li>
+ *   <li>Galería clínica: placas, radiografías y fotografías de la atención dental (nunca se usa como perfil).</li>
+ * </ul>
  */
 @Controller
 @RequestMapping("/pacientes/fotos")
@@ -34,12 +36,12 @@ public class FotoPacienteController {
     @Autowired
     private PacienteService pacienteService;
 
+    /** Agrega una imagen a la galería clínica dental del paciente. */
     @PostMapping("/{idPaciente}/subir")
-    public String subirFoto(@PathVariable("idPaciente") Long idPaciente,
-                            @RequestParam("archivo") MultipartFile archivo,
-                            @RequestParam(name = "descripcion", required = false) String descripcion,
-                            @RequestParam(name = "perfil", required = false) String perfil,
-                            RedirectAttributes redirectAttributes) {
+    public String subirFotoClinica(@PathVariable("idPaciente") Long idPaciente,
+                                   @RequestParam("archivo") MultipartFile archivo,
+                                   @RequestParam(name = "descripcion", required = false) String descripcion,
+                                   RedirectAttributes redirectAttributes) {
 
         Paciente paciente = pacienteService.buscarPorId(idPaciente).orElse(null);
         if (paciente == null) {
@@ -47,45 +49,22 @@ public class FotoPacienteController {
             return "redirect:/pacientes";
         }
 
-        String volver = "redirect:/pacientes/expediente/" + idPaciente + "#fotos";
+        String volver = "redirect:/pacientes/expediente/" + idPaciente + "#fotos-clinicas";
 
-        if (archivo == null || archivo.isEmpty()) {
-            redirectAttributes.addFlashAttribute("mensajeError", "Selecciona una imagen para subirla.");
-            return volver;
-        }
-
-        String tipo = archivo.getContentType() != null ? archivo.getContentType().toLowerCase() : "";
-        if (!tipo.startsWith("image/")) {
-            redirectAttributes.addFlashAttribute("mensajeError",
-                    "El archivo debe ser una imagen (JPG, PNG, WEBP o similar).");
-            return volver;
-        }
-        if (archivo.getSize() > MAX_BYTES) {
-            redirectAttributes.addFlashAttribute("mensajeError",
-                    "La imagen supera el límite de 8 MB. Redúcela e inténtalo de nuevo.");
+        String error = validarImagen(archivo);
+        if (error != null) {
+            redirectAttributes.addFlashAttribute("mensajeError", error);
             return volver;
         }
 
         try {
-            String dataUri = "data:" + tipo + ";base64,"
-                    + Base64.getEncoder().encodeToString(archivo.getBytes());
-
-            FotoPaciente foto = new FotoPaciente();
-            foto.setPaciente(paciente);
-            foto.setDatosBase64(dataUri);
-            foto.setTipoContenido(tipo);
-            foto.setNombreArchivo(archivo.getOriginalFilename());
+            FotoPaciente foto = construirFoto(paciente, archivo);
             foto.setDescripcion(descripcion != null && !descripcion.isBlank()
                     ? descripcion.trim() : "Foto clínica");
-            foto.setPerfil(esPrimeraFoto(idPaciente) || "S".equalsIgnoreCase(perfil));
-
+            foto.setPerfil(Boolean.FALSE);
             fotoRepository.save(foto);
 
-            if (Boolean.TRUE.equals(foto.getPerfil())) {
-                marcarComoPerfil(foto);
-            }
-
-            redirectAttributes.addFlashAttribute("mensajeExito", "Foto agregada al expediente del paciente.");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Foto agregada a la galería clínica del paciente.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError", "No se pudo guardar la imagen: " + e.getMessage());
         }
@@ -93,19 +72,41 @@ public class FotoPacienteController {
         return volver;
     }
 
-    /** Deja una sola foto como retrato del paciente. */
-    @PostMapping("/{idFoto}/perfil")
+    /** Sube o reemplaza la foto de perfil (un solo retrato por paciente). */
+    @PostMapping("/{idPaciente}/perfil/subir")
     @Transactional
-    public String marcarPerfil(@PathVariable("idFoto") Long idFoto, RedirectAttributes redirectAttributes) {
-        FotoPaciente foto = fotoRepository.findById(idFoto).orElse(null);
-        if (foto == null) {
-            redirectAttributes.addFlashAttribute("mensajeError", "La foto ya no existe.");
+    public String subirFotoPerfil(@PathVariable("idPaciente") Long idPaciente,
+                                  @RequestParam("archivo") MultipartFile archivo,
+                                  RedirectAttributes redirectAttributes) {
+
+        Paciente paciente = pacienteService.buscarPorId(idPaciente).orElse(null);
+        if (paciente == null) {
+            redirectAttributes.addFlashAttribute("mensajeError", "El paciente solicitado no existe.");
             return "redirect:/pacientes";
         }
 
-        marcarComoPerfil(foto);
-        redirectAttributes.addFlashAttribute("mensajeExito", "Foto de perfil actualizada.");
-        return "redirect:/pacientes/expediente/" + foto.getPaciente().getIdPaciente() + "#fotos";
+        String volver = "redirect:/pacientes/expediente/" + idPaciente + "#foto-perfil";
+
+        String error = validarImagen(archivo);
+        if (error != null) {
+            redirectAttributes.addFlashAttribute("mensajeError", error);
+            return volver;
+        }
+
+        try {
+            fotoRepository.deleteAll(fotoRepository.findByPacienteIdPacienteAndPerfilTrue(idPaciente));
+
+            FotoPaciente foto = construirFoto(paciente, archivo);
+            foto.setDescripcion("Foto de perfil");
+            foto.setPerfil(Boolean.TRUE);
+            fotoRepository.save(foto);
+
+            redirectAttributes.addFlashAttribute("mensajeExito", "Foto de perfil actualizada.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "No se pudo guardar la foto de perfil: " + e.getMessage());
+        }
+
+        return volver;
     }
 
     @PostMapping("/{idFoto}/eliminar")
@@ -113,39 +114,41 @@ public class FotoPacienteController {
     public String eliminarFoto(@PathVariable("idFoto") Long idFoto, RedirectAttributes redirectAttributes) {
         FotoPaciente foto = fotoRepository.findById(idFoto).orElse(null);
         if (foto == null) {
-            redirectAttributes.addFlashAttribute("mensajeError", "La foto ya no existe.");
+            redirectAttributes.addFlashAttribute("mensajeError", "La imagen ya no existe.");
             return "redirect:/pacientes";
         }
 
         Long idPaciente = foto.getPaciente().getIdPaciente();
+        boolean eraPerfil = Boolean.TRUE.equals(foto.getPerfil());
         fotoRepository.delete(foto);
 
-        // Si era la foto de perfil, se toma la más reciente que quede.
-        if (Boolean.TRUE.equals(foto.getPerfil()) && !fotoRepository
-                .findByPacienteIdPacienteOrderByFechaSubidaDesc(idPaciente).isEmpty()) {
-            FotoPaciente nueva = fotoRepository
-                    .findByPacienteIdPacienteOrderByFechaSubidaDesc(idPaciente).get(0);
-            nueva.setPerfil(Boolean.TRUE);
-            fotoRepository.save(nueva);
-        }
-
-        redirectAttributes.addFlashAttribute("mensajeExito", "Foto eliminada del expediente.");
-        return "redirect:/pacientes/expediente/" + idPaciente + "#fotos";
+        redirectAttributes.addFlashAttribute("mensajeExito",
+                eraPerfil ? "Foto de perfil eliminada." : "Imagen eliminada de la galería clínica.");
+        return "redirect:/pacientes/expediente/" + idPaciente + (eraPerfil ? "#foto-perfil" : "#fotos-clinicas");
     }
 
-    private boolean esPrimeraFoto(Long idPaciente) {
-        return fotoRepository.findByPacienteIdPacienteOrderByFechaSubidaDesc(idPaciente).isEmpty();
+    private String validarImagen(MultipartFile archivo) {
+        if (archivo == null || archivo.isEmpty()) {
+            return "Selecciona una imagen para subirla.";
+        }
+        String tipo = archivo.getContentType() != null ? archivo.getContentType().toLowerCase() : "";
+        if (!tipo.startsWith("image/")) {
+            return "El archivo debe ser una imagen (JPG, PNG, WEBP o similar).";
+        }
+        if (archivo.getSize() > MAX_BYTES) {
+            return "La imagen supera el límite de 8 MB. Redúcela e inténtalo de nuevo.";
+        }
+        return null;
     }
 
-    private void marcarComoPerfil(FotoPaciente foto) {
-        Long idPaciente = foto.getPaciente().getIdPaciente();
-        List<FotoPaciente> fotos = fotoRepository.findByPacienteIdPacienteOrderByFechaSubidaDesc(idPaciente);
-        for (FotoPaciente otra : fotos) {
-            boolean debeSerPerfil = otra.getIdFoto().equals(foto.getIdFoto());
-            if (!Boolean.valueOf(debeSerPerfil).equals(otra.getPerfil())) {
-                otra.setPerfil(debeSerPerfil);
-                fotoRepository.save(otra);
-            }
-        }
+    private FotoPaciente construirFoto(Paciente paciente, MultipartFile archivo) throws Exception {
+        String tipo = archivo.getContentType() != null ? archivo.getContentType().toLowerCase() : "";
+
+        FotoPaciente foto = new FotoPaciente();
+        foto.setPaciente(paciente);
+        foto.setDatosBase64("data:" + tipo + ";base64," + Base64.getEncoder().encodeToString(archivo.getBytes()));
+        foto.setTipoContenido(tipo);
+        foto.setNombreArchivo(archivo.getOriginalFilename());
+        return foto;
     }
 }
