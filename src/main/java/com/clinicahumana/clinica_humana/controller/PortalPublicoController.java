@@ -2,9 +2,11 @@ package com.clinicahumana.clinica_humana.controller;
 
 import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.Cita;
+import com.clinicahumana.clinica_humana.model.Empleado;
 import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.model.Tutor;
 import com.clinicahumana.clinica_humana.model.Usuario;
+import com.clinicahumana.clinica_humana.repository.EmpleadoRepository;
 import com.clinicahumana.clinica_humana.repository.PacienteRepository;
 import com.clinicahumana.clinica_humana.repository.TutorRepository;
 import com.clinicahumana.clinica_humana.service.CitaService;
@@ -15,11 +17,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -50,6 +56,12 @@ public class PortalPublicoController {
     @Autowired
     private TutorRepository tutorRepo;
 
+    @Autowired
+    private EmpleadoRepository empleadoRepo;
+
+    /** Número de la clínica para cuando una especialista no tenga WhatsApp registrado. */
+    private static final String WHATSAPP_CLINICA = "7474729051";
+
     // Pantalla pública del portal (sin sesión)
     @GetMapping("/agendar-cita")
     public String formulario(Model model) {
@@ -73,10 +85,23 @@ public class PortalPublicoController {
 
         return usuarioService.listarMedicosPorEspecialidad(rol).stream()
                 .filter(m -> Boolean.TRUE.equals(m.getActivo()))
-                .map(m -> Map.<String, Object>of(
-                        "id", m.getIdUsuario(),
-                        "nombre", m.getNombreCompleto()))
+                .map(m -> {
+                    Map<String, Object> datos = new LinkedHashMap<>();
+                    datos.put("id", m.getIdUsuario());
+                    datos.put("nombre", m.getNombreCompleto());
+                    datos.put("telefono", telefonoDe(m));
+                    return datos;
+                })
                 .toList();
+    }
+
+    /** Teléfono de contacto registrado en el expediente laboral de la especialista (vacío si no hay). */
+    private String telefonoDe(Usuario medico) {
+        return empleadoRepo.findByUsuarioIdUsuario(medico.getIdUsuario())
+                .map(Empleado::getTelefono)
+                .map(t -> t.replaceAll("[^0-9]", ""))
+                .filter(t -> t.length() >= 10)
+                .orElse("");
     }
 
     /**
@@ -116,6 +141,7 @@ public class PortalPublicoController {
             @RequestParam("fechaCita") String fechaCita,
             @RequestParam("horaCita") String horaCita,
             @RequestParam("motivo") String motivo,
+            @RequestParam(value = "aceptaAvisoFotos", required = false) String aceptaAvisoFotos,
             RedirectAttributes redirectAttributes) {
 
         // ---------- Validaciones de los datos del infante ----------
@@ -218,6 +244,15 @@ public class PortalPublicoController {
             return error(redirectAttributes, "El motivo no es válido: describa una causa real con palabras coherentes (ej. 'Revisión por dolor dental', 'Control de niño sano').");
         }
 
+        // Aviso de privacidad: en Odontología se toman fotografías clínicas, por lo que
+        // el tutor (o el paciente adulto independiente) debe autorizarlas expresamente.
+        boolean aceptoFotos = "on".equalsIgnoreCase(aceptaAvisoFotos)
+                || "true".equalsIgnoreCase(aceptaAvisoFotos)
+                || "1".equals(aceptaAvisoFotos);
+        if ("ODONTOLOGIA".equals(espNorm) && !aceptoFotos) {
+            return error(redirectAttributes, "Para la atención de Odontología debe aceptar el aviso de privacidad y el uso de imágenes clínicas.");
+        }
+
         // Cada especialidad tiene su propio panel: el alta cae en el área elegida
         AreaClinica area = AreaClinica.paraEspecialidad(espNorm);
 
@@ -257,13 +292,27 @@ public class PortalPublicoController {
             cita.setFecha(fCita);
             cita.setHora(hCita);
             cita.setMotivo(motivoNorm);
+            cita.setAceptaUsoFotosClinicas(aceptoFotos);
             Cita citaGuardada = citaService.agendarCita(cita);
 
+            String telefonoMedico = telefonoDe(medico);
             redirectAttributes.addFlashAttribute("mensajeExito",
                     "¡Cita agendada con éxito! Folio #" + citaGuardada.getIdCita()
                             + " para " + paciente.getNombre() + " " + paciente.getApellidos()
                             + " con " + medico.getNombreCompleto() + " el día " + fCita
                             + " a las " + hCita + " hrs. Aparecerá de inmediato en la agenda de la clínica.");
+            redirectAttributes.addFlashAttribute("whatsappCita", whatsappUrl(
+                    telefonoMedico.isEmpty() ? WHATSAPP_CLINICA : telefonoMedico,
+                    "Hola, agendé una cita en Clínica Humana.\n"
+                            + "Folio: #" + citaGuardada.getIdCita() + "\n"
+                            + "Paciente: " + paciente.getNombre() + " " + paciente.getApellidos() + "\n"
+                            + "Especialidad: " + espNorm + "\n"
+                            + "Especialista: " + medico.getNombreCompleto() + "\n"
+                            + "Fecha: " + fCita + " a las " + hCita + " hrs.\n"
+                            + "Motivo: " + motivoNorm));
+            redirectAttributes.addFlashAttribute("whatsappTelefono",
+                    telefonoMedico.isEmpty() ? WHATSAPP_CLINICA : telefonoMedico);
+            redirectAttributes.addFlashAttribute("whatsappEsClinica", telefonoMedico.isEmpty());
             return "redirect:/public/agendar-cita";
 
         } catch (IllegalStateException e) {
@@ -272,6 +321,15 @@ public class PortalPublicoController {
         } catch (Exception e) {
             return error(redirectAttributes, "No fue posible agendar la cita: " + e.getMessage());
         }
+    }
+
+    /** Enlace directo de WhatsApp con el número de la especialista (lada 52 para México). */
+    private String whatsappUrl(String telefono, String texto) {
+        String digitos = telefono == null ? "" : telefono.replaceAll("[^0-9]", "");
+        if (digitos.length() == 10) {
+            digitos = "52" + digitos;
+        }
+        return "https://wa.me/" + digitos + "?text=" + URLEncoder.encode(texto, StandardCharsets.UTF_8);
     }
 
     private String error(RedirectAttributes redirectAttributes, String mensaje) {

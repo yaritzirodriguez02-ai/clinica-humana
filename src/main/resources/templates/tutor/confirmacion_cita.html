@@ -23,6 +23,20 @@
             <p><strong>Recomendación:</strong> Presentarse 10 minutos antes de la hora acordada.</p>
         </div>
 
+        <div th:if="${whatsappCita}" class="bg-green-50 p-4 rounded-xl border border-green-200 text-xs text-left mb-6">
+            <p class="font-bold text-green-900 flex items-center gap-2 mb-1">
+                <i class="fa-brands fa-whatsapp text-lg text-green-600"></i> Confirma por WhatsApp
+            </p>
+            <p class="text-green-800 mb-3">
+                Contacto: <span class="font-mono font-bold" th:text="${whatsappTelefono}"></span>
+                <span th:if="${whatsappEsClinica}"> (WhatsApp de la clínica)</span>
+            </p>
+            <a th:href="${whatsappCita}" target="_blank" rel="noopener"
+               class="inline-flex items-center justify-center gap-2 w-full py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-bold transition">
+                <i class="fa-brands fa-whatsapp"></i> Abrir WhatsApp
+            </a>
+        </div>
+
         <div class="space-y-2">
             <a th:href="@{/portal-citas}" class="block w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition">
                 Agendar otra cita

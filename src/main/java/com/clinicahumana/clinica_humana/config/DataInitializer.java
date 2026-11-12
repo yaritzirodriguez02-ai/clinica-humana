@@ -1,11 +1,13 @@
 package com.clinicahumana.clinica_humana.config;
 
 import com.clinicahumana.clinica_humana.model.AreaClinica;
+import com.clinicahumana.clinica_humana.model.Empleado;
 import com.clinicahumana.clinica_humana.model.Medicamento;
 import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.model.Tutor;
 import com.clinicahumana.clinica_humana.model.Usuario;
 import com.clinicahumana.clinica_humana.repository.CitaRepository;
+import com.clinicahumana.clinica_humana.repository.EmpleadoRepository;
 import com.clinicahumana.clinica_humana.repository.MedicamentoRepository;
 import com.clinicahumana.clinica_humana.repository.PacienteRepository;
 import com.clinicahumana.clinica_humana.repository.TutorRepository;
@@ -54,6 +56,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PacienteRepository pacienteRepo;
     private final TutorRepository tutorRepo;
     private final CitaRepository citaRepo;
+    private final EmpleadoRepository empleadoRepo;
     private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
 
@@ -62,6 +65,7 @@ public class DataInitializer implements CommandLineRunner {
                            PacienteRepository pacienteRepo,
                            TutorRepository tutorRepo,
                            CitaRepository citaRepo,
+                           EmpleadoRepository empleadoRepo,
                            JdbcTemplate jdbcTemplate,
                            PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
@@ -69,6 +73,7 @@ public class DataInitializer implements CommandLineRunner {
         this.pacienteRepo = pacienteRepo;
         this.tutorRepo = tutorRepo;
         this.citaRepo = citaRepo;
+        this.empleadoRepo = empleadoRepo;
         this.jdbcTemplate = jdbcTemplate;
         this.passwordEncoder = passwordEncoder;
     }
@@ -99,6 +104,32 @@ public class DataInitializer implements CommandLineRunner {
 
         // Separación de pacientes y tutores por área clínica
         migrarAreasClinicas();
+
+        // WhatsApp de contacto de las especialistas (editable después en /empleados)
+        asegurarContactosWhatsApp();
+    }
+
+    /**
+     * Registra el número de WhatsApp de cada especialista si su expediente laboral todavía
+     * no lo tiene. Son los teléfonos publicados en los documentos de la clínica y pueden
+     * corregirse desde el módulo de empleados sin tocar el código.
+     */
+    private void asegurarContactosWhatsApp() {
+        Map<String, String> contactos = new HashMap<>();
+        contactos.put("gloria.gonzalez", "7474990538"); // Odontología / CISO
+        contactos.put("pilar.rios", "7471432709");      // Pediatría
+
+        for (Map.Entry<String, String> contacto : contactos.entrySet()) {
+            usuarioRepository.findByUsername(contacto.getKey()).ifPresent(usuario ->
+                    empleadoRepo.findByUsuarioIdUsuario(usuario.getIdUsuario()).ifPresent(empleado -> {
+                        String actual = empleado.getTelefono();
+                        if (actual == null || actual.isBlank()) {
+                            empleado.setTelefono(contacto.getValue());
+                            empleadoRepo.save(empleado);
+                            log.info("WhatsApp de contacto asignado a '{}'.", contacto.getKey());
+                        }
+                    }));
+        }
     }
 
     /**
