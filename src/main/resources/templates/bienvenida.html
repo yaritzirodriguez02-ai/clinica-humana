@@ -65,21 +65,18 @@
                 <div class="w-12 h-12 rounded-2xl bg-white shadow-lg shadow-black/30 flex items-center justify-center overflow-hidden ring-1 ring-white/40">
                     <img src="/img/logo-h.jpg" alt="Clínica Humana" class="w-full h-full object-contain">
                 </div>
-                <div class="leading-tight">
-                    <p class="text-lg font-extrabold tracking-tight">Clínica Humana</p>
-                    <p class="text-[11px] uppercase tracking-[0.18em] text-white/55">CISO · Sistema de Información Clínica</p>
-                </div>
+                <p class="text-lg font-extrabold tracking-tight">Clínica Humana</p>
             </div>
 
-            <a th:href="@{/entrar/recepcion}" class="hidden sm:inline-flex items-center gap-2 text-xs font-semibold text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-full px-4 py-2 transition">
-                <i class="fa-solid fa-user-shield"></i> Recepción y administración
+            <a th:href="@{/entrar/administracion}" class="hidden sm:inline-flex items-center gap-2 text-xs font-semibold text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-full px-4 py-2 transition">
+                <i class="fa-solid fa-user-shield"></i> Administración
             </a>
         </header>
 
         <!-- PRESENTACIÓN -->
         <section class="mt-12 sm:mt-16 text-center aparece aparece-1">
             <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-sky-200 bg-sky-400/10 border border-sky-300/25 rounded-full px-4 py-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Bienvenida al sistema
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Bienvenid@s
             </span>
             <h1 class="mt-5 text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.1]">
                 ¿A qué panel vas a entrar<span class="text-sky-300">?</span>
@@ -91,11 +88,11 @@
         </section>
 
         <!-- VENTANAS DE ESPECIALIDAD -->
-        <section class="mt-10 sm:mt-14 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+        <section class="mt-10 sm:mt-14 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
 
-            <!-- PEDIATRÍA -->
+            <!-- PEDIATRÍA: panel autónomo -->
             <a th:href="@{/entrar/pediatria}"
-               class="flotante aparece aparece-2 group relative rounded-3xl border border-white/15 bg-white/[0.09] backdrop-blur-xl p-7 sm:p-8 shadow-2xl shadow-black/40 hover:bg-white/[0.16] hover:border-sky-300/50 hover:-translate-y-1.5 transition-all duration-300">
+               class="flotante aparece aparece-2 group relative min-w-0 rounded-3xl border border-white/15 bg-white/[0.09] backdrop-blur-xl p-7 sm:p-8 shadow-2xl shadow-black/40 hover:bg-white/[0.16] hover:border-sky-300/50 hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
                 <div class="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-gradient-to-r from-sky-400 via-indigo-400 to-sky-400 opacity-80"></div>
 
                 <div class="flex items-start justify-between gap-4">
@@ -118,58 +115,80 @@
                     <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-sky-300 text-xs"></i> Recetas y vademécum interno</li>
                 </ul>
 
-                <span class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500 group-hover:bg-sky-400 text-white text-sm font-bold py-3 shadow-lg shadow-sky-900/40 transition">
-                    Entrar al panel <i class="fa-solid fa-arrow-right-long text-xs transition-transform group-hover:translate-x-1"></i>
-                </span>
-            </a>
-
-            <!-- ODONTOLOGÍA -->
-            <a th:href="@{/entrar/odontologia}"
-               class="flotante-lenta aparece aparece-3 group relative rounded-3xl border border-white/15 bg-white/[0.09] backdrop-blur-xl p-7 sm:p-8 shadow-2xl shadow-black/40 hover:bg-white/[0.16] hover:border-emerald-300/50 hover:-translate-y-1.5 transition-all duration-300">
-                <div class="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 opacity-80"></div>
-
-                <div class="flex items-start justify-between gap-4">
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-2xl shadow-lg shadow-emerald-900/50">
-                        <i class="fa-solid fa-tooth"></i>
-                    </div>
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-200/80 bg-emerald-400/15 border border-emerald-300/25 rounded-full px-3 py-1">
-                        Odontología
-                    </span>
-                </div>
-
-                <h2 class="mt-5 text-2xl font-extrabold tracking-tight">Panel de Odontología</h2>
-                <p class="mt-1.5 text-sm text-white/65 leading-relaxed">
-                    Odontopediatría, historia clínica dental, tratamientos y seguimiento con fotografías.
+                <p class="mt-auto pt-7 inline-flex items-center gap-2 text-[11px] font-medium text-white/45">
+                    <i class="fa-solid fa-lock text-sky-300/70 text-[10px]"></i> Panel autónomo: sólo Pediatría
                 </p>
 
-                <ul class="mt-5 space-y-2 text-[13px] text-white/75">
-                    <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Historia odontopediátrica y plan de tratamiento</li>
-                    <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Galería clínica y consentimiento de fotos</li>
-                    <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Informes, recetas y carnet de citas</li>
-                </ul>
-
-                <span class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 group-hover:bg-emerald-400 text-white text-sm font-bold py-3 shadow-lg shadow-emerald-900/40 transition">
-                    Entrar al panel <i class="fa-solid fa-arrow-right-long text-xs transition-transform group-hover:translate-x-1"></i>
+                <span class="mt-3 inline-flex">
+                    <span class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500 group-hover:bg-sky-400 text-white text-sm font-bold py-3 shadow-lg shadow-sky-900/40 transition">
+                        Entrar al panel <i class="fa-solid fa-arrow-right-long text-xs transition-transform group-hover:translate-x-1"></i>
+                    </span>
                 </span>
             </a>
+
+            <!-- ODONTOLOGÍA + RECEPCIÓN: trabajan juntos -->
+            <div class="flotante-lenta aparece aparece-3 relative min-w-0 rounded-3xl border border-white/15 bg-white/[0.09] backdrop-blur-xl shadow-2xl shadow-black/40 overflow-hidden flex flex-col hover:border-emerald-300/45 transition-colors duration-300">
+                <div class="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 opacity-80 z-10"></div>
+
+                <a th:href="@{/entrar/odontologia}"
+                   class="group relative flex-1 p-7 sm:p-8 hover:bg-white/[0.07] transition-colors duration-300">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-2xl shadow-lg shadow-emerald-900/50">
+                            <i class="fa-solid fa-tooth"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-200/80 bg-emerald-400/15 border border-emerald-300/25 rounded-full px-3 py-1">
+                            Odontología
+                        </span>
+                    </div>
+
+                    <h2 class="mt-5 text-2xl font-extrabold tracking-tight">Panel de Odontología</h2>
+                    <p class="mt-1.5 text-sm text-white/65 leading-relaxed">
+                        Odontopediatría, historia clínica dental, tratamientos y seguimiento con fotografías.
+                    </p>
+
+                    <ul class="mt-5 space-y-2 text-[13px] text-white/75">
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Historia odontopediátrica y plan de tratamiento</li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Galería clínica y consentimiento de fotos</li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Informes, recetas y carnet de citas</li>
+                    </ul>
+
+                    <span class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 group-hover:bg-emerald-400 text-white text-sm font-bold py-3 shadow-lg shadow-emerald-900/40 transition">
+                        Entrar al panel <i class="fa-solid fa-arrow-right-long text-xs transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                </a>
+
+                <!-- Recepción: continúa el trabajo de Odontología -->
+                <a th:href="@{/entrar/recepcion}"
+                   class="group relative flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-white/10 bg-emerald-950/30 hover:bg-emerald-400/[0.14] px-6 sm:px-7 py-5 transition-colors">
+                    <span class="absolute left-8 right-8 -top-px h-px bg-gradient-to-r from-transparent via-emerald-300/70 to-transparent"></span>
+
+                    <div class="w-11 h-11 shrink-0 rounded-xl bg-emerald-500/20 border border-emerald-300/30 text-emerald-200 flex items-center justify-center">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+
+                    <div class="min-w-[140px] flex-1">
+                        <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.18em] text-emerald-300/80">Enlazado a Odontología</p>
+                        <p class="text-sm font-bold leading-tight">Recepción
+                            <span class="font-normal text-white/60 text-xs">· agenda, cobros y caja</span>
+                        </p>
+                    </div>
+
+                    <span class="ml-auto shrink-0 inline-flex items-center gap-2 text-xs font-bold text-emerald-100 bg-emerald-500/20 group-hover:bg-emerald-500/35 border border-emerald-300/30 rounded-lg px-3 py-2 transition">
+                        Entrar <i class="fa-solid fa-arrow-right text-[10px] transition-transform group-hover:translate-x-0.5"></i>
+                    </span>
+                </a>
+            </div>
         </section>
 
         <!-- PIE -->
         <footer class="mt-auto pt-10 sm:pt-14 aparece aparece-3">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6">
-                <div class="flex flex-wrap items-center justify-center gap-3">
-                    <a th:href="@{/public/agendar-cita}"
-                       class="inline-flex items-center gap-2 text-xs font-semibold text-white/85 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-full px-4 py-2 transition">
-                        <i class="fa-regular fa-calendar-plus text-emerald-300"></i> Agendar cita en línea
-                    </a>
-                    <a th:href="@{/entrar/recepcion}"
-                       class="sm:hidden inline-flex items-center gap-2 text-xs font-semibold text-white/85 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-full px-4 py-2 transition">
-                        <i class="fa-solid fa-user-shield"></i> Recepción y administración
-                    </a>
-                </div>
-                <p class="text-[11px] text-white/40 text-center sm:text-right">
-                    Clínica Humana · Compromiso con tu salud<br>
-                    <span class="text-white/30">Sistema de Información Clínica (CISO)</span>
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 pt-6">
+                <a th:href="@{/entrar/administracion}"
+                   class="sm:hidden inline-flex items-center gap-2 text-xs font-semibold text-white/85 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-full px-4 py-2 transition">
+                    <i class="fa-solid fa-user-shield"></i> Administración
+                </a>
+                <p class="text-[11px] text-white/40 text-center sm:text-left">
+                    Clínica Humana
                 </p>
             </div>
         </footer>
