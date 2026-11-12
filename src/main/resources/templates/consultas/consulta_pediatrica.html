@@ -133,34 +133,30 @@
                 </div>
             </div>
 
-            <!-- 2. PADECIMIENTO ACTUAL -->
+            <!-- 2. EVALUACIÓN CLÍNICA Y PRESCRIPCIÓN -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-comment-medical text-indigo-600"></i> Padecimiento Actual
+                    <i class="fa-solid fa-stethoscope text-indigo-600"></i> Evaluación Clínica y Prescripción
                 </h3>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Motivo de consulta y evolución</label>
-                <textarea th:field="*{padecimientoActual}" rows="4"
-                          placeholder="Síntomas referidos por el tutor, tiempo de evolución, tratamientos previos, antecedentes del padecimiento..."
-                          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
-            </div>
 
-            <!-- 3. EXPLORACIÓN FÍSICA -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-hand-holding-medical text-indigo-600"></i> Exploración Física
-                </h3>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Hallazgos de la exploración</label>
-                <textarea th:field="*{exploracionFisica}" rows="4"
-                          placeholder="Habitus exterior, cabeza y cuello, tórax, abdomen, extremidades, hallazgos relevantes..."
-                          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
-            </div>
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Padecimiento Actual</label>
+                        <textarea th:field="*{padecimientoActual}" rows="4"
+                                  placeholder="Síntomas referidos por el tutor, tiempo de evolución, tratamientos previos, antecedentes del padecimiento..."
+                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
 
-            <!-- 4. DIAGNÓSTICO Y TRATAMIENTO -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h3 class="text-base font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-notes-medical text-indigo-600"></i> Diagnóstico y Tratamiento
-                </h3>
-                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Exploración Física</label>
+                        <textarea th:field="*{exploracionFisica}" rows="4"
+                                  placeholder="Habitus exterior, cabeza y cuello, tórax, abdomen, extremidades, hallazgos relevantes..."
+                                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-3">Diagnóstico y Tratamiento</label>
+                        <div class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Diagnóstico Médico *</label>
                         <textarea th:field="*{diagnostico}" rows="3" required
@@ -188,10 +184,12 @@
                             <i class="fa-solid fa-triangle-exclamation"></i> Descripción incoherente: escriba la prescripción real con al menos 2 palabras separadas por espacios (sin letras repetidas ni cadenas de teclado).
                         </p>
                     </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 5. FIRMA DIGITAL -->
+            <!-- 3. FIRMA DIGITAL -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
                     <i class="fa-solid fa-signature text-indigo-600"></i> Firma Digital del Médico *
@@ -431,15 +429,27 @@
             let punto = null;
             if (isFinite(edadMeses) && valor > 0 && edadMeses >= 24 && edadMeses <= 240) {
                 const px = x(edadMeses / 12), py = y(valor);
-                if (py > mt && py < H - mb) punto = { px: px, py: py };
+                const zPunto = zScore(valor, lmsEn(serie, edadMeses));
+                if (zPunto !== null && py > mt && py < H - mb) {
+                    const p = Math.max(0.1, Math.min(99.9, normalCdf(zPunto) * 100));
+                    punto = {
+                        px: px,
+                        py: py,
+                        etiqueta: 'P' + Math.round(p),
+                        color: (p < 3 || p > 97) ? '#d97706' : '#4338ca'
+                    };
+                }
             }
             if (punto) {
-                partes.push('<line id="' + idSvg + '-guia" x1="' + punto.px.toFixed(1) + '" y1="' + mt + '" x2="' + punto.px.toFixed(1) + '" y2="' + (H - mb) + '" stroke="#4338ca" stroke-width="0.7" stroke-dasharray="3 3"/>');
-                partes.push('<circle id="' + idSvg + '-pulso" cx="' + punto.px.toFixed(1) + '" cy="' + punto.py.toFixed(1) + '" r="4" fill="none" stroke="#6366f1" stroke-width="2" opacity="0.85">'
-                    + '<animate attributeName="r" values="4;20" dur="1s" fill="freeze"/>'
-                    + '<animate attributeName="opacity" values="0.85;0" dur="1s" fill="freeze"/>'
-                    + '</circle>');
-                partes.push('<circle id="' + idSvg + '-punto" cx="' + punto.px.toFixed(1) + '" cy="' + punto.py.toFixed(1) + '" r="4.5" fill="#4338ca" stroke="#ffffff" stroke-width="1.5"/>');
+                const aLaDerecha = punto.px < W - mr - 32;
+                partes.push('<line id="' + idSvg + '-guia" x1="' + punto.px.toFixed(1) + '" y1="' + mt + '" x2="' + punto.px.toFixed(1) + '" y2="' + (H - mb) + '" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="3 3"/>');
+                partes.push('<g id="' + idSvg + '-marcador" transform="translate(' + punto.px.toFixed(1) + ',' + punto.py.toFixed(1) + ')">'
+                    + '<circle id="' + idSvg + '-pulso" cx="0" cy="0" r="5" fill="none" stroke="' + punto.color + '" stroke-width="2.5" opacity="0.9">'
+                    + '<animate attributeName="r" values="5;26" dur="1.2s" fill="freeze"/>'
+                    + '<animate attributeName="opacity" values="0.9;0" dur="1.2s" fill="freeze"/></circle>'
+                    + '<circle id="' + idSvg + '-punto" cx="0" cy="0" r="6" fill="' + punto.color + '" stroke="#ffffff" stroke-width="2"/>'
+                    + '<text x="' + (aLaDerecha ? 10 : -10) + '" y="4" text-anchor="' + (aLaDerecha ? 'start' : 'end') + '" font-size="9.5" font-weight="700" fill="' + punto.color + '">' + punto.etiqueta + '</text>'
+                    + '</g>');
             }
 
             svg.innerHTML = partes.join('');
@@ -473,31 +483,26 @@
             });
         }
 
-        // El punto del paciente se desliza desde su posición anterior y late
+        // El marcador (punto + etiqueta del percentil) se desliza hasta su nueva posición
         function animarPunto(idSvg, destino) {
             const est = estadoGrafica(idSvg);
-            const circulo = document.getElementById(idSvg + '-punto');
-            const pulso = document.getElementById(idSvg + '-pulso');
+            const marcador = document.getElementById(idSvg + '-marcador');
             const guia = document.getElementById(idSvg + '-guia');
             if (est.frame) { cancelAnimationFrame(est.frame); est.frame = null; }
-            if (!circulo || !destino) { est.x = null; est.y = null; return; }
+            if (!marcador || !destino) { est.x = null; est.y = null; return; }
 
+            // Primera captura: entra desde abajo de la gráfica
             const desdeX = est.x !== null ? est.x : destino.px;
-            const desdeY = est.y !== null ? est.y : destino.py + 24;
+            const desdeY = est.y !== null ? est.y : destino.py + 34;
             const inicio = performance.now();
-            const DURACION = 450;
+            const DURACION = 650;
 
             function paso(ahora) {
                 const avance = Math.min(1, (ahora - inicio) / DURACION);
                 const suave = 1 - Math.pow(1 - avance, 3);
                 const cx = desdeX + (destino.px - desdeX) * suave;
                 const cy = desdeY + (destino.py - desdeY) * suave;
-                circulo.setAttribute('cx', cx.toFixed(1));
-                circulo.setAttribute('cy', cy.toFixed(1));
-                if (pulso) {
-                    pulso.setAttribute('cx', cx.toFixed(1));
-                    pulso.setAttribute('cy', cy.toFixed(1));
-                }
+                marcador.setAttribute('transform', 'translate(' + cx.toFixed(1) + ',' + cy.toFixed(1) + ')');
                 if (guia) {
                     guia.setAttribute('x1', cx.toFixed(1));
                     guia.setAttribute('x2', cx.toFixed(1));
@@ -513,6 +518,24 @@
             est.frame = requestAnimationFrame(paso);
         }
 
+        // Pequeño rebote del indicador de percentil cuando cambia
+        function animarResultado(el) {
+            if (!el || !el.animate) return;
+            el.style.display = 'inline-block';
+            el.animate(
+                [{ transform: 'scale(1.3)', opacity: 0.45 }, { transform: 'scale(1)', opacity: 1 }],
+                { duration: 380, easing: 'ease-out' }
+            );
+        }
+
+        function fijarResultado(el, texto, clase) {
+            if (!el) return;
+            const cambio = el.textContent !== texto;
+            el.textContent = texto;
+            if (clase) el.className = clase;
+            if (cambio) animarResultado(el);
+        }
+
         function actualizarPercentiles() {
             const panel = document.getElementById('panelPercentiles');
             if (!panel || !DATOS_CDC) return;
@@ -524,21 +547,24 @@
 
             if (!sexo || meses === null) {
                 aviso.textContent = 'Falta el sexo o la fecha de nacimiento del paciente.';
-                resTalla.textContent = '--';
-                resPeso.textContent = '--';
+                aviso.className = 'text-[11px] font-bold text-amber-700';
+                fijarResultado(resTalla, '--', 'text-xs font-bold text-slate-500');
+                fijarResultado(resPeso, '--', 'text-xs font-bold text-slate-500');
                 dibujarGrafica('graficaTalla', 'estatura', sexo || 1, null, 0, 60, 200);
                 dibujarGrafica('graficaPeso', 'peso', sexo || 1, null, 0, 0, 100);
                 return;
             }
             if (meses < 24 || meses > 240) {
-                aviso.textContent = 'Las tablas de percentiles aplican de 2 a 20 años.';
-                resTalla.textContent = '--';
-                resPeso.textContent = '--';
+                aviso.textContent = 'Sin percentiles: las tablas aplican de 2 a 20 años de edad.';
+                aviso.className = 'text-[11px] font-bold text-amber-700 bg-amber-100 border border-amber-300 rounded px-2 py-0.5';
+                fijarResultado(resTalla, '--', 'text-xs font-bold text-slate-500');
+                fijarResultado(resPeso, '--', 'text-xs font-bold text-slate-500');
                 dibujarGrafica('graficaTalla', 'estatura', sexo, null, 0, 60, 200);
                 dibujarGrafica('graficaPeso', 'peso', sexo, null, 0, 0, 100);
                 return;
             }
             aviso.textContent = 'Edad: ' + Math.floor(meses / 12) + ' años ' + Math.round(meses % 12) + ' meses';
+            aviso.className = 'text-[11px] text-slate-500';
 
             const talla = parseFloat(document.getElementById('talla').value);
             const peso = parseFloat(document.getElementById('peso').value);
@@ -551,11 +577,11 @@
                 let etiqueta = 'Adecuada para la edad';
                 if (p < 3) etiqueta = 'Baja talla para la edad';
                 else if (p > 97) etiqueta = 'Talla alta para la edad';
-                resTalla.textContent = 'P' + Math.round(p) + ' · ' + etiqueta;
-                resTalla.className = 'text-xs font-bold ' + (p < 3 || p > 97 ? 'text-amber-700' : 'text-emerald-700');
+                fijarResultado(resTalla, 'P' + Math.round(p) + ' · ' + etiqueta,
+                    'text-xs font-bold ' + (p < 3 || p > 97 ? 'text-amber-700' : 'text-emerald-700'));
                 dibujarGrafica('graficaTalla', 'estatura', sexo, meses, talla, 60, 200);
             } else {
-                resTalla.textContent = '--';
+                fijarResultado(resTalla, '--', 'text-xs font-bold text-slate-500');
                 dibujarGrafica('graficaTalla', 'estatura', sexo, meses, 0, 60, 200);
             }
 
@@ -566,11 +592,11 @@
                 if (p < 3) etiqueta = 'Bajo peso para la edad';
                 else if (p > 97) etiqueta = 'Peso alto para la edad';
                 else if (p > 85) etiqueta = 'Peso elevado para la edad';
-                resPeso.textContent = 'P' + Math.round(p) + ' · ' + etiqueta;
-                resPeso.className = 'text-xs font-bold ' + (p < 3 || p > 85 ? 'text-amber-700' : 'text-emerald-700');
+                fijarResultado(resPeso, 'P' + Math.round(p) + ' · ' + etiqueta,
+                    'text-xs font-bold ' + (p < 3 || p > 85 ? 'text-amber-700' : 'text-emerald-700'));
                 dibujarGrafica('graficaPeso', 'peso', sexo, meses, peso, 0, 100);
             } else {
-                resPeso.textContent = '--';
+                fijarResultado(resPeso, '--', 'text-xs font-bold text-slate-500');
                 dibujarGrafica('graficaPeso', 'peso', sexo, meses, 0, 0, 100);
             }
         }
