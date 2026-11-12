@@ -67,6 +67,14 @@ public class ExpedientePediatrico {
     @Column(name = "saturacion_oxigeno")
     private Integer saturacionOxigeno;
 
+    // Padecimiento actual referido por el tutor/paciente
+    @Column(name = "padecimiento_actual", columnDefinition = "TEXT")
+    private String padecimientoActual;
+
+    // Hallazgos de la exploración física
+    @Column(name = "exploracion_fisica", columnDefinition = "TEXT")
+    private String exploracionFisica;
+
     // Columna física 1 en MySQL (diagnostico_medico)
     @NotBlank(message = "El diagnóstico médico es obligatorio")
     @Size(min = 5, max = 1000, message = "El diagnóstico debe tener entre 5 y 1000 caracteres")
@@ -196,6 +204,22 @@ public class ExpedientePediatrico {
 
     public void setSaturacionOxigeno(Integer saturacionOxigeno) {
         this.saturacionOxigeno = saturacionOxigeno;
+    }
+
+    public String getPadecimientoActual() {
+        return padecimientoActual;
+    }
+
+    public void setPadecimientoActual(String padecimientoActual) {
+        this.padecimientoActual = padecimientoActual;
+    }
+
+    public String getExploracionFisica() {
+        return exploracionFisica;
+    }
+
+    public void setExploracionFisica(String exploracionFisica) {
+        this.exploracionFisica = exploracionFisica;
     }
 
     public String getDiagnostico() {

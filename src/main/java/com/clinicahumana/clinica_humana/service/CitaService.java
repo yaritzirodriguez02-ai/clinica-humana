@@ -7,7 +7,9 @@ import com.clinicahumana.clinica_humana.repository.CitaRepository;
 import com.clinicahumana.clinica_humana.repository.DisponibilidadHorarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,6 +28,16 @@ public class CitaService {
 
     @Autowired
     private DisponibilidadHorarioRepository disponibilidadRepository;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    /**
+     * Candado de la agenda: serializa la verificación de horario y el INSERT.
+     * Evita que dos envíos simultáneos del mismo formulario (doble clic) pasen
+     * ambos la validación y creen la cita por duplicado.
+     */
+    private final Object candadoAgenda = new Object();
 
     public List<Cita> listarTodas() {
         return citaRepository.findAll();
@@ -65,8 +77,15 @@ public class CitaService {
         return citaRepository.findByFechaOrderByHoraAsc(fecha);
     }
 
-    @Transactional
     public Cita agendarCita(Cita cita) {
+        // La transacción se ejecuta dentro del candado para que el COMMIT ocurra
+        // antes de liberar el bloqueo (y el siguiente envío ya vea la cita guardada).
+        synchronized (candadoAgenda) {
+            return new TransactionTemplate(transactionManager).execute(status -> guardarCitaValidada(cita));
+        }
+    }
+
+    private Cita guardarCitaValidada(Cita cita) {
         // Los paneles no se mezclan: el paciente debe estar registrado en el área de la especialidad
         AreaClinica areaCita = AreaClinica.paraEspecialidad(cita.getEspecialidad());
         if (areaCita != null && cita.getPaciente() != null

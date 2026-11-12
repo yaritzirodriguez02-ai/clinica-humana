@@ -102,7 +102,7 @@ if (!recetasExistentes.isEmpty()) {
         return (arreglo != null && arreglo.length > i && arreglo[i] != null) ? arreglo[i].trim() : "";
     }
 
-    // Guardar receta con lista dinámica de medicamentos (validación estricta anti basura)
+    // Guardar receta con lista dinámica de medicamentos (captura libre)
     @PostMapping("/guardar")
     public String guardarReceta(@ModelAttribute("receta") Receta receta,
                                 @RequestParam(name = "medicamento[]", required = false) String[] medicamentos,
@@ -145,21 +145,9 @@ if (!recetasExistentes.isEmpty()) {
                 String dosisValor = valor(dosis, i);
                 String frecValor = valor(frecuencias, i);
                 String durValor = valor(duraciones, i);
-                String prefijo = "Renglón " + (i + 1) + ": ";
-
-                if (!ValidacionesClinicas.medicamentoValido(med)) {
-                    errores.add(prefijo + "el medicamento '" + med + "' no es un nombre de fármaco válido. Use el catálogo interno o un nombre real del vademécum (letras, espacios y signos básicos), sin texto aleatorio.");
-                }
-                if (dosisValor.isEmpty()) {
-                    errores.add(prefijo + "debe indicar la dosis (ej. 1 pastilla, 1 ampolleta, 5 ml).");
-                }
-                if (!ValidacionesClinicas.frecuenciaValida(frecValor)) {
-                    errores.add(prefijo + "la frecuencia '" + frecValor + "' no tiene un formato coherente. Use por ejemplo: cada 8 horas, 8 hrs o c/8h.");
-                }
-                if (!ValidacionesClinicas.duracionValida(durValor)) {
-                    errores.add(prefijo + "la duración '" + durValor + "' no tiene un formato coherente. Use por ejemplo: por 5 días.");
-                }
-
+                // Sin restricciones de nombre, dosis, frecuencia o duración:
+                // la médica puede escribir libremente cualquier fármaco que conozca
+                // o elegir uno del catálogo interno.
                 Map<String, String> renglon = new LinkedHashMap<>();
                 renglon.put("medicamento", med);
                 renglon.put("presentacion", present);

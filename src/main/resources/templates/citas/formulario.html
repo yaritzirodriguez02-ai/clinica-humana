@@ -194,6 +194,12 @@
             const errorSpan = document.getElementById("errorMotivoCliente");
 
             form.addEventListener("submit", function(e) {
+                // Evita el doble envío por doble clic: se guarda una sola cita
+                if (form.dataset.enviando === "1") {
+                    e.preventDefault();
+                    return;
+                }
+
                 const valor = campoMotivo.value.trim();
 
                 // Regla 1: Debe contener al menos 2 palabras con sentido
@@ -210,6 +216,15 @@
                 } else {
                     errorSpan.classList.add("hidden");
                     campoMotivo.classList.remove("border-rose-500");
+                }
+
+                if (!e.defaultPrevented) {
+                    form.dataset.enviando = "1";
+                    const boton = form.querySelector('button[type="submit"]');
+                    if (boton) {
+                        boton.disabled = true;
+                        boton.classList.add("opacity-60", "cursor-not-allowed");
+                    }
                 }
             });
         });

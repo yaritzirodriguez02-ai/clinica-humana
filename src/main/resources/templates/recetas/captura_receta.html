@@ -87,15 +87,15 @@
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                         </div>
                         <div class="col-span-2">
-                            <input type="text" name="dosis[]" placeholder="Dosis (Ej. 1 pastilla, 5 ml)" required
+                            <input type="text" name="dosis[]" placeholder="Dosis (Ej. 1 pastilla, 5 ml)"
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                         </div>
                         <div class="col-span-2">
-                            <input type="text" name="frecuencia[]" placeholder="Cada (Ej. 8 hrs)" required
+                            <input type="text" name="frecuencia[]" placeholder="Cada (Ej. 8 hrs)"
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                         </div>
                         <div class="col-span-2 flex items-center gap-1">
-                            <input type="text" name="duracion[]" placeholder="Por (Ej. 5 días)" required
+                            <input type="text" name="duracion[]" placeholder="Por (Ej. 5 días)"
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                             <button type="button" onclick="eliminarRenglon(this)" class="text-rose-500 hover:text-rose-700 p-1 text-sm">
                                 <i class="fa-solid fa-trash"></i>
@@ -121,15 +121,15 @@
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                         </div>
                         <div class="col-span-2">
-                            <input type="text" name="dosis[]" th:value="${r.dosis}" placeholder="Dosis (Ej. 1 pastilla, 5 ml)" required
+                            <input type="text" name="dosis[]" th:value="${r.dosis}" placeholder="Dosis (Ej. 1 pastilla, 5 ml)"
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                         </div>
                         <div class="col-span-2">
-                            <input type="text" name="frecuencia[]" th:value="${r.frecuencia}" placeholder="Cada (Ej. 8 hrs)" required
+                            <input type="text" name="frecuencia[]" th:value="${r.frecuencia}" placeholder="Cada (Ej. 8 hrs)"
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                         </div>
                         <div class="col-span-2 flex items-center gap-1">
-                            <input type="text" name="duracion[]" th:value="${r.duracion}" placeholder="Por (Ej. 5 días)" required
+                            <input type="text" name="duracion[]" th:value="${r.duracion}" placeholder="Por (Ej. 5 días)"
                                    class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                             <button type="button" onclick="eliminarRenglon(this)" class="text-rose-500 hover:text-rose-700 p-1 text-sm">
                                 <i class="fa-solid fa-trash"></i>
@@ -170,13 +170,13 @@
                     <input type="text" name="presentacion[]" placeholder="Presentación" class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                 </div>
                 <div class="col-span-2">
-                    <input type="text" name="dosis[]" placeholder="Dosis" required class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
+                    <input type="text" name="dosis[]" placeholder="Dosis" class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                 </div>
                 <div class="col-span-2">
-                    <input type="text" name="frecuencia[]" placeholder="Cada" required class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
+                    <input type="text" name="frecuencia[]" placeholder="Cada" class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                 </div>
                 <div class="col-span-2 flex items-center gap-1">
-                    <input type="text" name="duracion[]" placeholder="Por" required class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
+                    <input type="text" name="duracion[]" placeholder="Por" class="w-full text-xs px-2.5 py-1.5 border border-slate-300 rounded-lg">
                     <button type="button" onclick="eliminarRenglon(this)" class="text-rose-500 hover:text-rose-700 p-1 text-sm">
                         <i class="fa-solid fa-trash"></i>
                     </button>
@@ -218,25 +218,8 @@
             }
         }
 
-        // =================== CANDADAS DE VALIDACIÓN DE LA RECETA ===================
-        const RE_FRECUENCIA = /^(?:cada\s+|c\/\s*|q)?\d{1,3}(?:\s*-\s*\d{1,3})?\s*(?:horas?|hrs?|h|d[ií]as?|d|semanas?|minutos?|min)$/i;
-        const RE_DURACION = /^(?:por\s+)?\d{1,3}(?:\s*-\s*\d{1,3})?\s*(?:d[ií]as?|d|semanas?|meses)$/i;
-        const RE_MEDICAMENTO = /^[\p{L}\d][\p{L}\d \-().,%'\/]{2,119}$/u;
+        // =================== VALIDACIÓN MÍNIMA DE LA RECETA ===================
         const RE_BASE = /([a-záéíóúüñ]{2,5})\1{3,}/i;
-
-        function medicamentoValido(m) {
-            const v = (m || '').trim();
-            if (!RE_MEDICAMENTO.test(v)) return false;
-            if (RE_BASE.test(v)) return false;
-            let letras = 0;
-            for (const p of v.split(/\s+/)) {
-                if (p.length > 30) return false;
-                const solo = p.replace(/[^\p{L}]/gu, '');
-                letras += solo.length;
-                if (solo.length >= 4 && !/[aeiouáéíóúü]/i.test(solo)) return false;
-            }
-            return letras >= 4;
-        }
 
         function recomendacionValida(txt) {
             const v = (txt || '').trim();
@@ -255,8 +238,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            const catalogo = new Set(Array.from(document.querySelectorAll('#listaMedicamentos option'))
-                .map(o => o.value.trim().toLowerCase()));
             const form = document.getElementById('formReceta');
             form.addEventListener('submit', function (ev) {
                 const errores = [];
@@ -264,37 +245,13 @@
                 document.querySelectorAll('.renglon-med').forEach(fila => {
                     indice++;
                     const med = fila.querySelector('input[name="medicamento[]"]');
-                    const dosis = fila.querySelector('input[name="dosis[]"]');
-                    const frec = fila.querySelector('input[name="frecuencia[]"]');
-                    const dur = fila.querySelector('input[name="duracion[]"]');
-                    [med, dosis, frec, dur].forEach(c => c && c.classList.remove('border-rose-500'));
+                    if (med) med.classList.remove('border-rose-500');
 
+                    // Sólo se exige el nombre del medicamento: dosis, frecuencia y duración son libres
                     const nombre = med ? med.value.trim() : '';
                     if (!nombre) {
                         errores.push('Renglón ' + indice + ': debe indicar el medicamento.');
                         if (med) med.classList.add('border-rose-500');
-                    } else if (!medicamentoValido(nombre)) {
-                        errores.push('Renglón ' + indice + ': "' + nombre + '" no es un nombre de fármaco válido. Use el catálogo o un nombre real del vademécum, sin texto aleatorio.');
-                        med.classList.add('border-rose-500');
-                    } else if (!catalogo.has(nombre.toLowerCase())) {
-                        const continuar = confirm('El medicamento "' + nombre + '" no está en el catálogo interno de la clínica.\n\n¿Desea prescribirlo de todos modos?');
-                        if (!continuar) {
-                            errores.push('Renglón ' + indice + ': "' + nombre + '" fue rechazado (no pertenece al catálogo de medicamentos).');
-                            med.classList.add('border-rose-500');
-                        }
-                    }
-
-                    if (dosis && !dosis.value.trim()) {
-                        errores.push('Renglón ' + indice + ': debe indicar la dosis (ej. 1 pastilla, 1 ampolleta, 5 ml).');
-                        dosis.classList.add('border-rose-500');
-                    }
-                    if (frec && !RE_FRECUENCIA.test(frec.value.trim())) {
-                        errores.push('Renglón ' + indice + ': la frecuencia "' + frec.value.trim() + '" no tiene formato coherente (ej. cada 8 horas, 8 hrs, c/8h).');
-                        frec.classList.add('border-rose-500');
-                    }
-                    if (dur && !RE_DURACION.test(dur.value.trim())) {
-                        errores.push('Renglón ' + indice + ': la duración "' + dur.value.trim() + '" no tiene formato coherente (ej. por 5 días).');
-                        dur.classList.add('border-rose-500');
                     }
                 });
 
