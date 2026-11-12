@@ -35,8 +35,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                // Recursos estáticos públicos
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/portal-citas/**").permitAll()
+                // Portada de entrada (elección de panel: Pediatría / Odontología) y recursos estáticos
+                .requestMatchers("/", "/entrar/**", "/img/**", "/css/**", "/js/**", "/images/**", "/portal-citas/**").permitAll()
 
                 // Portal Público de Citas para Tutores (agendamiento en línea SIN sesión):
                 // incluye /public/agendar-cita y sus endpoints JSON de médicos y horarios ocupados
