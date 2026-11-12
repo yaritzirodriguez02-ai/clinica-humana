@@ -15,6 +15,7 @@ import com.clinicahumana.clinica_humana.repository.CarnetCitasRepository;
 import com.clinicahumana.clinica_humana.repository.CitaRepository;
 import com.clinicahumana.clinica_humana.repository.ExpedienteOdontopediatricoRepository;
 import com.clinicahumana.clinica_humana.repository.ExpedientePediatricoRepository;
+import com.clinicahumana.clinica_humana.repository.FotoPacienteRepository;
 import com.clinicahumana.clinica_humana.repository.InformeOdontologicoRepository;
 import com.clinicahumana.clinica_humana.repository.PacienteRepository;
 import com.clinicahumana.clinica_humana.repository.PagoRepository;
@@ -141,6 +142,9 @@ public class DepuracionService {
 
     @Autowired
     private TutorRepository tutorRepo;
+
+    @Autowired
+    private FotoPacienteRepository fotoPacienteRepo;
 
     // ===================== CONSULTA =====================
 
@@ -453,6 +457,8 @@ public class DepuracionService {
         citaRepo.flush();
         carnetRepo.deleteAll(carnetRepo.findByPacienteIdPaciente(id));
         carnetRepo.flush();
+        fotoPacienteRepo.deleteAll(fotoPacienteRepo.findByPacienteIdPacienteOrderByFechaSubidaDesc(id));
+        fotoPacienteRepo.flush();
 
         Tutor tutor = paciente.getTutor();
         Long idTutor = tutor != null ? tutor.getIdTutor() : null;

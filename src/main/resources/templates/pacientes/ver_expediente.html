@@ -56,14 +56,28 @@
 
     <!-- Ficha del Paciente -->
     <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap justify-between items-start gap-4">
-        <div>
-            <span class="text-xs font-semibold text-indigo-600 uppercase">Paciente</span>
-            <h3 class="text-xl font-bold text-slate-900" th:text="${paciente.nombre + ' ' + paciente.apellidos}"></h3>
-            <p class="text-xs text-slate-500 font-mono" th:text="${'CURP: ' + paciente.curp + ' | Nacimiento: ' + paciente.fechaNacimiento}"></p>
+        <div class="flex items-center gap-4">
+            <img th:if="${fotoPerfil != null}" th:src="${fotoPerfil.datosBase64}" alt="Foto del paciente"
+                 class="w-20 h-20 rounded-xl object-cover border-2 border-indigo-300 shadow-sm">
+            <div th:if="${fotoPerfil == null}"
+                 class="w-20 h-20 rounded-xl bg-indigo-100 border-2 border-indigo-200 flex items-center justify-center text-2xl font-bold text-indigo-600"
+                 th:text="${#strings.substring(paciente.nombre, 0, 1) + #strings.substring(paciente.apellidos, 0, 1)}">AA</div>
+            <div>
+                <span class="text-xs font-semibold text-indigo-600 uppercase">Paciente</span>
+                <h3 class="text-xl font-bold text-slate-900" th:text="${paciente.nombre + ' ' + paciente.apellidos}"></h3>
+                <p class="text-xs text-slate-500 font-mono">
+                    <span th:text="${'CURP: ' + (paciente.curp != null and !paciente.curp.isEmpty() ? paciente.curp : 'No registrada')}"></span>
+                    <span> | </span>
+                    <span th:text="${'Nacimiento: ' + (paciente.fechaNacimiento != null ? #temporals.format(paciente.fechaNacimiento, 'dd/MM/yyyy') : 'No registrado')}"></span>
+                </p>
+            </div>
         </div>
-        <div class="bg-slate-100 px-4 py-2 rounded-lg text-sm">
+        <div class="bg-slate-100 px-4 py-2 rounded-lg text-sm" th:if="${paciente.tutor != null}">
             <span class="font-semibold text-slate-700">Tutor:</span>
             <span th:text="${'(' + paciente.tutor.parentesco + ') ' + paciente.tutor.nombre + ' ' + paciente.tutor.apellidos + ' - ' + paciente.tutor.telefono}"></span>
+        </div>
+        <div class="bg-slate-100 px-4 py-2 rounded-lg text-sm text-slate-500" th:if="${paciente.tutor == null}">
+            Paciente mayor de edad — sin tutor registrado
         </div>
     </div>
 
@@ -289,6 +303,80 @@
             </div>
         </div>
 
+    </section>
+
+    <!-- Fotos y estudios del paciente -->
+    <section id="fotos" class="mb-8">
+        <div class="flex items-center gap-3 mb-4">
+            <i class="fa-solid fa-images text-indigo-600 text-xl"></i>
+            <h3 class="text-lg font-bold text-slate-900">Fotos y estudios</h3>
+            <span class="text-xs text-slate-400 font-medium bg-slate-100 px-2 py-0.5 rounded-full"
+                  th:text="${'Total: ' + (fotos != null ? fotos.size() : 0)}"></span>
+        </div>
+
+        <!-- Subir una foto nueva -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mb-4">
+            <form th:action="@{/pacientes/fotos/{id}/subir(id=${idPaciente})}" method="post"
+                  enctype="multipart/form-data" class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Imagen (JPG, PNG o WEBP)</label>
+                    <input type="file" name="archivo" accept="image/*" required
+                           class="w-full text-sm text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-semibold hover:file:bg-indigo-100">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Descripción</label>
+                    <input type="text" name="descripcion" maxlength="200"
+                           placeholder="Ej. Radiografía panorámica, placa inicial..."
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                        <input type="checkbox" name="perfil" value="S" class="accent-indigo-600">
+                        Usar como foto de perfil
+                    </label>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Subir foto
+                    </button>
+                </div>
+            </form>
+            <p class="text-xs text-slate-400 mt-2">
+                <i class="fa-solid fa-circle-info mr-1"></i>
+                Puedes subir placas, radiografías, fotos de la atención dental o el retrato del paciente. Máximo 8 MB por imagen.
+            </p>
+        </div>
+
+        <div th:if="${#lists.isEmpty(fotos)}" class="bg-white p-6 rounded-xl border border-dashed border-slate-300 text-slate-400 text-sm">
+            <i class="fa-solid fa-image text-2xl mb-2 block opacity-50"></i>
+            Este paciente todavía no tiene fotos ni estudios en su expediente.
+        </div>
+
+        <div th:if="${not #lists.isEmpty(fotos)}" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div th:each="f : ${fotos}" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                <a th:href="${f.datosBase64}" target="_blank" class="block bg-slate-100">
+                    <img th:src="${f.datosBase64}" th:alt="${f.descripcion}" class="w-full h-40 object-contain">
+                </a>
+                <div class="p-3 flex flex-col gap-1 flex-1">
+                    <span th:if="${f.perfil}" class="self-start text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+                        <i class="fa-solid fa-id-badge mr-1"></i> Foto de perfil
+                    </span>
+                    <p class="text-sm font-semibold text-slate-800 leading-snug" th:text="${f.descripcion}">Descripción</p>
+                    <p class="text-xs text-slate-400" th:text="${f.fechaSubida != null ? #temporals.format(f.fechaSubida, 'dd/MM/yyyy HH:mm') : ''}"></p>
+                    <div class="flex flex-wrap gap-2 mt-auto pt-2">
+                        <form th:unless="${f.perfil}" th:action="@{/pacientes/fotos/{id}/perfil(id=${f.idFoto})}" method="post">
+                            <button type="submit" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2.5 py-1.5 rounded-lg font-semibold transition">
+                                <i class="fa-solid fa-id-badge"></i> Perfil
+                            </button>
+                        </form>
+                        <form th:action="@{/pacientes/fotos/{id}/eliminar(id=${f.idFoto})}" method="post"
+                              onsubmit="return confirm('¿Eliminar esta foto del expediente?');">
+                            <button type="submit" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1.5 rounded-lg font-semibold transition">
+                                <i class="fa-solid fa-trash-can"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
     <p class="text-xs text-slate-400 text-center pt-4 border-t border-slate-200">

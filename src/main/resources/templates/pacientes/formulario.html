@@ -60,16 +60,27 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">CURP (18 caracteres) *</label>
-                        <input type="text" th:field="*{curp}" maxlength="18" required
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                            CURP (18 caracteres)
+                            <span th:text="${areaActual.slug == 'odontologia' ? '(opcional)' : '*'}">*</span>
+                        </label>
+                        <input type="text" th:field="*{curp}" maxlength="18"
+                               th:attr="required=${areaActual.slug != 'odontologia' ? 'required' : null}"
                                class="w-full px-3 py-2 uppercase font-mono border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
                         <span th:if="${#fields.hasErrors('curp')}" th:errors="*{curp}" class="text-xs text-rose-500"></span>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Fecha de Nacimiento *</label>
-                        <input type="date" th:field="*{fechaNacimiento}" required
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                            Fecha de Nacimiento
+                            <span th:text="${areaActual.slug == 'odontologia' ? '(cualquier edad; opcional)' : '*'}">*</span>
+                        </label>
+                        <input type="date" th:field="*{fechaNacimiento}"
+                               th:attr="required=${areaActual.slug != 'odontologia' ? 'required' : null}"
                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        <p th:if="${areaActual.slug == 'odontologia'}" class="text-[11px] text-slate-400 mt-1">
+                            Este panel atiende niños, jóvenes y adultos sin restricción de edad.
+                        </p>
                         <span th:if="${#fields.hasErrors('fechaNacimiento')}" th:errors="*{fechaNacimiento}" class="text-xs text-rose-500"></span>
                     </div>
 
@@ -133,26 +144,31 @@
             <!-- BLOQUE 2: DATOS DEL TUTOR LEGAL -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h2 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-user-shield text-indigo-600"></i> Datos del Tutor Legal Responsable
+                    <i class="fa-solid fa-user-shield text-indigo-600"></i>
+                    <span th:text="${areaActual.slug == 'odontologia' ? 'Tutor o Responsable (opcional si el paciente es adulto)' : 'Datos del Tutor Legal Responsable'}">Datos del Tutor Legal Responsable</span>
                 </h2>
+                <p th:if="${areaActual.slug == 'odontologia'}" class="mb-4 text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    <i class="fa-solid fa-circle-info mr-1"></i>
+                    Si el paciente acude por su cuenta (joven o adulto), deja este bloque vacío: el registro se guarda sin tutor.
+                </p>
                 <input type="hidden" th:field="*{tutor.idTutor}" />
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre del Tutor *</label>
-                        <input type="text" th:field="*{tutor.nombre}" required
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre del Tutor <span th:text="${areaActual.slug == 'odontologia' ? '' : '*'}">*</span></label>
+                        <input type="text" th:field="*{tutor.nombre}" th:attr="required=${areaActual.slug != 'odontologia' ? 'required' : null}"
                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Apellidos del Tutor *</label>
-                        <input type="text" th:field="*{tutor.apellidos}" required
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Apellidos del Tutor <span th:text="${areaActual.slug == 'odontologia' ? '' : '*'}">*</span></label>
+                        <input type="text" th:field="*{tutor.apellidos}" th:attr="required=${areaActual.slug != 'odontologia' ? 'required' : null}"
                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Parentesco *</label>
-                        <select th:field="*{tutor.parentesco}" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Parentesco <span th:text="${areaActual.slug == 'odontologia' ? '' : '*'}">*</span></label>
+                        <select th:field="*{tutor.parentesco}" th:attr="required=${areaActual.slug != 'odontologia' ? 'required' : null}" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
                             <option value="Madre">Madre</option>
                             <option value="Padre">Padre</option>
                             <option value="Abuelo/a">Abuelo/a</option>
@@ -161,8 +177,8 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Teléfono (10 dígitos) *</label>
-                        <input type="tel" th:field="*{tutor.telefono}" maxlength="10" required
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Teléfono (10 dígitos) <span th:text="${areaActual.slug == 'odontologia' ? '' : '*'}">*</span></label>
+                        <input type="tel" th:field="*{tutor.telefono}" maxlength="10" th:attr="required=${areaActual.slug != 'odontologia' ? 'required' : null}"
                                class="w-full px-3 py-2 font-mono border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
                     </div>
 

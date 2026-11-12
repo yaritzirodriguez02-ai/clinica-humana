@@ -38,7 +38,7 @@
         <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
             <div class="mb-6 text-center border-b border-slate-100 pb-4">
                 <h2 class="text-2xl font-black text-slate-900">Agendar Cita Médica o Dental</h2>
-                <p class="text-xs text-slate-500 mt-1">Completa los datos del menor y el tutor para reservar tu turno en el consultorio.</p>
+                <p class="text-xs text-slate-500 mt-1">Completa los datos del paciente (niño, joven o adulto) y de su tutor o responsable para reservar tu turno en el consultorio.</p>
             </div>
 
             <form th:action="@{/portal-citas/solicitar}" method="post" class="space-y-6">
@@ -46,17 +46,17 @@
                 <!-- SECCIÓN 1: DATOS DEL PACIENTE (INFANTE) -->
                 <div>
                     <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-child text-indigo-500"></i> 1. Datos del Paciente Infantil
+                        <i class="fa-solid fa-user text-indigo-500"></i> 1. Datos del Paciente
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="sm:col-span-2">
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">CURP del Niño(a) *</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">CURP del Paciente *</label>
                             <input type="text" name="curp" required maxlength="18" placeholder="Ej. AAAA000000HGRNNN00"
                                    class="w-full uppercase font-mono px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nombre(s) *</label>
-                            <input type="text" name="nombrePaciente" required placeholder="Nombre del infante"
+                            <input type="text" name="nombrePaciente" required placeholder="Nombre del paciente"
                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <div>

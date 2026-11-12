@@ -43,7 +43,7 @@
         <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200">
             <div class="mb-6 text-center border-b border-slate-100 pb-4">
                 <h2 class="text-2xl font-black text-slate-900">Agendar Cita Médica o Dental</h2>
-                <p class="text-xs text-slate-500 mt-1">Completa los datos del menor y del tutor legal para reservar tu turno. No se requiere cuenta ni contraseña.</p>
+                <p class="text-xs text-slate-500 mt-1">Completa los datos del paciente (niño, joven o adulto) y de su tutor o responsable para reservar tu turno. No se requiere cuenta ni contraseña.</p>
             </div>
 
             <form id="formPortalCita" th:action="@{/public/agendar-cita}" method="post" class="space-y-6">
@@ -52,12 +52,12 @@
                 <div>
                     <h3 class="text-xs font-black uppercase text-indigo-700 tracking-wider mb-3 flex items-center gap-2">
                         <span class="w-5 h-5 bg-indigo-600 text-white rounded-full flex items-center justify-center text-[10px]">1</span>
-                        Datos del Paciente (Infante)
+                        Datos del Paciente
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nombre(s) *</label>
-                            <input type="text" name="nombrePaciente" required maxlength="100" placeholder="Nombre del infante"
+                            <input type="text" name="nombrePaciente" required maxlength="100" placeholder="Nombre del paciente"
                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <div>
@@ -66,7 +66,7 @@
                                    class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                         </div>
                         <div class="sm:col-span-2">
-                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">CURP del Niño(a) *</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">CURP del Paciente *</label>
                             <input type="text" id="campoCurp" name="curp" required maxlength="18" placeholder="Ej. AAAA000000HGRNNN00"
                                    class="w-full uppercase font-mono px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                             <span class="text-[10px] text-slate-400">18 caracteres oficiales. Si el paciente ya tiene citas anteriores, use la misma CURP.</span>

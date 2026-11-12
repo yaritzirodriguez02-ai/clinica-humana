@@ -122,7 +122,8 @@ public class Paciente {
     }
 
     public void setCurp(String curp) {
-        this.curp = curp;
+        // CURP vacía se guarda como nula: el campo es opcional en odontología
+        this.curp = (curp == null || curp.isBlank()) ? null : curp.trim().toUpperCase();
     }
 
     public LocalDate getFechaNacimiento() {

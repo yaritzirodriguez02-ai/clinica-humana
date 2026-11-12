@@ -3,9 +3,11 @@ package com.clinicahumana.clinica_humana.controller;
 import com.clinicahumana.clinica_humana.model.AreaClinica;
 import com.clinicahumana.clinica_humana.model.ExpedienteOdontopediatrico;
 import com.clinicahumana.clinica_humana.model.ExpedientePediatrico;
+import com.clinicahumana.clinica_humana.model.FotoPaciente;
 import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.model.Tutor;
 import com.clinicahumana.clinica_humana.model.Usuario;
+import com.clinicahumana.clinica_humana.repository.FotoPacienteRepository;
 import com.clinicahumana.clinica_humana.service.ClinicoYPagosService;
 import com.clinicahumana.clinica_humana.service.PacienteService;
 import com.clinicahumana.clinica_humana.service.UsuarioService;
@@ -20,7 +22,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/pacientes")
@@ -34,6 +38,9 @@ public class PacienteController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private FotoPacienteRepository fotoPacienteRepository;
 
     // Listar los pacientes del área del usuario con opción de búsqueda (RF02)
     @GetMapping
@@ -62,7 +69,16 @@ public class PacienteController {
                 ? pacienteService.buscarPorNombreOApellido(buscar.trim(), area)
                 : pacienteService.listarPorArea(area);
 
+        // Foto de perfil de cada paciente (si tiene) para mostrarla en el directorio
+        Map<Long, FotoPaciente> fotosPerfil = new HashMap<>();
+        if (!lista.isEmpty()) {
+            fotoPacienteRepository.findByPacienteIdPacienteInAndPerfilTrue(
+                            lista.stream().map(Paciente::getIdPaciente).toList())
+                    .forEach(f -> fotosPerfil.putIfAbsent(f.getPaciente().getIdPaciente(), f));
+        }
+
         model.addAttribute("pacientes", lista);
+        model.addAttribute("fotosPerfil", fotosPerfil);
         model.addAttribute("buscar", buscar);
         model.addAttribute("areaActual", area);
         model.addAttribute("areasPermitidas", areasPermitidas);
@@ -127,6 +143,15 @@ public class PacienteController {
         List<ExpedienteOdontopediatrico> odontoCronologica = new ArrayList<>(historiaOdontopediatrica);
         Collections.reverse(odontoCronologica);
 
+        // Fotos clínicas del paciente y su retrato de perfil
+        List<FotoPaciente> fotos = fotoPacienteRepository.findByPacienteIdPacienteOrderByFechaSubidaDesc(idPaciente);
+        FotoPaciente fotoPerfil = fotos.stream()
+                .filter(f -> Boolean.TRUE.equals(f.getPerfil()))
+                .findFirst()
+                .orElse(null);
+        model.addAttribute("fotos", fotos);
+        model.addAttribute("fotoPerfil", fotoPerfil);
+
         model.addAttribute("historiaPediatrica", historiaPediatrica);
         model.addAttribute("historiaOdontopediatrica", historiaOdontopediatrica);
         model.addAttribute("historiaPediatricaCronologica", pediatraCronologica);
@@ -179,6 +204,18 @@ public class PacienteController {
         }
 
         paciente.setArea(area);
+
+        // En odontología la atención es de libre edad: el tutor es opcional, así que
+        // se descarta cuando el campo se dejó vacío en lugar de exigirlo.
+        if (paciente.getTutor() != null) {
+            boolean nombreVacio = paciente.getTutor().getNombre() == null
+                    || paciente.getTutor().getNombre().isBlank();
+            boolean apellidosVacios = paciente.getTutor().getApellidos() == null
+                    || paciente.getTutor().getApellidos().isBlank();
+            if (nombreVacio && apellidosVacios) {
+                paciente.setTutor(null);
+            }
+        }
 
         if (result.hasErrors()) {
             prepararFormulario(model, paciente, area, esAdmin(rol));

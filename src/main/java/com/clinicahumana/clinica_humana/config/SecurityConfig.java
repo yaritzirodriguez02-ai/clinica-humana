@@ -1,5 +1,6 @@
 package com.clinicahumana.clinica_humana.config;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -15,6 +17,18 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    /**
+     * Procesa los formularios multipart (subida de fotos) ANTES de la seguridad,
+     * para que el token CSRF viaje dentro del formulario sin ser rechazado.
+     */
+    @Bean
+    public FilterRegistrationBean<MultipartFilter> multipartFilter() {
+        FilterRegistrationBean<MultipartFilter> registro = new FilterRegistrationBean<>(new MultipartFilter());
+        // -101: justo antes de la cadena de Spring Security (orden -100)
+        registro.setOrder(-101);
+        return registro;
     }
 
     @Bean
