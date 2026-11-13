@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- ========================================================================== -->
+<!-- Fragmento de íconos SVG del panel odontología (estilo único).                -->
+<!-- Uso: <div th:replace="~{fragments/odontologia :: icono(nombre='mX')}" />    -->
+<!-- Los seis: m1 muela, m2 espejo dental, m3 explorador, m4 cepillo, m5 implante, m6 jeringa. -->
+<!-- ========================================================================== -->
+<head>
+  <meta charset="UTF-8" />
+  <title>Íconos odontología</title>
+</head>
+<body>
+  <th:block th:fragment="icono(nombre)">
+    <!-- m1 - Muela -->
+    <svg th:if="${nombre == 'm1'}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" aria-hidden="true">
+      <path d="M32 4 C38 4 42 9 42 15 C42 22 37 27 32 31 C27 27 22 22 22 15 C22 9 26 4 32 4 Z"/>
+      <path d="M32 31 C37 31 42 36 42 42 C42 48 37 52 32 52 C27 52 22 48 22 42 C22 36 27 31 32 31 Z"/>
+      <path d="M32 15 C35 15 37 18 37 22 C37 25 35 27 32 27 C29 27 27 25 27 22 C27 18 29 15 32 15 Z" fill="currentColor" opacity="0.25"/>
+      <path d="M22 15 L22 48" opacity="0.5"/>
+      <path d="M42 15 L42 48" opacity="0.5"/>
+    </svg>
+
+    <!-- m2 - Espejo dental -->
+    <svg th:if="${nombre == 'm2'}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" aria-hidden="true">
+      <path d="M20 12 C20 12 16 16 16 22 L16 42 C16 48 20 52 26 52 L38 52 C44 52 48 48 48 42 L48 22 C48 16 44 12 44 12"/>
+      <path d="M20 12 C20 12 16 16 16 22 L16 42 C16 48 20 52 26 52 L38 52 C44 52 48 48 48 42 L48 22 C48 16 44 12 44 12 Z" fill="currentColor" opacity="0.18"/>
+      <circle cx="32" cy="32" r="10" stroke-width="1.6" opacity="0.85"/>
+      <path d="M32 22 L32 42 M22 32 L42 32" opacity="0.4"/>
+      <path d="M12 12 L12 52 M52 12 L52 52" opacity="0.35"/>
+    </svg>
+
+    <!-- m3 - Explorador dental -->
+    <svg th:if="${nombre == 'm3'}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" aria-hidden="true">
+      <path d="M10 48 L22 38 L22 58 Z" fill="currentColor" opacity="0.2"/>
+      <path d="M22 38 L54 38 L54 48 L22 48 Z" fill="currentColor" opacity="0.25"/>
+      <path d="M54 38 L58 34" opacity="0.9"/>
+      <path d="M54 48 L58 52" opacity="0.9"/>
+      <path d="M22 38 C22 38 32 30 44 30 L54 38" opacity="0.9"/>
+      <path d="M22 48 C22 48 32 56 44 56 L54 48" opacity="0.7"/>
+      <circle cx="44" cy="34" r="1.4" fill="currentColor" opacity="0.9"/>
+    </svg>
+
+    <!-- m4 - Cepillo dental -->
+    <svg th:if="${nombre == 'm4'}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" aria-hidden="true">
+      <path d="M20 10 L20 54" opacity="0.95"/>
+      <path d="M20 54 L30 54 L30 50 L20 50 Z" fill="currentColor" opacity="0.25"/>
+      <path d="M28 10 C28 10 36 14 36 20 L36 50 C36 54 32 54 32 50 L32 20 C32 14 28 10 28 10 Z" fill="currentColor" opacity="0.2"/>
+      <path d="M36 20 L54 14 M36 30 L54 26 M36 40 L54 36 M36 48 L52 46" opacity="0.9"/>
+      <path d="M32 50 C32 50 44 52 50 50" opacity="0.7"/>
+    </svg>
+
+    <!-- m5 - Implante dental -->
+    <svg th:if="${nombre == 'm5'}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" aria-hidden="true">
+      <path d="M28 52 L28 32 C28 28 32 24 36 24 C40 24 44 28 44 32 L44 52" opacity="0.95"/>
+      <path d="M28 52 C28 52 36 56 44 52" fill="currentColor" opacity="0.25"/>
+      <path d="M36 24 C36 24 40 18 42 14" opacity="0.9"/>
+      <path d="M30 36 L42 36" opacity="0.4"/>
+      <path d="M30 42 L42 42" opacity="0.4"/>
+      <circle cx="36" cy="28" r="1.6" fill="currentColor" opacity="0.9"/>
+    </svg>
+
+    <!-- m6 - Jeringa / orden inyección -->
+    <svg th:if="${nombre == 'm6'}" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" aria-hidden="true">
+      <path d="M14 32 L30 32" opacity="0.95"/>
+      <path d="M30 32 L50 18 L50 46 L30 32 Z" fill="currentColor" opacity="0.2"/>
+      <path d="M50 18 L58 12 M50 46 L58 52" opacity="0.9"/>
+      <path d="M50 18 C50 18 54 22 54 28 C54 34 50 38 50 38" opacity="0.5" fill="currentColor"/>
+      <path d="M50 28 L58 28" opacity="0.5"/>
+      <circle cx="22" cy="32" r="1.6" fill="currentColor" opacity="0.9"/>
+    </svg>
+  </th:block>
+</body>
+</html>

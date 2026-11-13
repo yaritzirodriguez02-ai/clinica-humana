@@ -1,0 +1,575 @@
+/* ==========================================================================
+   Odontología — estilo único (vidrio)
+   Panel odontológico: toda la extensión del negocio.
+   Canales de contacto:  dir..@gmail.com  |  (32) 216 84 XX
+   ========================================================================== */
+
+:root {
+  /* Colores (luz) */
+  --odc-navy:       #12306F;
+  --odc-deep:       #0B1F4D;
+  --odc-aqua:       #37B7DA;
+  --odc-mid:        #2F78C4;
+  --odc-bg-1:       #F3F8FC;
+  --odc-bg-2:       #D9EAF7;
+  --odc-text:       #12306F;
+  --odc-mute:       #5B6F9A;
+  --odc-line:       rgba(18, 48, 111, 0.14);
+
+  /* Vidrio */
+  --glass-bg:       rgba(255, 255, 255, 0.82);
+  --glass-fg:       rgba(18, 48, 111, 0.85);
+  --glass-blur:     blur(16px);
+  --glass-shadow:   0 16px 36px -24px rgba(18, 48, 111, 0.55);
+  --glass-radius:   22px;
+  --glass-border:   1px solid rgba(255, 255, 255, 0.45);
+
+  /* Tipografía */
+  --serif:          'Times New Roman', 'Liberation Serif', 'Nimbus Roman', Georgia, serif;
+  --ls-base:        0.04em;
+  --ls-title:       0.08em;
+
+  /* Fondos animados */
+  --blob-1:         rgba(55, 183, 218, 0.18);
+  --blob-2:         rgba(18, 48, 111, 0.16);
+  --dot:            rgba(18, 48, 111, 0.10);
+  --accent-dot:     rgba(55, 183, 218, 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --odc-navy:       #1A3A8E;
+    --odc-deep:       #0A1F56;
+    --odc-aqua:       #4FD0EA;
+    --odc-mid:        #4A8DD4;
+    --odc-bg-1:       #0A1A3F;
+    --odc-bg-2:       #050F27;
+    --odc-text:       #E7EEFC;
+    --odc-mute:       #A8B4D2;
+    --odc-line:       rgba(120, 156, 210, 0.14);
+
+    --glass-bg:       rgba(15, 30, 64, 0.72);
+    --glass-fg:       rgba(231, 238, 252, 0.85);
+    --glass-blur:     blur(16px);
+    --glass-shadow:   0 16px 36px -24px rgba(0, 0, 0, 0.65);
+    --glass-border:   1px solid rgba(120, 156, 210, 0.30);
+
+    --blob-1:         rgba(79, 208, 234, 0.18);
+    --blob-2:         rgba(74, 141, 212, 0.18);
+    --dot:            rgba(120, 156, 210, 0.14);
+    --accent-dot:     rgba(79, 208, 234, 0.22);
+  }
+}
+
+/* Reset básico del panel */
+.od-svg icono, .odontologia *, .od-panel * { box-sizing: border-box; }
+
+.od-root {
+  font-family: var(--serif);
+  color: var(--odc-text);
+  background: linear-gradient(160deg, var(--odc-bg-1), var(--odc-bg-2));
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.od-root body {
+  margin: 0;
+  background: transparent;
+}
+
+/* Tipografía mayúsculas */
+.od-uppercase { text-transform: uppercase; letter-spacing: var(--ls-base); }
+.od-title     { text-transform: uppercase; letter-spacing: var(--ls-title);
+                font-family: var(--serif); font-weight: 700; color: var(--odc-text); }
+.od-sub       { text-transform: uppercase; letter-spacing: var(--ls-base);
+                font-family: var(--serif); color: var(--odc-mute); }
+
+/* Efecto vidrio */
+.od-glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  border: var(--glass-border);
+  border-radius: var(--glass-radius);
+}
+
+.od-glass-sm { border-radius: 20px; }
+.od-glass-md { border-radius: 22px; }
+
+/* Entradas del formulario */
+.od-input {
+  font-family: var(--serif);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--odc-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--odc-text);
+  width: 100%;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, background 0.25s ease;
+  font-size: 0.98rem;
+}
+.od-input::placeholder { color: var(--odc-mute); letter-spacing: var(--ls-base); }
+.od-input:focus {
+  outline: none;
+  border-color: var(--odc-mid);
+  box-shadow: 0 0 0 3px rgba(47, 120, 196, 0.18);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.od-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--odc-line);
+  border-radius: 12px;
+  padding: 12px 36px 12px 14px;
+  color: var(--odc-text);
+  font-family: var(--serif);
+  width: 100%;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2312306F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, background 0.25s ease;
+}
+.od-select:focus {
+  outline: none;
+  border-color: var(--odc-mid);
+  box-shadow: 0 0 0 3px rgba(47, 120, 196, 0.18);
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+.od-textarea.od-input { resize: vertical; min-height: 96px; }
+
+.od-label {
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  font-size: 0.82rem;
+  color: var(--odc-text);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Botones */
+.od-btn {
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  border: none;
+  border-radius: 14px;
+  padding: 12px 22px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, color 0.22s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.od-btn:active { transform: translateY(1px); }
+
+.od-btn.od-primary {
+  background: var(--odc-navy);
+  color: #ffffff;
+  box-shadow: 0 8px 22px -16px rgba(18, 48, 111, 0.7);
+}
+.od-btn.od-primary:hover {
+  background: var(--odc-deep);
+  box-shadow: 0 12px 30px -18px rgba(18, 48, 111, 0.9);
+  transform: translateY(-1px);
+}
+
+.od-btn.od-accent {
+  background: var(--odc-aqua);
+  color: var(--odc-deep);
+  box-shadow: 0 8px 22px -16px rgba(55, 183, 218, 0.6);
+}
+.od-btn.od-accent:hover {
+  background: var(--odc-mid);
+  color: #ffffff;
+  box-shadow: 0 12px 30px -18px rgba(47, 120, 196, 0.7);
+  transform: translateY(-1px);
+}
+
+.od-btn.od-outline {
+  background: transparent;
+  color: var(--odc-text);
+  border: 1.5px solid var(--odc-navy);
+}
+.od-btn.od-outline:hover {
+  background: var(--odc-navy);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.od-btn.od-ghost {
+  background: transparent;
+  color: var(--odc-text);
+}
+.od-btn.od-ghost:hover {
+  background: rgba(18, 48, 111, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Icono flotante de botón */
+.od-btn svg.icon-odontologia { width: 16px; height: 16px; }
+
+/* Tarjetas / cajas */
+.od-card { padding: 22px 24px; }
+.od-card.od-card-sm { padding: 16px 18px; }
+.od-card.od-card-xs { padding: 10px 12px; }
+
+/* Badge */
+.od-badge {
+  display: inline-block;
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  background: rgba(55, 183, 218, 0.16);
+  color: var(--odc-navy);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  border: 1px solid rgba(55, 183, 218, 0.35);
+}
+.od-badge.od-badge-strong { background: var(--odc-navy); color: #ffffff; border-color: var(--odc-navy); }
+
+/* Mensaje / flash */
+.od-flash {
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-family: var(--serif);
+  background: rgba(18, 48, 111, 0.08);
+  border: 1px solid rgba(18, 48, 111, 0.18);
+  color: var(--odc-text);
+  font-size: 0.92rem;
+}
+.od-flash.od-flash-info  { background: rgba(55, 183, 218, 0.12); border-color: rgba(55, 183, 218, 0.35); color: var(--odc-deep); }
+.od-flash.od-flash-warn  { background: rgba(245, 180, 56, 0.14); border-color: rgba(245, 180, 56, 0.4); color: #5a4612; }
+.od-flash.od-flash-error { background: rgba(200, 70, 70, 0.12); border-color: rgba(200, 70, 70, 0.4); color: #6e1f1f; }
+
+/* Separador */
+.od-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--odc-line), transparent); margin: 18px 0; }
+
+/* Grilla base */
+.od-grid { display: grid; }
+
+/* Rejilla de columnas responsive */
+.od-col2  { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.od-col3  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 760px) {
+  .od-col2, .od-col3 { grid-template-columns: 1fr; }
+}
+
+/* Entradas escalonadas con fade+subida */
+.od-field {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: od-fadeUp 0.42s ease forwards;
+}
+.od-field:nth-child(1)  { animation-delay: 0.00s; }
+.od-field:nth-child(2)  { animation-delay: 0.06s; }
+.od-field:nth-child(3)  { animation-delay: 0.12s; }
+.od-field:nth-child(4)  { animation-delay: 0.18s; }
+.od-field:nth-child(5)  { animation-delay: 0.24s; }
+.od-field:nth-child(6)  { animation-delay: 0.30s; }
+.od-field:nth-child(7)  { animation-delay: 0.36s; }
+.od-field:nth-child(8)  { animation-delay: 0.42s; }
+.od-field:nth-child(9)  { animation-delay: 0.48s; }
+.od-field:nth-child(10) { animation-delay: 0.54s; }
+
+@keyframes od-fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tabla odontología */
+.od-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--serif);
+}
+.od-table th, .od-table td {
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--odc-line);
+  font-size: 0.82rem;
+}
+.od-table th {
+  color: var(--odc-text);
+  font-size: 0.74rem;
+  letter-spacing: var(--ls-title);
+  background: rgba(18, 48, 111, 0.06);
+}
+.od-table tbody tr:hover td { background: rgba(55, 183, 218, 0.06); }
+.od-table tbody tr:hover { transform: translateX(2px); }
+.od-table { border-radius: 14px; overflow: hidden; box-shadow: var(--glass-shadow); border: var(--glass-border); }
+.od-table thead th { border-radius: 14px 14px 0 0; }
+
+/* Navbar vidrio (headers del panel odontología) */
+.od-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 22px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  border-bottom: var(--glass-border);
+  border-radius: 0 0 22px 22px;
+  margin-bottom: 18px;
+}
+.od-nav:only-child { border-radius: 22px; margin-bottom: 18px; }
+
+.od-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--odc-text);
+}
+.od-nav-brand svg.icon-odontologia { width: 26px; height: 26px; color: var(--odc-navy); }
+.od-nav-brand-text {
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-title);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.od-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.od-nav-link {
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  color: var(--odc-text);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  transition: background 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease, color 0.22s ease;
+}
+.od-nav-link:hover {
+  background: rgba(18, 48, 111, 0.08);
+  color: var(--odc-navy);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -8px rgba(18, 48, 111, 0.5);
+}
+.od-nav-link.od-nav-link-active { background: var(--odc-navy); color: #ffffff; }
+.od-nav-link.od-nav-link-active:hover { background: var(--odc-deep); color: #ffffff; }
+
+.od-nav-cta {
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  font-size: 0.82rem;
+  text-decoration: none;
+  color: var(--odc-deep);
+  background: var(--odc-aqua);
+  box-shadow: 0 6px 16px -14px rgba(55, 183, 218, 0.7);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+.od-nav-cta:hover { background: var(--odc-mid); color: #ffffff; transform: translateY(-1px); }
+
+/* Footer del panel */
+.od-footer {
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  font-size: 0.78rem;
+  color: var(--odc-mute);
+  padding: 18px 22px;
+  text-align: center;
+}
+
+/* Sección empacada */
+.od-section {
+  border-radius: 22px;
+  padding: 24px 26px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  border: var(--glass-border);
+  margin-bottom: 18px;
+}
+
+/* Título de sección */
+.od-section-title { margin: 0 0 14px 0; }
+.od-section-sub   { margin: 0 0 16px 0; color: var(--odc-mute); }
+
+/* Muhra / acción pequeña */
+.od-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  font-size: 0.78rem;
+  background: rgba(18, 48, 111, 0.08);
+  color: var(--odc-text);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--odc-line);
+  text-decoration: none;
+  transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
+}
+.od-chip:hover { background: var(--odc-navy); color: #ffffff; transform: translateY(-1px); }
+.od-chip svg.icon-odontologia { width: 13px; height: 13px; }
+
+/* Tupla de contacto */
+.od-contact-row {
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  font-size: 0.86rem;
+  color: var(--odc-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.od-contact-row svg.icon-odontologia { width: 15px; height: 15px; color: var(--odc-mid); }
+
+/* impresión */
+@media print {
+  body { background: #ffffff !important; }
+  .od-glass, .od-section, .od-nav, .od-footer, .od-bloques-bg { background: transparent !important; backdrop-filter: none !important; box-shadow: none !important; border-color: #cccccc !important; color: #000000 !important; }
+  .od-uppercase, .od-title, .od-sub, .od-label, .od-chip, .od-contact-row, .od-badge, .od-btn { color: #000000 !important; }
+}
+
+/* Preferir menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .od-field { opacity: 1; transform: none; animation: none; }
+}
+
+/* Safe-area (mobile con barras) */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .od-root { padding-top: env(safe-area-inset-top, 0); }
+  .od-nav { padding-top: calc(12px + env(safe-area-inset-top, 0)); }
+}
+
+/* Anclas suaves */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Caja de canales de contacto (confirmación) */
+.od-channel-box {
+  border-radius: 16px;
+  background: rgba(55, 183, 218, 0.10);
+  border: 1px solid rgba(55, 183, 218, 0.4);
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+.od-channel-box .od-channel-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-base);
+  font-size: 0.86rem;
+  color: var(--odc-deep);
+  margin: 4px 0;
+}
+
+/* Animación del fondo fijo (se aplica al contenedor raíz) */
+.od-bloques-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--odc-bg-1), var(--odc-bg-2));
+}
+@media (prefers-color-scheme: dark) {
+  .od-bloques-bg { background: linear-gradient(160deg, var(--odc-bg-1), var(--odc-bg-2)); }
+}
+
+.od-bloques-bg .od-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  will-change: transform, opacity;
+}
+.od-bloques-bg .od-blob-1 {
+  width: 280px; height: 280px;
+  background: var(--blob-1);
+  top: -80px; left: -80px;
+  animation: od-blob-drift-1 22s ease-in-out infinite alternate;
+}
+.od-bloques-bg .od-blob-2 {
+  width: 320px; height: 320px;
+  background: var(--blob-2);
+  bottom: -120px; right: -100px;
+  animation: od-blob-drift-2 26s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .od-bloques-bg .od-blob { animation: none; }
+}
+@keyframes od-blob-drift-1 {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.8; }
+  100% { transform: translate(60px, 40px) scale(1.1); opacity: 1; }
+}
+@keyframes od-blob-drift-2 {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.85; }
+  100% { transform: translate(-50px, -40px) scale(1.15); opacity: 1; }
+}
+
+/* Cuadrícula de puntos */
+.od-bloques-bg .od-dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--dot) 1.1px, transparent 1.2px);
+  background-size: 28px 28px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* Íconos flotantes decorativos */
+.od-bloques-bg .od-float-icon {
+  position: absolute;
+  color: var(--odc-mid);
+  opacity: 0.55;
+  pointer-events: none;
+  animation: od-float-icon 20s linear infinite;
+}
+.od-bloques-bg .od-float-icon svg { width: 64px; height: 64px; }
+.od-bloques-bg .od-float-icon:nth-child(3)  { animation-duration: 26s; animation-delay: -3s;  top: 12%; left: 6%; }
+.od-bloques-bg .od-float-icon:nth-child(4)  { animation-duration: 22s; animation-delay: -7s;  top: 55%; right: 7%; }
+.od-bloques-bg .od-float-icon:nth-child(5)  { animation-duration: 24s; animation-delay: -11s; top: 78%; left: 10%; }
+.od-bloques-bg .od-float-icon:nth-child(6)  { animation-duration: 20s; animation-delay: -2s;  top: 18%; right: 12%; }
+.od-bloques-bg .od-float-icon:nth-child(7)  { animation-duration: 28s; animation-delay: -15s; bottom: 10%; left: 40%; }
+@media (prefers-reduced-motion: reduce) {
+  .od-bloques-bg .od-float-icon { animation: none; opacity: 0.18; }
+}
+@keyframes od-float-icon {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(20px, -30px) rotate(4deg); }
+  50%  { transform: translate(-10px, 20px) rotate(-2deg); }
+  75%  { transform: translate(25px, 10px) rotate(3deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
