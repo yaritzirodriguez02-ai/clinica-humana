@@ -4,294 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agenda de Citas Médicas y Dentales</title>
-    <link rel="stylesheet" th:href="@{/css/odontologia.css}" href="/css/odontologia.css">
-    <link rel="stylesheet" th:href="@{/css/main.css}" href="/css/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="od-root">
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
 
-    <!-- Fondo animado fixed -->
-    <div class="od-bloques-bg" aria-hidden="true">
-        <div class="od-blob od-blob-1"></div>
-        <div class="od-blob od-blob-2"></div>
-        <div class="od-dot-grid"></div>
-        <div class="od-float-icon" th:replace="~{fragments/odontologia :: icono(nombre='m3')}"></div>
-        <div class="od-float-icon" th:replace="~{fragments/odontologia :: icono(nombre='m4')}"></div>
-        <div class="od-float-icon" th:replace="~{fragments/odontologia :: icono(nombre='m5')}"></div>
-        <div class="od-float-icon" th:replace="~{fragments/odontologia :: icono(nombre='m6')}"></div>
-        <div class="od-float-icon" th:replace="~{fragments/odontologia :: icono(nombre='m2')}"></div>
-    </div>
+    <!-- Barra de Navegación Global Unificada -->
+    <div th:replace="~{fragments/navbar :: barraNavegacion}"></div>
 
-    <!-- Navbar vidrio odontología -->
-    <nav class="od-nav" aria-label="Navegación del panel odontología">
-        <a class="od-nav-brand" th:href="@{/}">
-            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" aria-hidden="true">
-                <path d="M32 4 C38 4 42 9 42 15 C42 22 37 27 32 31 C27 27 22 22 22 15 C22 9 26 4 32 4 Z"/>
-                <path d="M32 31 C37 31 42 36 42 42 C42 48 37 52 32 52 C27 52 22 48 22 42 C22 36 27 31 32 31 Z"/>
-                <path d="M32 15 C35 15 37 18 37 22 C37 25 35 27 32 27 C29 27 27 25 27 22 C27 18 29 15 32 15 Z" fill="currentColor" opacity="0.25"/>
-                <path d="M22 15 L22 48" opacity="0.5"/>
-                <path d="M42 15 L42 48" opacity="0.5"/>
-            </svg>
-            <span class="od-nav-brand-text">Odontología</span>
-        </a>
-        <div class="od-nav-links">
-            <a class="od-nav-link od-nav-link-active" th:href="@{/citas}" th:text="Agenda">Agenda</a>
-            <a class="od-nav-link" th:href="@{/pacientes}" th:text="Pacientes">Pacientes</a>
-            <a class="od-nav-link" th:href="@{/consultas}" th:text="Consultas">Consultas</a>
-            <a class="od-nav-link" th:href="@{/pagos}" th:text="Pagos">Pagos</a>
-            <a class="od-nav-cta" th:href="@{/citas/nueva}" th:text="'Agendar Cita'">Agendar Cita</a>
-        </div>
-    </nav>
-
-    <main class="max-w-6xl mx-auto px-4 py-6">
-
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
         <!-- Notificaciones Flash -->
-        <div th:if="${mensajeExito}" class="od-flash od-flash-info mb-5">
-            <span class="od-uppercase" style="font-weight:700;">Éxito:</span>
+        <div th:if="${mensajeExito}" class="mb-6 p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600"></i>
             <span th:text="${mensajeExito}"></span>
         </div>
-        <div th:if="${mensajeError}" class="od-flash od-flash-error mb-5">
-            <span class="od-uppercase" style="font-weight:700;">Aviso:</span>
+        <div th:if="${mensajeError}" class="mb-6 p-4 bg-rose-100 border-l-4 border-rose-500 text-rose-800 rounded shadow-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-600"></i>
             <span th:text="${mensajeError}"></span>
         </div>
 
         <!-- Encabezado adaptable según el rol del usuario conectado -->
-        <section class="od-section">
-            <div class="od-field">
-                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOPEDIATRA'}" class="od-glass" style="border-radius:22px;">
-                    <div class="od-field" style="animation:none;opacity:1;transform:none;">
-                        <div class="flex items-start gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#12306F] to-[#2F78C4] flex items-center justify-center text-white shadow-md shrink-0">
-                                <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:32px;height:32px;color:#ffffff;" aria-hidden="true">
-                                    <path d="M32 4 C38 4 42 9 42 15 C42 22 37 27 32 31 C27 27 22 22 22 15 C22 9 26 4 32 4 Z"/>
-                                    <path d="M32 31 C37 31 42 36 42 42 C42 48 37 52 32 52 C27 52 22 48 22 42 C22 36 27 31 32 31 Z"/>
-                                    <path d="M32 15 C35 15 37 18 37 22 C37 25 35 27 32 27 C29 27 27 25 27 22 C27 18 29 15 32 15 Z" fill="currentColor" opacity="0.4"/>
-                                </svg>
-                            </div>
-                            <div class="min-w-0">
-                                <h2 class="od-title" style="font-size:1.15rem;">Consultorio de Odontología</h2>
-                                <p class="od-sub" style="font-size:0.82rem;">Cirujano dentista · CISO · Atención dental integral.</p>
-                            </div>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <!-- Vista para Dra. Pilar -->
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'PEDIATRA'}" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0 shadow-sm">
+                            <img th:src="@{/img/logo-pediatria.png}" src="/img/logo-pediatria.png" alt="Logo Pediatría" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
+                            <i class="fa-solid fa-user-injured text-2xl"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="text-xl font-extrabold text-slate-900">Consultorio Pediátrico</h2>
+                            <p class="text-sm text-slate-600">Dr/a Pediatra · Atención de bebés y menores hasta 15 años.</p>
                         </div>
                     </div>
                 </div>
-
+                <!-- Vista para Odontología / CISO -->
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOPEDIATRA'}" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 overflow-hidden">
+                    <div class="absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl from-blue-200/40 to-transparent rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                    <div class="flex items-start gap-4 relative">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-900 to-blue-600 flex items-center justify-center text-white shadow-md shrink-0">
+                            <img th:src="@{/img/logo-odontologia.png}" src="/img/logo-odontologia.png" alt="Logo Odontología" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
+                            <i class="fa-solid fa-tooth text-2xl"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="text-xl font-extrabold uppercase tracking-wide text-slate-900">Consultorio de Odontología</h2>
+                            <p class="text-sm text-slate-600">Dra. Gloria González Herrera · CIRUJANA DENTISTA · CISO.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Vista para Recepción / Admin -->
                 <div th:if="${usuarioActual != null and (usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}">
-                    <h2 class="od-title">Agenda General de Consultas</h2>
-                    <p class="od-sub">Coordinación de citas para especialistas, asignación de turnos y caja general.</p>
+                    <h2 class="text-2xl font-bold text-slate-900">Agenda General de Consultas y Recepción</h2>
+                    <p class="text-sm text-slate-500">Coordinación de citas para especialistas, asignación de turnos y caja general.</p>
                 </div>
             </div>
-        </section>
+
+            <!-- Botón Agendar Cita (Habilitado para ODONTOPEDIATRA, PEDIATRA, RECEPCIONISTA y ADMIN) -->
+            <a th:if="${usuarioActual != null and (usuarioActual.rol == 'PEDIATRA' or usuarioActual.rol == 'ODONTOPEDIATRA' or usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}"
+               th:href="@{/citas/nueva}" class="group relative inline-flex items-center gap-2 px-6 py-2.5 rounded-xl shadow-md text-sm font-extrabold uppercase tracking-wide border border-white/30 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 hover:from-blue-800 hover:via-blue-700 hover:to-blue-600 text-white transition-all duration-200">
+                <span class="absolute inset-0 rounded-xl bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                <i class="fa-solid fa-calendar-plus text-base"></i> Agendar Cita
+            </a>
+        </div>
 
         <!-- Filtros de Agenda -->
-        <div class="od-section od-glass" style="border-radius:20px;">
-            <div class="od-field" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;">
-                <p class="od-sub" style="font-size:0.78rem;">
-                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:15px;height:15px;color:var(--odc-mid);margin-right:6px;" aria-hidden="true">
-                        <path d="M12 12 L52 52 M52 12 L12 52" opacity="0.85"/>
-                        <circle cx="32" cy="32" r="20" opacity="0.5"/>
-                    </svg>
-                    <span th:if="${vistaFutura}" class="od-badge od-badge-strong">Próximas citas</span>
-                    <span th:unless="${vistaFutura}" class="od-badge">Citas del día <span th:text="${filtroFecha}">2026-01-01</span></span>
-                </p>
-                <form th:action="@{/citas}" method="get" class="od-field" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-                    <div class="od-field" style="position:relative;min-width:160px;">
-                        <input type="date" name="fecha" th:value="${filtroFecha}" class="od-input" style="padding-right:34px;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--odc-mute);" aria-hidden="true">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="16" y1="2" x2="16" y2="6"/>
-                            <line x1="8" y1="2" x2="8" y2="6"/>
-                            <line x1="3" y1="10" x2="21" y2="10"/>
-                        </svg>
-                    </div>
-                    <div class="od-field" style="position:relative;min-width:180px;" th:if="${esAdmin}">
-                        <select name="especialidad" class="od-select">
-                            <option value="">Todas las especialidades</option>
-                            <option value="ODONTOLOGIA" th:selected="${filtroEspecialidad == 'ODONTOLOGIA'}">CISO - Odontología</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="od-btn od-primary">Buscar</button>
-                    <a th:href="@{/citas}" class="od-btn od-outline" th:text="Ver próximas">Ver próximas</a>
-                </form>
-            </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-wrap justify-between items-center gap-4">
+            <p class="text-xs text-slate-500">
+                <i class="fa-solid fa-filter text-indigo-500"></i>
+                <span th:if="${vistaFutura}" class="font-semibold text-indigo-700">Mostrando próximas citas (de hoy en adelante).</span>
+                <span th:unless="${vistaFutura}" class="font-semibold text-amber-700">Mostrando citas del día <span th:text="${filtroFecha}">2026-01-01</span>.</span>
+            </p>
+            <form th:action="@{/citas}" method="get" class="flex flex-wrap items-center gap-3">
+                <input type="date" name="fecha" th:value="${filtroFecha}"
+                       class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                <select th:if="${esAdmin}" name="especialidad"
+                        class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                    <option value="">Todas las especialidades</option>
+                    <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>
+                    <option value="ODONTOLOGIA" th:selected="${filtroEspecialidad == 'ODONTOLOGIA'}">CISO - Odontologia</option>
+                </select>                        <button type="submit" class="px-4 py-1.5 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-800 hover:to-blue-700 text-white rounded-lg text-xs font-bold uppercase tracking-wide shadow transition">Buscar</button>
+                <a th:href="@{/citas}"                          class="group relative inline-flex items-center gap-1 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-slate-200 to-slate-100 hover:from-slate-300 hover:to-slate-200 text-slate-800 shadow-sm transition">Ver próximas
+                          <span class="absolute inset-0 rounded-lg bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                      </a>
+            </form>
         </div>
 
         <!-- Tabla de Citas -->
-        <div class="od-section" style="overflow:hidden; border-radius:20px;">
-            <div class="od-field">
-                <div class="od-uppercase" style="font-size:0.78rem;letter-spacing:var(--ls-title);color:var(--odc-mute);margin-bottom:10px;">
-                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:16px;height:16px;vertical-align:middle;margin-right:8px;color:var(--odc-mid);" aria-hidden="true">
-                        <path d="M16 10 L48 10 M16 24 L48 24 M16 38 L48 38 M16 52 L48 52"/>
-                        <path d="M16 10 L16 52 M48 10 L48 52"/>
-                    </svg>
-                    Agenda de citas
-                </div>
-            </div>
-            <div class="od-field">
-                <div class="overflow-x-auto">
-                    <table class="od-table">
-                        <thead>
-                            <tr>
-                                <th>Horario</th>
-                                <th>Paciente</th>
-                                <th>Especialidad</th>
-                                <th>Cirujano dentista asignado</th>
-                                <th>Motivo</th>
-                                <th>Estado</th>
-                                <th style="text-align:center;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:if="${#lists.isEmpty(citas)}">
-                                <td colspan="7" class="od-field" style="padding:28px 12px;text-align:center;color:var(--odc-mute);">
-                                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:40px;height:40px;color:var(--odc-mute);display:block;margin:0 auto 10px;" aria-hidden="true">
-                                        <rect x="14" y="20" width="36" height="36" rx="6" opacity="0.6"/>
-                                        <path d="M14 40 L24 32 L32 40 L40 32 L48 40"/>
-                                        <circle cx="32" cy="32" r="3" fill="currentColor" opacity="0.7"/>
-                                    </svg>
-                                    <div class="od-uppercase">No hay citas registradas</div>
-                                    <div class="od-sub" style="margin-top:4px;">para este criterio.</div>
-                                </td>
-                            </tr>
-                            <tr th:each="c : ${citas}" class="od-field" style="background:transparent;">
-                                <td class="od-field" style="background:transparent;">
-                                    <div>
-                                        <div class="od-uppercase" style="font-size:0.76rem;font-weight:700;color:var(--odc-text);" th:text="${c.fecha}">2026-09-25</div>
-                                        <div class="od-uppercase" style="font-size:0.74rem;font-family:monospace;letter-spacing:var(--ls-base);color:var(--odc-mid);" th:text="${c.hora}">10:00</div>
-                                    </div>
-                                </td>
-                                <td class="od-field" style="background:transparent;">
-                                    <div>
-                                        <div class="od-uppercase" style="font-weight:700;color:var(--odc-text);" th:text="${c.paciente.nombre + ' ' + c.paciente.apellidos}">Nombre del paciente</div>
-                                        <div class="od-uppercase" style="font-size:0.72rem;font-family:monospace;color:var(--odc-mute);" th:text="'CURP: ' + ${c.paciente.curp}">CURP: XXXXX</div>
-                                    </div>
-                                    <div th:if="${c.especialidad == 'ODONTOLOGIA'}" class="od-field mt-1" style="margin-top:8px;">
-                                        <span th:if="${c.aceptaUsoFotosClinicas}"
-                                              class="od-badge od-badge-strong" style="display:inline-flex;align-items:center;gap:5px;">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;" aria-hidden="true">
-                                                <path d="M12 3 L3 7 L3 17 L12 21 L21 17 L21 7 Z"/>
-                                                <path d="M12 12 L12 16 M12 8 L12 12"/>
-                                            </svg>
-                                            Autorizó fotos clínicas
-                                        </span>
-                                        <span th:unless="${c.aceptaUsoFotosClinicas}"
-                                              class="od-badge" style="display:inline-flex;align-items:center;gap:5px;background:rgba(245,180,56,0.14);color:#5a4612;border-color:rgba(245,180,56,0.4);">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;" aria-hidden="true">
-                                                <path d="M12 2 L12 22 M2 12 L22 12"/>
-                                            </svg>
-                                            Sin consentimiento de fotos
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="od-field" style="background:transparent;">
-                                    <span class="od-badge" th:classappend="${c.especialidad == 'ODONTOLOGIA'} ? ' od-badge-strong' : ''" th:text="${c.especialidad}">ODONTOLOGIA</span>
-                                </td>
-                                <td class="od-field" style="background:transparent;color:var(--odc-text);" th:text="${c.medico.nombreCompleto}">Cirujano dentista asignado</td>
-                                <td class="od-field" style="background:transparent;color:var(--odc-mute);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" th:text="${c.motivo}" th:title="${c.motivo}">Motivo de consulta</td>
-                                <td class="od-field" style="background:transparent;">
-                                    <span class="od-badge" th:classappend="${c.estado == 'PROGRAMADA'} ? ' od-badge-strong' : ''" th:text="${c.estado}">PROGRAMADA</span>
-                                </td>
-                                <td class="od-field" style="background:transparent;text-align:center;white-space:nowrap;">
-                                    <div th:if="${c.estado == 'PROGRAMADA'}" class="od-field" style="display:inline-flex;flex-wrap:wrap;gap:4px;justify-content:center;margin:0;">
-                                        <a th:if="${usuarioActual != null and (usuarioActual.rol == 'ADMIN' or (c.medico != null and c.medico.idUsuario != null and c.medico.idUsuario == usuarioActual.idUsuario))}"
-                                           th:href="@{/consultas/atender/{id}(id=${c.idCita})}"
-                                           class="od-chip od-chip-action" style="background:rgba(20,160,90,0.12);color:#14a05a;border-color:rgba(20,160,90,0.35);text-decoration:none;">
-                                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:12px;height:12px;" aria-hidden="true">
-                                                <circle cx="32" cy="22" r="8"/>
-                                                <path d="M32 14 V6 M32 38 V42"/>
-                                                <rect x="14" y="46" width="36" height="6" rx="2"/>
-                                                <path d="M22 62 L28 56 L34 62 L40 56 L46 62"/>
-                                            </svg>
-                                            Atender
-                                        </a>
-                                        <button type="button"
-                                                th:data-id="${c.idCita}"
-                                                th:data-fecha="${c.fecha}"
-                                                th:data-hora="${c.hora}"
-                                                onclick="abrirModalReprogramarDesde(this)"
-                                                class="od-chip od-chip-action" style="background:rgba(47,120,196,0.12);color:var(--odc-navy);border-color:rgba(47,120,196,0.35);text-decoration:none;">
-                                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:12px;height:12px;" aria-hidden="true">
-                                                <rect x="14" y="22" width="36" height="24" rx="4"/>
-                                                <path d="M14 34 L22 26 M40 26 L48 34"/>
-                                                <path d="M32 26 V46"/>
-                                            </svg>
-                                            Reagendar
-                                        </button>
-                                        <form th:action="@{/citas/no-asistio}" method="post" class="od-field" style="display:inline;" onsubmit="return confirm('¿Confirmas que el paciente NO se presentó a su turno?');">
-                                            <input type="hidden" name="idCita" th:value="${c.idCita}">
-                                            <button type="submit" class="od-chip od-chip-action" style="background:rgba(245,180,56,0.14);color:#5a4612;border-color:rgba(245,180,56,0.4);text-decoration:none;">
-                                                <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:12px;height:12px;" aria-hidden="true">
-                                                    <circle cx="32" cy="22" r="10"/>
-                                                    <path d="M22 22 L42 42 M42 22 L22 42"/>
-                                                </svg>
-                                                No Asistió
-                                            </button>
-                                        </form>
-                                        <button type="button"
-                                                th:data-id="${c.idCita}"
-                                                onclick="abrirModalCancelarDesde(this)"
-                                                class="od-chip od-chip-action" style="background:rgba(200,70,70,0.12);color:#c84646;border-color:rgba(200,70,70,0.35);text-decoration:none;">
-                                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:12px;height:12px;" aria-hidden="true">
-                                                <circle cx="32" cy="32" r="18"/>
-                                                <path d="M20 32 L44 32 M32 20 L32 44"/>
-                                            </svg>
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                    <div th:if="${c.estado == 'COMPLETADA'}" class="od-field" style="display:inline-flex;gap:6px;align-items:center;">
-                                        <span class="od-badge od-badge-strong" style="display:inline-flex;align-items:center;gap:5px;background:rgba(20,160,90,0.18);color:#14a05a;border-color:rgba(20,160,90,0.4);">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px;" aria-hidden="true">
-                                                <polyline points="20 6 9 17 4 12"/>
-                                            </svg>
-                                            Atendida
-                                        </span>
-                                        <a th:if="${usuarioActual != null and usuarioActual.rol != 'RECEPCIONISTA'}"
-                                           th:href="@{/recetas/nueva/{id}(id=${c.idCita})}"
-                                           class="od-chip" style="text-decoration:none;">
-                                            <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:12px;height:12px;" aria-hidden="true">
-                                                <rect x="14" y="14" width="36" height="42" rx="4"/>
-                                                <path d="M26 14 L26 8 M34 14 L34 8"/>
-                                                <path d="M22 28 L40 28 M22 34 L38 34 M22 40 L36 40"/>
-                                            </svg>
-                                            Receta
-                                        </a>
-                                    </div>
-                                    <div th:if="${c.estado == 'CANCELADA'}" class="od-uppercase" style="font-size:0.74rem;color:#c84646;font-style:italic;" th:title="${c.motivoCancelacion != null ? c.motivoCancelacion : 'Cancelada'}">
-                                        <span th:text="${c.motivoCancelacion != null ? 'Motivo: ' + c.motivoCancelacion : 'Cancelada'}">Cancelada</span>
-                                    </div>
-                                    <div th:if="${c.estado == 'NO_ASISTIO'}" class="od-uppercase" style="font-size:0.74rem;color:#5a4612;font-weight:700;">
-                                        Inasistencia registrada
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>    </main>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gradient-to-r from-slate-100 to-slate-50 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Horario</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Paciente Infantil</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Especialidad</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Médico Asignado</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Motivo</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Estado</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 text-sm">
+                        <tr th:if="${#lists.isEmpty(citas)}">
+                            <td colspan="7" class="py-8 text-center text-slate-400">
+                                <i class="fa-solid fa-calendar-xmark text-3xl mb-2 block"></i>
+                                No hay citas registradas en la agenda para este criterio.
+                            </td>
+                        </tr>
+                        <tr th:each="c : ${citas}" class="hover:bg-slate-50 transition">
+                            <td class="py-3 px-4">
+                                <div class="font-semibold text-slate-900" th:text="${c.fecha}">2026-09-25</div>
+                                <span class="text-xs font-mono font-extrabold text-blue-700" th:text="${c.hora}">10:00</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <div class="font-medium text-slate-900" th:text="${c.paciente.nombre + ' ' + c.paciente.apellidos}">Nombre Niño</div>
+                                <span class="text-xs text-slate-400 font-mono" th:text="'CURP: ' + ${c.paciente.curp}"></span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-full"
+                                      th:classappend="${c.especialidad == 'PEDIATRIA'} ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'"
+                                      th:text="${c.especialidad}"></span>
+                            </td>
+                            <td class="py-3 px-4 text-slate-700" th:text="${c.medico.nombreCompleto}">Dra. Asignada</td>
+                            <td class="py-3 px-4 text-slate-600 max-w-xs truncate" th:text="${c.motivo}" th:title="${c.motivo}">Motivo de consulta</td>
+                            <td class="py-3 px-4">
+                                <span class="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded"
+                                      th:classappend="${c.estado == 'PROGRAMADA'} ? 'bg-blue-100 text-blue-800' : 
+                                                     (${c.estado == 'COMPLETADA'} ? 'bg-emerald-100 text-emerald-800' :                                                       (${c.estado == 'NO_ASISTIO'} ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'))"
+                                      th:text="${c.estado}">PROGRAMADA</span>
+                            </td>
+                            <td class="py-3 px-4 text-center whitespace-nowrap">
+                                
+                                <!-- Si la cita está PROGRAMADA: Acciones activas -->
+                                <div th:if="${c.estado == 'PROGRAMADA'}" class="inline-flex items-center gap-1.5 flex-wrap justify-center">
+                                    
+                                    <!-- 1. Atender: Exclusivo para la especialista ASIGNADA o el administrador -->
+                                    <a th:if="${usuarioActual != null and (usuarioActual.rol == 'ADMIN' or (c.medico != null and c.medico.idUsuario != null and c.medico.idUsuario == usuarioActual.idUsuario))}"
+                                       th:href="@{/consultas/atender/{id}(id=${c.idCita})}"
+                                       class="text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-stethoscope"></i> Atender
+                                    </a>
 
-    <!-- Modal para reprogramar -->
-    <div id="modalReprogramar" class="od-glass" style="position:fixed;inset:0;background:rgba(18,48,111,0.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000;border-radius:22px;">
-        <div class="od-glass" style="border-radius:20px;width:100%;max-width:420px;padding:24px;box-shadow:var(--glass-shadow);">
-            <div class="od-field">
-                <h3 class="od-title" style="display:flex;align-items:center;gap:8px;margin:0 0 4px 0;">
-                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:18px;height:18px;color:var(--odc-mid);" aria-hidden="true">
-                        <rect x="14" y="22" width="36" height="24" rx="4"/>
-                        <path d="M14 34 L22 26 M40 26 L48 34"/>
-                        <path d="M32 26 V46"/>
-                    </svg>
-                    Reagendar Consulta
-                </h3>
-                <p class="od-sub" style="margin:0 0 16px 0;">Selecciona el nuevo día y horario disponible para el paciente.</p>
+                                    <!-- 2. Reprogramar (Abre modal) -->
+                                    <button type="button"
+                                            th:attr="data-id=${c.idCita},data-fecha=${c.fecha},data-hora=${c.hora}"
+                                            onclick="abrirModalReprogramarDesde(this)"
+                                            class="text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-calendar-days"></i> Reagendar
+                                    </button>
+
+                                    <!-- 3. No Asistió -->
+                                    <form th:action="@{/citas/no-asistio}" method="post" class="inline"
+                                          onsubmit="return confirm('¿Confirmas que el paciente NO se presentó a su turno?');">
+                                        <input type="hidden" name="idCita" th:value="${c.idCita}">
+                                        <button type="submit" 
+                                                class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                            <i class="fa-solid fa-user-xmark"></i> No Asistió
+                                        </button>
+                                    </form>
+
+                                    <!-- 4. Cancelar (Abre modal para capturar motivo obligatorio) -->
+                                    <button type="button"
+                                            th:attr="data-id=${c.idCita}"
+                                            onclick="abrirModalCancelarDesde(this)"
+                                            class="text-rose-600 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-2 py-1 rounded text-xs font-semibold inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-ban"></i> Cancelar
+                                    </button>
+                                </div>
+
+                                <!-- Si la cita ya está COMPLETADA -->
+                                <div th:if="${c.estado == 'COMPLETADA'}" class="inline-flex items-center gap-1">
+                                    <span class="text-[11px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
+                                        <i class="fa-solid fa-check-double"></i> Atendida
+                                    </span>
+                                    <a th:if="${usuarioActual != null and usuarioActual.rol != 'RECEPCIONISTA'}"
+                                       th:href="@{/recetas/nueva/{id}(id=${c.idCita})}"
+                                       class="text-blue-700 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide inline-flex items-center gap-1 transition">
+                                        <i class="fa-solid fa-file-prescription"></i> Receta
+                                    </a>
+                                </div>
+
+                                <!-- Si fue CANCELADA o NO ASISTIÓ: solo lectura con detalle -->
+                                <div th:if="${c.estado == 'CANCELADA'}" class="text-rose-700 text-xs font-bold uppercase tracking-wide italic" th:title="${c.motivoCancelacion != null ? c.motivoCancelacion : 'Cancelada'}">
+                                    <span th:text="${c.motivoCancelacion != null ? 'Motivo: ' + c.motivoCancelacion : 'Cancelada'}"></span>
+                                </div>
+                                <div th:if="${c.estado == 'NO_ASISTIO'}" class="text-amber-700 text-xs font-bold uppercase tracking-wide">
+                                    Inasistencia registrada
+                                </div>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <form th:action="@{/citas/reprogramar}" method="post" class="od-field" style="display:flex;flex-direction:column;gap:14px;">
+        </div>
+    </main>
+
+    <!-- MODAL PARA REPROGRAMAR CITA -->
+    <div id="modalReprogramar" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2 mb-2 uppercase tracking-wide">
+                <i class="fa-solid fa-calendar-days text-blue-700"></i> Reagendar Consulta Médica
+            </h3>
+            <p class="text-xs text-slate-500 mb-4 uppercase tracking-wider">Selecciona el nuevo día y horario disponible para el paciente.</p>
+            
+            <form th:action="@{/citas/reprogramar}" method="post" class="space-y-4">
                 <input type="hidden" id="idCitaReprogramar" name="idCita">
-                <div class="od-field" style="display:flex;flex-direction:column;gap:6px;">
-                    <label class="od-label" for="nuevaFecha">Nueva Fecha *</label>
-                    <input type="date" id="nuevaFecha" name="nuevaFecha" required class="od-input">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nueva Fecha *</label>
+                    <input type="date" id="nuevaFecha" name="nuevaFecha" required
+                           class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div class="od-field" style="display:flex;flex-direction:column;gap:6px;">
-                    <label class="od-label" for="nuevaHora">Nuevo Horario *</label>
-                    <select id="nuevaHora" name="nuevaHora" required class="od-select">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nuevo Horario *</label>
+                    <select id="nuevaHora" name="nuevaHora" required
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono font-bold focus:ring-2 focus:ring-blue-500">
                         <option value="">-- Seleccionar Turno --</option>
                         <option value="09:00">09:00 AM</option>
                         <option value="09:30">09:30 AM</option>
@@ -313,48 +242,47 @@
                         <option value="19:00">07:00 PM</option>
                     </select>
                 </div>
-                <div class="od-field" style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;padding-top:14px;border-top:1px solid var(--odc-line);">
-                    <button type="button" onclick="cerrarModalReprogramar()" class="od-btn od-outline" th:text="Cancelar">Cancelar</button>
-                    <button type="submit" class="od-btn od-primary" th:text="Guardar Cambios">Guardar Cambios</button>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="cerrarModalReprogramar()" class="group relative inline-flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-slate-200 to-slate-100 hover:from-slate-300 hover:to-slate-200 text-slate-800 shadow-sm transition">Cancelar
+                      <span class="absolute inset-0 rounded-lg bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    </button>
+                    <button type="submit" class="group relative inline-flex items-center gap-1 px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-md transition">Guardar Cambios
+                      <span class="absolute inset-0 rounded-lg bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal para cancelar -->
-    <div id="modalCancelar" class="od-glass" style="position:fixed;inset:0;background:rgba(18,48,111,0.4);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000;border-radius:22px;">
-        <div class="od-glass" style="border-radius:20px;width:100%;max-width:440px;padding:24px;box-shadow:var(--glass-shadow);">
-            <div class="od-field">
-                <h3 class="od-title" style="display:flex;align-items:center;gap:8px;margin:0 0 4px 0;">
-                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="icon-odontologia" style="width:18px;height:18px;color:#c84646;" aria-hidden="true">
-                        <circle cx="32" cy="32" r="18"/>
-                        <path d="M20 32 L44 32 M32 20 L32 44"/>
-                    </svg>
-                    Cancelación de Cita
-                </h3>
-                <p class="od-sub" style="margin:0 0 16px 0;">Indica la causa para mantener la trazabilidad clínica.</p>
-            </div>
-            <form th:action="@{/citas/cancelar}" method="post" class="od-field" style="display:flex;flex-direction:column;gap:14px;">
+    <!-- MODAL PARA CANCELAR CITA CON MOTIVO -->
+    <div id="modalCancelar" class="fixed inset-0 bg-slate-900/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200">
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2 mb-2 uppercase tracking-wide">
+                <i class="fa-solid fa-ban text-rose-600"></i> Cancelación de Cita
+            </h3>
+            <p class="text-xs text-slate-500 mb-4 uppercase tracking-wider">Indica la causa por la cual se cancela la cita para mantener la trazabilidad clínica.</p>
+            
+            <form th:action="@{/citas/cancelar}" method="post" class="space-y-4">
                 <input type="hidden" id="idCitaCancelar" name="idCita">
-                <div class="od-field" style="display:flex;flex-direction:column;gap:6px;">
-                    <label class="od-label" for="motivoCancelacion">Motivo de Cancelación *</label>
-                    <textarea name="motivoCancelacion" required minlength="5" rows="3" placeholder="Ej. Tutor avisó por emergencia familiar, paciente indispuesto de salud..."
-                              class="od-textarea od-input"></textarea>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Motivo de Cancelación *</label>
+                    <textarea name="motivoCancelacion" required minlength="5" rows="3"
+                              placeholder="Ej. Tutor avisó por emergencia familiar, paciente indispuesto de salud..."
+                              class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500"></textarea>
                 </div>
-                <div class="od-field" style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;padding-top:14px;border-top:1px solid var(--odc-line);">
-                    <button type="button" onclick="cerrarModalCancelar()" class="od-btn od-outline" th:text="Cerrar">Cerrar</button>
-                    <button type="submit" class="od-btn" style="background:#c84646;color:#ffffff;box-shadow:0 8px 22px -14px rgba(200,70,70,0.7);" th:text="Confirmar Cancelación">Confirmar Cancelación</button>
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="cerrarModalCancelar()" class="group relative inline-flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-slate-200 to-slate-100 hover:from-slate-300 hover:to-slate-200 text-slate-800 shadow-sm transition">Cerrar
+                      <span class="absolute inset-0 rounded-lg bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    </button>
+                    <button type="submit" class="group relative inline-flex items-center gap-1 px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wide border border-white/20 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white shadow-md transition">Confirmar Cancelación
+                      <span class="absolute inset-0 rounded-lg bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="od-footer" style="margin-top:24px;">
-        <div class="od-uppercase" style="font-weight:700;color:var(--odc-text);margin-bottom:4px;">Odontología · Consulta dental integral</div>
-        <div class="od-sub" style="font-size:0.72rem;">dir..@gmail.com · (32) 216 84 XX</div>
-    </footer>
-
+    <!-- Scripts para modales y restricciones de fecha -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const fechaInput = document.getElementById("nuevaFecha");
@@ -371,20 +299,22 @@
             document.getElementById('idCitaReprogramar').value = id;
             document.getElementById('nuevaFecha').value = fecha;
             document.getElementById('nuevaHora').value = hora;
-            document.getElementById('modalReprogramar').style.display = 'flex';
+            document.getElementById('modalReprogramar').classList.remove('hidden');
         }
 
+        // Variantes seguras: leen los datos desde atributos data-* (evitan expresiones
+        // no confiables en th:onclick con objetos LocalDate/LocalTime)
         function abrirModalReprogramarDesde(btn) {
             abrirModalReprogramar(btn.dataset.id, btn.dataset.fecha, btn.dataset.hora);
         }
 
         function cerrarModalReprogramar() {
-            document.getElementById('modalReprogramar').style.display = 'none';
+            document.getElementById('modalReprogramar').classList.add('hidden');
         }
 
         function abrirModalCancelar(id) {
             document.getElementById('idCitaCancelar').value = id;
-            document.getElementById('modalCancelar').style.display = 'flex';
+            document.getElementById('modalCancelar').classList.remove('hidden');
         }
 
         function abrirModalCancelarDesde(btn) {
@@ -392,10 +322,9 @@
         }
 
         function cerrarModalCancelar() {
-            document.getElementById('modalCancelar').style.display = 'none';
+            document.getElementById('modalCancelar').classList.add('hidden');
         }
     </script>
 
 </body>
-</html>
- 
+</html> 

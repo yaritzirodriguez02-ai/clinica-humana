@@ -1,0 +1,6 @@
+# Ginny test notes (manual verification)
+# 1) Router: /entrar/odontologia debe llevar directo al panel odontología, sin branding de otra área.
+# 2) Bienvenida: línea que dice "Odontopediatría" debe estar corregida a "Odontología".
+# 3) Navbar: no debe aparecer texto "Odontopediatría" donde solo corresponde odontología.
+# 4) Vista agenda: sin fondo animado, sin navbar vidrio propia, sin íconos SVG flotantes de odontología.
+# 5) Rol ODONTOPEDIATRA aún existe en DB/seed; la vista usa ese rol donde ya existía.
