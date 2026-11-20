@@ -48,7 +48,7 @@ public class DepuracionService {
     /** Las dos áreas clínicas independientes del sistema. */
     public enum Area {
         ODONTOLOGIA("odontologia", "Odontología (CISO)",
-                List.of("ODONTOLOGIA", "ODONTOPEDIATRIA")),
+                List.of("ODONTOLOGIA")),
         PEDIATRIA("pediatria", "Pediatría",
                 List.of("PEDIATRIA"));
 
@@ -235,13 +235,13 @@ public class DepuracionService {
             for (InformeOdontologico i : informes) {
                 pacientesDelArea.putIfAbsent(i.getPaciente().getIdPaciente(), i.getPaciente());
             }
-        for (CarnetCitas c : carnets) {
-            pacientesDelArea.putIfAbsent(c.getPaciente().getIdPaciente(), c.getPaciente());
-        }
-        // Pacientes dados de alta en el área aunque todavía no tengan registros clínicos
-        for (Paciente p : pacienteRepo.findByArea(areaClinica(area))) {
-            pacientesDelArea.putIfAbsent(p.getIdPaciente(), p);
-        }
+            for (CarnetCitas c : carnets) {
+                pacientesDelArea.putIfAbsent(c.getPaciente().getIdPaciente(), c.getPaciente());
+            }
+            // Pacientes dados de alta en el área aunque todavía no tengan registros clínicos
+            for (Paciente p : pacienteRepo.findByArea(areaClinica(area))) {
+                pacientesDelArea.putIfAbsent(p.getIdPaciente(), p);
+            }
         }
 
         // Los compartidos se calculan ANTES de borrar: si el paciente también tiene

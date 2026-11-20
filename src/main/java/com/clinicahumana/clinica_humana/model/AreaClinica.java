@@ -34,7 +34,7 @@ public enum AreaClinica {
             return null;
         }
         return switch (rol.trim().toUpperCase()) {
-            case "ODONTOPEDIATRA", "ODONTOLOGIA", "RECEPCIONISTA" -> ODONTOLOGIA;
+            case "ODONTOLOGIA", "RECEPCIONISTA" -> ODONTOLOGIA;
             case "PEDIATRA" -> PEDIATRIA;
             default -> null;
         };
@@ -49,7 +49,7 @@ public enum AreaClinica {
         if ("PEDIATRIA".equals(esp)) {
             return PEDIATRIA;
         }
-        if ("ODONTOLOGIA".equals(esp) || "ODONTOPEDIATRIA".equals(esp)) {
+        if ("ODONTOLOGIA".equals(esp)) {
             return ODONTOLOGIA;
         }
         return null;

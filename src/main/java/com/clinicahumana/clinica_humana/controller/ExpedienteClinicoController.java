@@ -156,9 +156,9 @@ public class ExpedienteClinicoController {
         return "redirect:/pacientes/expediente/" + exp.getPaciente().getIdPaciente();
     }
 
-    // ===================== ODONTOPEDIATRÍA =====================
+    // ===================== ODONTOLOGÍA =====================
 
-    @PostMapping("/odontopediatria/expediente/guardar")
+    @PostMapping("/odontologia/expediente/guardar")
     public String guardarExpedienteOdontopediatrico(@Valid @ModelAttribute("expediente") ExpedienteOdontopediatrico expediente,
                                                    BindingResult result,
                                                    @RequestParam(name = "idCita", required = false) Long idCita,
@@ -196,11 +196,11 @@ public class ExpedienteClinicoController {
         expediente.setMedico(cita.getMedico());
 
         clinicoService.guardarExpedienteOdontopediatricoDesdeCrud(expediente, cita);
-        redirectAttributes.addFlashAttribute("mensajeExito", "Atención odontopediátrica registrada exitosamente.");
+        redirectAttributes.addFlashAttribute("mensajeExito", "Atención odontológica registrada exitosamente.");
         return "redirect:/pacientes/expediente/" + cita.getPaciente().getIdPaciente();
     }
 
-    @GetMapping("/odontopediatria/expediente/editar/{idExpediente}")
+    @GetMapping("/odontologia/expediente/editar/{idExpediente}")
     public String formularioEditarExpedienteOdontopediatrico(@PathVariable Long idExpediente,
                                                              @RequestParam(name = "idPaciente", required = false) Long idPaciente,
                                                              Principal principal,
@@ -213,28 +213,28 @@ public class ExpedienteClinicoController {
         }
 
         ExpedienteOdontopediatrico exp = expOpt.get();
-        Usuario medico = obtenerMedicoAsignado(principal, "ODONTOPEDIATRA");
+        Usuario medico = obtenerMedicoAsignado(principal, "ODONTOLOGIA");
         if (medico == null || !medico.getIdUsuario().equals(exp.getMedico().getIdUsuario())) {
             redirectAttributes.addFlashAttribute("mensajeError", "No tienes permiso para editar esta atención.");
             return "redirect:/pacientes";
         }
 
         model.addAttribute("expediente", exp);
-        model.addAttribute("tituloFormulario", "Editar Atención Odontopediátrica");
+        model.addAttribute("tituloFormulario", "Editar Atención Odontológica");
 
-        model.addAttribute("urlAction", "/consultas/odontopediatria/expediente/actualizar");
+        model.addAttribute("urlAction", "/consultas/odontologia/expediente/actualizar");
         model.addAttribute("linkVolver", "/pacientes/expediente/" + exp.getPaciente().getIdPaciente());
         return "consultas/expediente_odontopediatrico_form";
     }
 
-    @PostMapping("/odontopediatria/expediente/actualizar")
+    @PostMapping("/odontologia/expediente/actualizar")
     public String actualizarExpedienteOdontopediatrico(@Valid @ModelAttribute("expediente") ExpedienteOdontopediatrico expediente,
                                                       BindingResult result,
                                                       Model model,
                                                       RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            model.addAttribute("tituloFormulario", "Editar Atención Odontopediátrica");
-            model.addAttribute("urlAction", "/consultas/odontopediatria/expediente/actualizar");
+            model.addAttribute("tituloFormulario", "Editar Atención Odontológica");
+            model.addAttribute("urlAction", "/consultas/odontologia/expediente/actualizar");
             model.addAttribute("linkVolver", expediente.getPaciente() != null && expediente.getPaciente().getIdPaciente() != null
                     ? "/pacientes/expediente/" + expediente.getPaciente().getIdPaciente() : "/pacientes");
             return "consultas/expediente_odontopediatrico_form";
@@ -254,11 +254,11 @@ public class ExpedienteClinicoController {
         existente.setCostoTratamiento(expediente.getCostoTratamiento());
 
         clinicoService.actualizarExpedienteOdontopediatrico(existente);
-        redirectAttributes.addFlashAttribute("mensajeExito", "Atención odontopediátrica actualizada exitosamente.");
+        redirectAttributes.addFlashAttribute("mensajeExito", "Atención odontológica actualizada exitosamente.");
         return "redirect:/pacientes/expediente/" + existente.getPaciente().getIdPaciente();
     }
 
-    @PostMapping("/odontopediatria/expediente/eliminar/{idExpediente}")
+    @PostMapping("/odontologia/expediente/eliminar/{idExpediente}")
     public String eliminarExpedienteOdontopediatrico(@PathVariable Long idExpediente,
                                                     @RequestParam(name = "idPaciente", required = false) Long idPaciente,
                                                     Principal principal,
@@ -270,14 +270,14 @@ public class ExpedienteClinicoController {
         }
 
         ExpedienteOdontopediatrico exp = expOpt.get();
-        Usuario medico = obtenerMedicoAsignado(principal, "ODONTOPEDIATRA");
+        Usuario medico = obtenerMedicoAsignado(principal, "ODONTOLOGIA");
         if (medico == null || !medico.getIdUsuario().equals(exp.getMedico().getIdUsuario())) {
             redirectAttributes.addFlashAttribute("mensajeError", "No tienes permiso para eliminar esta atención.");
             return "redirect:/pacientes";
         }
 
         clinicoService.eliminarExpedienteOdontopediatrico(idExpediente);
-        redirectAttributes.addFlashAttribute("mensajeExito", "Atención odontopediátrica eliminada del historial.");
+        redirectAttributes.addFlashAttribute("mensajeExito", "Atención odontológica eliminada del historial.");
         return "redirect:/pacientes/expediente/" + exp.getPaciente().getIdPaciente();
     }
 

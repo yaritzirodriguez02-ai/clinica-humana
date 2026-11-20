@@ -36,7 +36,7 @@ public class Usuario {
 
     @NotBlank(message = "El rol es obligatorio")
     @Column(name = "rol", nullable = false, length = 30)
-    private String rol; // 'ADMIN', 'PEDIATRA', 'ODONTOPEDIATRA', 'RECEPCIONISTA'
+    private String rol; // 'ADMIN', 'PEDIATRA', 'ODONTOLOGIA', 'RECEPCIONISTA'
 
     @Column(name = "activo")
     private Boolean activo = true;

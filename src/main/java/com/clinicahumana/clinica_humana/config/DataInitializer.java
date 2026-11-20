@@ -23,18 +23,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Siembra las cuentas iniciales del sistema en una base de datos limpia de MySQL.
- * Se ejecuta al arrancar la aplicación y solo crea usuarios que todavía no existen
- * (idempotente: no duplica ni sobreescribe cuentas existentes).
- *
- * Las contraseñas se guardan codificadas con el PasswordEncoder de la aplicación
- * (DelegatingPasswordEncoder, que usa BCrypt internamente y produce hashes {bcrypt}...).
- *
- * IMPORTANTE: en producción debe cambiarse la contraseña tras el primer acceso.
- */
-@Component
-public class DataInitializer implements CommandLineRunner {
+/**     * Siembra las cuentas iniciales del sistema en una base de datos limpia de MySQL.
+     * Se ejecuta al arrancar la aplicación y solo crea usuarios que todavía no existen.
+     * (idempotente: no duplica ni sobreescribe cuentas existentes).
+     *
+     * Las contraseñas se guardan codificadas con el PasswordEncoder de la aplicación.
+     * (DelegatingPasswordEncoder, que usa BCrypt internamente y produce hashes {bcrypt}...).
+     *
+     * IMPORTANTE: en producción debe cambiarse la contraseña tras el primer acceso.
+     */
+    @Component
+    public class DataInitializer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
 
@@ -42,8 +41,8 @@ public class DataInitializer implements CommandLineRunner {
     private static final String CLAVE_DEMO = "123456";
 
     /**
-     * Nombre oficial de la especialista odontopediatra que debe aparecer siempre
-     * con la titulación completa en el panel de la doctora y en toda la comunicación del módulo CISO.
+     * Nombre oficial de la odontóloga / CISO que debe aparecer siempre
+     * con la titulación completa en el panel de la doctora y en toda la comunicación del módulo dental.
      */
     public static final String NOMBRE_OFICIAL_DRA_GONZALEZ_HERRERA =
             "DRA. GLORIA GONZÁLEZ HERRERA - CIRUJANA DENTISTA";
@@ -85,24 +84,24 @@ public class DataInitializer implements CommandLineRunner {
         // 1. Administrador general (panel, personal, reportes)
         crearUsuarioSiNoExiste("admin", "Administrador General", "ADMIN", CLAVE_ADMIN);
 
-        // 2. Recepción y caja (cobros y agenda de odontopediatría)
+        // 2. Recepción y caja (cobros y agenda de odontología)
         crearUsuarioSiNoExiste("recepcion", "Recepción y Caja", "RECEPCIONISTA", CLAVE_DEMO);
 
         // 3. Médicas pediatras
         crearUsuarioSiNoExiste("pilar.rios", "Dra. Pilar Ríos", "PEDIATRA", CLAVE_DEMO);
         crearUsuarioSiNoExiste("laura.mendez", "Dra. Laura Méndez", "PEDIATRA", CLAVE_DEMO);
 
-        // 4. Médicas odontopediatras
-        crearUsuarioSiNoExiste("gloria.gonzalez", NOMBRE_OFICIAL_DRA_GONZALEZ_HERRERA, "ODONTOPEDIATRA", CLAVE_DEMO);
-        crearUsuarioSiNoExiste("sofia.castro", "Dra. Sofía Castro", "ODONTOPEDIATRA", CLAVE_DEMO);
+        // 4. Odontólogas / CISO
+        crearUsuarioSiNoExiste("gloria.gonzalez", NOMBRE_OFICIAL_DRA_GONZALEZ_HERRERA, "ODONTOLOGIA", CLAVE_DEMO);
+        crearUsuarioSiNoExiste("sofia.castro", "Dra. Sofía Castro", "ODONTOLOGIA", CLAVE_DEMO);
 
         log.info("=== Usuarios iniciales listos | admin: '{}' | cuentas demo: '{}' ===",
                 CLAVE_ADMIN, CLAVE_DEMO);
 
-        // Catálogo base de medicamentos (Vademécum interno)
+        // Catálogo base de medicamentos (Vademécum interno).
         sembrarMedicamentos();
 
-        // Separación de pacientes y tutores por área clínica
+        // Separación de pacientes y tutores por área clínica (odontología / pediatría).
         migrarAreasClinicas();
 
         // WhatsApp de contacto de las especialistas (editable después en /empleados)
@@ -133,12 +132,12 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     /**
-     * Deja lista la separación de paneles (odontología / pediatría) sobre una base ya existente:
+     * Deja lista la separación de paneles odontología y pediatría sobre una base ya existente:
      *
      * 1. La CURP era única en todo el sistema; ahora es única dentro de cada área, porque una misma
      *    persona puede registrarse por separado en odontología y en pediatría.
      * 2. A los pacientes y tutores anteriores se les asigna el área que corresponde a su historial
-     *    (pediatría sólo si su historial es exclusivamente pediátrico; en cualquier otro caso, dental).
+     *    (pediatría solo si su historial es exclusivamente pediátrico; en cualquier otro caso, dental).
      *
      * Es idempotente: si ya está todo migrado no hace nada.
      */
@@ -166,6 +165,15 @@ public class DataInitializer implements CommandLineRunner {
                         log.info("Índice único global de CURP '{}' eliminado: ahora es único por área.", indice);
                     }
                 }
+                break;
+            }
+                }
+                for (String indice : indices) {
+                    if (!"uk_paciente_curp_area".equalsIgnoreCase(indice)) {
+                        jdbcTemplate.execute("ALTER TABLE pacientes DROP INDEX `" + indice + "`");
+                        log.info("Índice único global de CURP '{}' eliminado: ahora es único por área.", indice);
+                    }
+                }
             }
         } catch (Exception e) {
             log.warn("No se pudo ajustar el índice único de CURP por área: {}", e.getMessage());
@@ -185,7 +193,7 @@ public class DataInitializer implements CommandLineRunner {
             Long id = paciente.getIdPaciente();
             boolean soloPediatria = citaRepo.existsByPacienteIdPacienteAndEspecialidadIn(id, List.of("PEDIATRIA"))
                     && !citaRepo.existsByPacienteIdPacienteAndEspecialidadIn(id,
-                            List.of("ODONTOLOGIA", "ODONTOPEDIATRIA"));
+                            List.of("ODONTOLOGIA"));
             AreaClinica area = soloPediatria ? AreaClinica.PEDIATRIA : AreaClinica.ODONTOLOGIA;
 
             paciente.setArea(area);
@@ -214,14 +222,16 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     /**
-     * Siembra el catálogo inicial de fármacos (Pediatría, Odontopediatría y uso general).
-     * Idempotente: omite fármacos cuyo nombre comercial ya existe.
+     * Siembra el catálogo inicial de medicamentos (pediatría, odontología y uso general).
+     * Es idempotente: omite fármacos cuyo nombre comercial ya existe.
      * Se puede ampliar desde el módulo /medicamentos o importando el Excel de la clínica.
      */
     private void sembrarMedicamentos() {
         // {nombreComercial, sustanciaActiva, presentacion, concentracion, categoria}
         String[][] catalogo = {
-            // De uso general (ambas especialidades)
+            // De uso general (ambas áreas)
+            // De uso general (ambas áreas)
+            // De uso general (ambas áreas)
             {"Paracetamol", "Paracetamol", "Solución oral", "120 mg/5 ml", "GENERAL"},
             {"Ibuprofeno", "Ibuprofeno", "Suspensión oral", "100 mg/5 ml", "GENERAL"},
             // Pediatría
@@ -234,7 +244,7 @@ public class DataInitializer implements CommandLineRunner {
             {"Nistatina", "Nistatina", "Suspensión oral", "100,000 UI/ml", "PEDIATRIA"},
             {"Salbutamol", "Salbutamol", "Solución para inhalación", "5 mg/ml", "PEDIATRIA"},
             {"SRO (Suero Oral)", "Sales de rehidratación oral", "Polvo para solución", "26.4 g/L", "PEDIATRIA"},
-            // Odontopediatría
+            // Odontología / CISO
             {"Lidocaína 2%", "Lidocaína con epinefrina", "Solución inyectable", "2% (1:80,000)", "ODONTOLOGIA"},
             {"Clorexidina 0.12%", "Clorexidina digluconato", "Enjuague bucal", "0.12%", "ODONTOLOGIA"},
             {"Flúor barniz", "Flúoruro de sodio", "Barniz tópico", "5%", "ODONTOLOGIA"},

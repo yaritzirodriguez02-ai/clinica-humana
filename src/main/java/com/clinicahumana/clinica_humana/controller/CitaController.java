@@ -101,9 +101,9 @@ public class CitaController {
         if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
             cita.setEspecialidad("ODONTOLOGIA");
             medicosPermitidos = usuarioService.listarTodos().stream()
-                    .filter(u -> "ODONTOPEDIATRA".equals(u.getRol()))
+                    .filter(u -> "ODONTOLOGIA".equals(u.getRol()))
                     .toList();
-            if ("ODONTOPEDIATRA".equals(rol)) {
+            if ("ODONTOLOGIA".equals(rol)) {
                 cita.setMedico(usuarioConectado);
             }
         }
@@ -118,7 +118,7 @@ public class CitaController {
         // ADMIN: Ambas especialidades disponibles
         else {
             medicosPermitidos = usuarioService.listarTodos().stream()
-                    .filter(u -> "PEDIATRA".equals(u.getRol()) || "ODONTOPEDIATRA".equals(u.getRol()))
+                    .filter(u -> "PEDIATRA".equals(u.getRol()) || "ODONTOLOGIA".equals(u.getRol()))
                     .toList();
         }
 
@@ -146,7 +146,7 @@ public class CitaController {
         String rol = usuarioConectado != null ? usuarioConectado.getRol() : "";
 
         // Asignación de seguridad según el rol
-        if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
+        if ("RECEPCIONISTA".equals(rol) || "ODONTOLOGIA".equals(rol)) {
             cita.setEspecialidad("ODONTOLOGIA");
             if (cita.getMedico() == null || cita.getMedico().getIdUsuario() == null) {
                 cita.setMedico(usuarioConectado);
@@ -164,9 +164,9 @@ public class CitaController {
             model.addAttribute("pacientes", pacienteService.listarPorArea(areaPacientes));
             model.addAttribute("esAdmin", areaPacientes == null);
             List<Usuario> medicos;
-            if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
+            if ("RECEPCIONISTA".equals(rol) || "ODONTOLOGIA".equals(rol)) {
                 medicos = usuarioService.listarTodos().stream()
-                        .filter(u -> "ODONTOPEDIATRA".equals(u.getRol()))
+                        .filter(u -> "ODONTOLOGIA".equals(u.getRol()))
                         .toList();
             } else if ("PEDIATRA".equals(rol)) {
                 medicos = usuarioService.listarTodos().stream()
@@ -174,7 +174,7 @@ public class CitaController {
                         .toList();
             } else {
                 medicos = usuarioService.listarTodos().stream()
-                        .filter(u -> "PEDIATRA".equals(u.getRol()) || "ODONTOPEDIATRA".equals(u.getRol()))
+                        .filter(u -> "PEDIATRA".equals(u.getRol()) || "ODONTOLOGIA".equals(u.getRol()))
                         .toList();
             }
             model.addAttribute("medicos", medicos);

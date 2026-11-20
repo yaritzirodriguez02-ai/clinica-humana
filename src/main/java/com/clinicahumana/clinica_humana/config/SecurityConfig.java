@@ -41,45 +41,44 @@ public class SecurityConfig {
                 // Portal Público de Citas para Tutores (agendamiento en línea SIN sesión):
                 // incluye /public/agendar-cita y sus endpoints JSON de médicos y horarios ocupados
                 .requestMatchers("/public/**").permitAll()
-                
                 // Panel de administración y gestión de personal: EXCLUSIVO de ADMIN
                 .requestMatchers("/admin/**", "/empleados/**").hasRole("ADMIN")
 
                 // Módulo CU01 (Pacientes y Tutores): Acceso para todos los roles autorizados
-                .requestMatchers("/pacientes/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOPEDIATRA")
+                .requestMatchers("/pacientes/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOLOGIA")
                 
                 // Módulo CU02 (Citas / Agenda): Acceso por rol, sin cruce entre paneles clínicos
-                .requestMatchers("/citas/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "RECEPCIONISTA", "ADMIN")
+                .requestMatchers("/citas/**").hasAnyRole("PEDIATRA", "ODONTOLOGIA", "RECEPCIONISTA", "ADMIN")
                 
                 // Módulo CU03 (Consulta Pediátrica): Pediatra y Admin
                 .requestMatchers("/consultas/pediatria/**").hasAnyRole("PEDIATRA", "ADMIN")
                 
-                // Módulo CU04 (Consulta Odontopediátrica): Odontopediatra y Admin
-                .requestMatchers("/consultas/odontopediatria/**").hasAnyRole("ODONTOPEDIATRA", "ADMIN")
+                // Módulo CU04 (Consulta Odontológica): Odontóloga/CISO y Admin
+                .requestMatchers("/consultas/odontologia/**").hasAnyRole("ODONTOLOGIA", "ADMIN")
                 
                 // Apertura de expediente desde la agenda (/consultas/atender/{id}): solo personal médico
-                .requestMatchers("/consultas/atender/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
+                .requestMatchers("/consultas/atender/**").hasAnyRole("PEDIATRA", "ODONTOLOGIA", "ADMIN")
 
                 // Recetas médicas: solo personal médico (Recepción no emite recetas)
-                .requestMatchers("/recetas/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
+                .requestMatchers("/recetas/**").hasAnyRole("PEDIATRA", "ODONTOLOGIA", "ADMIN")
 
-                // Informes en hoja membretada de CISO: la odontóloga los redacta,
+                // Informes en hoja membretada de CISO: la odontóloga/CISO los redacta,
                 // recepción los consulta/imprime y el administrador tiene acceso total
-                .requestMatchers("/informes/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "ADMIN")
+                .requestMatchers("/informes/**").hasAnyRole("ODONTOLOGIA", "RECEPCIONISTA", "ADMIN")
 
-                // Carnet de citas del consultorio (CISO): lo imprime la odontóloga,
+                // Carnet de citas del consultorio (CISO): lo imprime la odontóloga/CISO,
                 // recepción y el administrador también pueden reimprimirlo
-                .requestMatchers("/carnets/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "ADMIN")
+                .requestMatchers("/carnets/**").hasAnyRole("ODONTOLOGIA", "RECEPCIONISTA", "ADMIN")
 
-                // Limpieza de registros por área: odontología y recepción comparten el
+                // Limpieza de registros por área: odontología/CISO y recepción comparten el
                 // área dental, pediatría administra la suya y el admin controla ambas
-                .requestMatchers("/registros/**").hasAnyRole("ODONTOLOGIA", "ODONTOPEDIATRA", "RECEPCIONISTA", "PEDIATRA", "ADMIN")
+                .requestMatchers("/registros/**").hasAnyRole("ODONTOLOGIA", "RECEPCIONISTA", "PEDIATRA", "ADMIN")
 
                 // Catálogo de medicamentos (Vademécum interno): personal médico y admin
-                .requestMatchers("/medicamentos/**").hasAnyRole("PEDIATRA", "ODONTOPEDIATRA", "ADMIN")
+                .requestMatchers("/medicamentos/**").hasAnyRole("PEDIATRA", "ODONTOLOGIA", "ADMIN")
 
                 // Módulo CU06 (Cobros, Caja y Corte): RECEPCIÓN, ADMIN y MÉDICOS
-                .requestMatchers("/pagos/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOPEDIATRA")
+                .requestMatchers("/pagos/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOLOGIA")
                 
                 // El resto de rutas requiere sesión iniciada
                 .anyRequest().authenticated()

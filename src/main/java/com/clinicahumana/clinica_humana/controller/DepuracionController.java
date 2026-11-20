@@ -203,7 +203,7 @@ public class DepuracionController {
         if ("PEDIATRA".equals(rol)) {
             return List.of(Area.PEDIATRIA);
         }
-        if ("ODONTOPEDIATRA".equals(rol) || "ODONTOLOGIA".equals(rol) || "RECEPCIONISTA".equals(rol)) {
+        if ("ODONTOLOGIA".equals(rol) || "RECEPCIONISTA".equals(rol)) {
             return List.of(Area.ODONTOLOGIA);
         }
         return List.of();

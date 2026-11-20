@@ -21,7 +21,8 @@ import java.util.List;
 /**
  * CRUD completo de Personal/Colaboradores (CREAR, LISTAR, EDITAR, ELIMINAR/DAR DE BAJA).
  * Todas las rutas (/empleados/**) están reservadas EXCLUSIVAMENTE al rol ADMIN en SecurityConfig.
- */
+ *
+ * Roles válidos para nuevas cuentas: ADMIN, PEDIATRA, ODONTOLOGIA, RECEPCIONISTA.
 @Controller
 @RequestMapping("/empleados")
 public class EmpleadoController {

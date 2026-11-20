@@ -79,7 +79,7 @@ public class ConsultaController {
             exp.setMedico(cita.getMedico());
             model.addAttribute("expediente", exp);
             model.addAttribute("historial", clinicoService.obtenerHistorialOdontopediatrico(cita.getPaciente().getIdPaciente()));
-            return "consultas/consulta_odontopediatrica";
+            return "consultas/consulta_odontologia";
         }
     }
 
@@ -119,8 +119,8 @@ public class ConsultaController {
     }
 
     // Guardar Consulta Odontopediátrica (CU04)
-    @PostMapping("/odontopediatria/guardar")
-    public String guardarConsultaOdontopediatrica(@Valid @ModelAttribute("expediente") ExpedienteOdontopediatrico expediente,
+    @PostMapping("/odontologia/guardar")
+    public String guardarConsultaOdontologia(@Valid @ModelAttribute("expediente") ExpedienteOdontopediatrico expediente,
                                                  BindingResult result,
                                                  @RequestParam(name = "firmaFisica", required = false) String firmaFisica,
                                                  Model model,
@@ -145,11 +145,11 @@ public class ConsultaController {
             model.addAttribute("erroresValidacion", result.getAllErrors().stream()
                     .map(e -> e.getDefaultMessage()).toList());
             model.addAttribute("historial", clinicoService.obtenerHistorialOdontopediatrico(expediente.getPaciente().getIdPaciente()));
-            return "consultas/consulta_odontopediatrica";
+            return "consultas/consulta_odontologia";
         }
 
         clinicoService.guardarConsultaOdontopediatrica(expediente);
-        redirectAttributes.addFlashAttribute("mensajeExito", "Consulta odontopediátrica registrada con éxito.");
+        redirectAttributes.addFlashAttribute("mensajeExito", "Consulta odontológica registrada con éxito.");
         return "redirect:/citas";
     }
 }

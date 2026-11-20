@@ -209,9 +209,8 @@ public String imprimirReceta(@PathVariable("idReceta") Long idReceta, Model mode
                     model.addAttribute("talla", exp.getTalla());
                     model.addAttribute("temperatura", exp.getTemperatura());
                 });
-        return "recetas/receta_pediatrica_print";
-    } else {
-        return "recetas/receta_odontopediatrica_print";
-    }
+        return "recetas/receta_pediatrica_print";        } else {
+            return "recetas/receta_odontopediatrica_print";
+        }
 }
 }

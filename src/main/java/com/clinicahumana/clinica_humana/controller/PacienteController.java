@@ -114,13 +114,13 @@ public class PacienteController {
         }
 
         boolean esPediatra = "PEDIATRA".equals(rol);
-        boolean esOdontopediatra = "ODONTOPEDIATRA".equals(rol);
+        boolean esOdontologa = "ODONTOLOGIA".equals(rol);
         boolean esRecepcionista = "RECEPCIONISTA".equals(rol);
 
         model.addAttribute("rolUsuario", rol);
         model.addAttribute("esAdmin", esAdmin);
         model.addAttribute("esPediatra", esPediatra);
-        model.addAttribute("esOdontopediatra", esOdontopediatra);
+        model.addAttribute("esOdontologa", esOdontologa);
         model.addAttribute("esRecepcionista", esRecepcionista);
         model.addAttribute("idPaciente", idPaciente);
 
@@ -130,7 +130,7 @@ public class PacienteController {
         if (esPediatra) {
             historiaPediatrica = clinicoService.obtenerHistorialPediatricoPorMedico(idPaciente, usuarioActual.getIdUsuario());
             historiaOdontopediatrica = List.of();
-        } else if (esOdontopediatra || esRecepcionista) {
+        } else if (esOdontologa || esRecepcionista) {
             historiaPediatrica = List.of();
             historiaOdontopediatrica = clinicoService.obtenerHistorialOdontopediatricoPorMedico(idPaciente, usuarioActual.getIdUsuario());
         } else {

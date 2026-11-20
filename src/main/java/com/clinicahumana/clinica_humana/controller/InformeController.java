@@ -288,15 +288,14 @@ public class InformeController {
                 ? usuarioService.buscarPorUsername(principal.getName()).orElse(null)
                 : null;
 
-        if (actual != null && ("ODONTOPEDIATRA".equals(actual.getRol())
-                || "ODONTOLOGIA".equals(actual.getRol())
+        if (actual != null && ("ODONTOLOGIA".equals(actual.getRol())
                 || "PEDIATRA".equals(actual.getRol()))) {
             return actual;
         }
 
         Usuario titular = usuarioRepo.findAll().stream()
                 .filter(u -> Boolean.TRUE.equals(u.getActivo()))
-                .filter(u -> "ODONTOPEDIATRA".equals(u.getRol()) || "ODONTOLOGIA".equals(u.getRol()))
+                .filter(u -> "ODONTOLOGIA".equals(u.getRol()))
                 .findFirst()
                 .orElse(null);
 

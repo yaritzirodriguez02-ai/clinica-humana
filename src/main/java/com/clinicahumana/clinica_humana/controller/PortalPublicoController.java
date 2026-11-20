@@ -81,7 +81,7 @@ public class PortalPublicoController {
     @ResponseBody
     public List<Map<String, Object>> medicosPorEspecialidad(@RequestParam("especialidad") String especialidad) {
         String rol = "PEDIATRIA".equalsIgnoreCase(especialidad) ? "PEDIATRA"
-                : "ODONTOLOGIA".equalsIgnoreCase(especialidad) ? "ODONTOPEDIATRA" : "";
+                : "ODONTOLOGIA".equalsIgnoreCase(especialidad) ? "ODONTOLOGIA" : "";
 
         if (rol.isEmpty()) {
             return List.of();
@@ -212,7 +212,7 @@ public class PortalPublicoController {
             return error(redirectAttributes, "Debe seleccionar una especialidad válida (Pediatría u Odontología).");
         }
 
-        String rolEsperado = "PEDIATRIA".equals(espNorm) ? "PEDIATRA" : "ODONTOPEDIATRA";
+        String rolEsperado = "PEDIATRIA".equals(espNorm) ? "PEDIATRA" : "ODONTOLOGIA";
         Usuario medico = usuarioService.buscarPorId(idMedico == null ? -1L : idMedico).orElse(null);
         if (medico == null || !rolEsperado.equals(medico.getRol()) || !Boolean.TRUE.equals(medico.getActivo())) {
             return error(redirectAttributes, "El médico seleccionado no está disponible para la especialidad elegida. Vuelva a elegirlo.");
