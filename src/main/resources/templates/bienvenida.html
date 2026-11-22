@@ -3,102 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clinica Humana — Bienvenida</title>
-    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css">
+    <title>Clínica Humana</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; min-height: 100vh; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; background: #0b1424; position: relative; overflow-x: hidden; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
 
-        .fachada { position: fixed; inset: 0; z-index: 0; background:
-            repeating-linear-gradient(90deg, rgba(225,228,235,0.06) 0px, rgba(225,228,235,0.10) 2px, transparent 2px, transparent 40px),
-            repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 26px),
-            radial-gradient(120% 70% at 50% 88%, rgba(30,60,45,0.55) 0%, rgba(20,40,32,0.35) 60%, transparent 72%),
-            linear-gradient(180deg, rgba(214,90,55,0.55) 0%, rgba(214,90,55,0.35) 60%, transparent 100%) 0% 0% / 22% 70% no-repeat,
-            linear-gradient(180deg, rgba(180,185,196,0.25) 0%, rgba(120,125,135,0.18) 60%, rgba(70,76,86,0.10) 100%); }
+        /* Ventanas flotando lentamente, cada una con su propio ritmo */
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-10px); }
+        }
+        .flotante       { animation: flotar 9s ease-in-out infinite; }
+        .flotante-lenta { animation: flotar 11s ease-in-out infinite; animation-delay: -3s; }
 
-        .letrero { position: absolute; top: 12%; left: 50%; transform: translateX(-50%); z-index: 1; text-align: center; color: #2f7ffc; text-shadow: 0 2px 0 rgba(12,20,40,0.55), 0 1px 2px rgba(0,0,0,0.4); letter-spacing: 0.02em; user-select: none; }
-        .letrero .cross { display: inline-block; width: 1.1rem; height: 1.1rem; border: 2.5px solid currentColor; border-radius: 2px; vertical-align: middle; margin-right: 0.55rem; position: relative; }
-        .letrero .cross::before, .letrero .cross::after { content: ""; position: absolute; background: currentColor; }
-        .letrero .cross::before { left: 50%; top: 0; bottom: 0; width: 2.5px; transform: translateX(-50%); }
-        .letrero .cross::after { top: 50%; left: 0; right: 0; height: 2.5px; transform: translateY(-50%); }
-        .letrero .cruz { font-size: 3.6rem; line-height: 1; font-weight: 700; font-family: Georgia, serif; opacity: 0.95; }
-        .letrero .nombre { display: block; font-size: 4.2rem; font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 0.1rem; }
-        .letrero .nombre b { font-weight: 700; }
+        /* Zoom muy lento sobre la foto de la clínica */
+        @keyframes acercar {
+            from { transform: scale(1.04); }
+            to   { transform: scale(1.12); }
+        }
+        #fotoClinica {
+            animation: acercar 28s ease-in-out infinite alternate;
+            transition: background-image .6s ease;
+        }
 
-        .burbujas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
-        .burbuja { position: absolute; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(255,255,255,0.15) 70%, rgba(255,255,255,0.05)); box-shadow: inset 0 -4px 10px rgba(0,0,0,0.25), inset 0 4px 14px rgba(255,255,255,0.7), 0 8px 22px rgba(0,0,0,0.35); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #0b1424; font-weight: 700; text-align: center; pointer-events: auto; cursor: pointer; transition: transform 0.25s ease, box-shadow 0.25s ease; will-change: transform; backdrop-filter: blur(1px); text-decoration: none; }
-        .burbuja:hover { transform: scale(1.06); box-shadow: inset 0 -4px 10px rgba(0,0,0,0.25), inset 0 4px 14px rgba(255,255,255,0.85), 0 12px 28px rgba(0,0,0,0.45); }
-        .burbuja .icono { font-size: 2.4rem; line-height: 1; display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
-        .burbuja .label { font-size: 0.95rem; letter-spacing: 0.04em; margin-top: 0.4rem; text-transform: uppercase; display: block; font-weight: 600; text-shadow: 0 1px 2px rgba(255,255,255,0.55); }
+        /* Aparición escalonada */
+        @keyframes aparecer {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .aparece   { animation: aparecer .8s cubic-bezier(.22,1,.36,1) both; }
+        .aparece-1 { animation-delay: .1s; }
+        .aparece-2 { animation-delay: .25s; }
+        .aparece-3 { animation-delay: .4s; }
 
-        .burbuja-odontologia { width: 150px; height: 150px; left: 10%; top: 44%; background: radial-gradient(circle at 35% 30%, #7fe0ff, #1b8fe0 70%, #0b5bb0); color: #04233a; }
-        .burbuja-odontologia .icono::before { content: "🦷"; }
-        .burbuja-pediatria { width: 150px; height: 150px; right: 12%; top: 36%; background: radial-gradient(circle at 35% 30%, #ffd9a8, #ff9d4d 70%, #d8631a); color: #3a1605; }
-        .burbuja-pediatria .icono::before { content: "🩺"; }
-        .burbuja-recepcion { width: 170px; height: 170px; left: 50%; top: 60%; transform: translateX(-50%); background: radial-gradient(circle at 35% 30%, #e8eef7, #a9c0dc 70%, #5f7fa0); color: #0b1726; box-shadow: inset 0 -4px 10px rgba(0,0,0,0.25), inset 0 4px 14px rgba(255,255,255,0.7), 0 8px 22px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,255,255,0.15); }
-        .burbuja-recepcion:hover { transform: translateX(-50%) scale(1.06); }
-        .burbuja-recepcion .icono::before { content: "🏥"; font-size: 2.6rem; }
-        .burbuja-recepcion .label { font-size: 1.05rem; }
-
-        .sub { position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 2; color: rgba(255,255,255,0.75); font-size: 0.95rem; letter-spacing: 0.06em; text-shadow: 0 1px 3px rgba(0,0,0,0.55); text-align: center; white-space: nowrap; }
-
-        .odontograma { position: absolute; right: 22px; bottom: 22px; z-index: 2; background: rgba(10,18,30,0.7); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.4); }
-        .odontograma .titulo { color: rgba(255,255,255,0.85); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
-        .odontograma .dientes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; width: 104px; }
-        .diente { aspect-ratio: 1 / 1.15; border-radius: 4px 4px 6px 6px; background: linear-gradient(180deg, #f0e6cf 0%, #d8c29e 100%); box-shadow: inset 0 -2px 4px rgba(0,0,0,0.18), inset 0 2px 3px rgba(255,255,255,0.6); border: 1px solid rgba(120,90,55,0.4); transition: transform 0.2s ease, background 0.2s ease; cursor: pointer; }
-        .diente.activo { background: linear-gradient(180deg, #bfe3ff 0%, #7fc3e8 100%); box-shadow: inset 0 -2px 4px rgba(0,0,0,0.15), inset 0 2px 3px rgba(255,255,255,0.7), 0 0 0 2px #3a8fd4; }
-        .diente:hover { transform: translateY(-3px); background: linear-gradient(180deg, #cfe6ff 0%, #8fc9f0 100%); }
-        .diente.activo:hover { background: linear-gradient(180deg, #d6f0ff 0%, #9fd3f2 100%); }
-        .odontograma .admin-link { color: #9fd3f2; font-size: 0.62rem; letter-spacing: 0.08em; text-decoration: none; text-transform: uppercase; font-weight: 600; text-align: center; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 6px; width: 100%; transition: color 0.2s ease, background 0.2s ease; border-radius: 4px; cursor: pointer; }
-        .odontograma .admin-link:hover { color: #ffffff; background: rgba(255,255,255,0.08); }
-
-        @media (max-width: 640px) {
-            .letrero .nombre { font-size: 2.6rem; }
-            .letrero .cruz { font-size: 2.4rem; }
-            .burbuja-odontologia, .burbuja-pediatria { width: 110px; height: 110px; }
-            .burbuja-odontologia .icono, .burbuja-pediatria .icono { font-size: 1.8rem; }
-            .burbuja-recepcion { width: 120px; height: 120px; }
-            .burbuja-recepcion .icono { font-size: 2rem; }
-            .sub { font-size: 0.8rem; bottom: 80px; }
-            .odontograma { right: 12px; bottom: 12px; padding: 10px 10px; }
-            .odontograma .dientes { width: 80px; }
+        @media (prefers-reduced-motion: reduce) {
+            .flotante, .flotante-lenta, .aparece, #fotoClinica { animation: none !important; }
         }
     </style>
 </head>
-<body>
-    <div class="fachada" aria-hidden="true"></div>
+<body class="min-h-screen bg-slate-900 text-white antialiased">
 
-    <div class="letrero">
-        <span class="cruz"><span class="cross" aria-hidden="true"></span></span>
-        <span class="nombre"><b>Clinic</b>a Humana</span>
+    <!-- FONDO: foto de la clínica + velo para que el texto se lea -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div id="fotoClinica" class="absolute inset-0 bg-cover bg-center" style="background-color: #0f172a;"></div>
+        <div class="absolute inset-0"
+             style="background:
+                radial-gradient(circle at 15% 15%, rgba(56,189,248,.28), transparent 55%),
+                radial-gradient(circle at 85% 25%, rgba(16,185,129,.22), transparent 55%),
+                linear-gradient(180deg, rgba(8,15,32,.93) 0%, rgba(8,15,32,.72) 42%, rgba(8,15,32,.96) 100%);"></div>
+        <div class="absolute inset-0 opacity-[0.05]"
+             style="background-image: linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px); background-size: 46px 46px;"></div>
     </div>
 
-    <div class="burbujas">
-        <a th:href="@{/entrar/ODONTOLOGIA}" class="burbuja burbuja-odontologia" aria-label="Ingresar como odontólogo">
-            <span class="icono" aria-hidden="true"></span>
-            <span class="label">Odontología</span>
-        </a>
-        <a th:href="@{/entrar/PEDIATRIA}" class="burbuja burbuja-pediatria" aria-label="Ingresar como pediatra">
-            <span class="icono" aria-hidden="true"></span>
-            <span class="label">Pediatría</span>
-        </a>
-        <a th:href="@{/entrar/recepcion}" class="burbuja burbuja-recepcion" aria-label="Ingresar como recepcionista">
-            <span class="icono" aria-hidden="true"></span>
-            <span class="label">Recepción · Unida</span>
-        </a>
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-7 flex flex-col min-h-screen">
+
+        <!-- ENCABEZADO -->
+        <header class="flex items-center justify-between gap-4 aparece">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-white shadow-lg shadow-black/30 flex items-center justify-center overflow-hidden ring-1 ring-white/40">
+                    <img src="/img/logo-h.jpg" alt="Clínica Humana" class="w-full h-full object-contain">
+                </div>
+                <p class="text-lg font-extrabold tracking-tight">Clínica Humana</p>
+            </div>
+
+            <a th:href="@{/entrar/administracion}" class="hidden sm:inline-flex items-center gap-2 text-xs font-semibold text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-full px-4 py-2 transition">
+                <i class="fa-solid fa-user-shield"></i> Administración
+            </a>
+        </header>
+
+        <!-- PRESENTACIÓN -->
+        <section class="mt-12 sm:mt-16 text-center aparece aparece-1">
+            <span class="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-sky-200 bg-sky-400/10 border border-sky-300/25 rounded-full px-4 py-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Bienvenid@s
+            </span>
+            <h1 class="mt-5 text-3xl sm:text-5xl font-extrabold tracking-tight leading-[1.1]">
+                ¿A qué panel vas a entrar<span class="text-sky-300">?</span>
+            </h1>
+            <p class="mt-3.5 text-sm sm:text-base text-white/65 max-w-2xl mx-auto">
+                Elige tu especialidad y el sistema te llevará a tu agenda, expedientes y recetas.
+                Cada panel muestra únicamente lo que corresponde a tu área.
+            </p>
+        </section>
+
+        <!-- VENTANAS DE ESPECIALIDAD -->
+        <section class="mt-10 sm:mt-14 grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+
+            <!-- PEDIATRÍA: panel autónomo -->
+            <a th:href="@{/entrar/pediatria}"
+               class="flotante aparece aparece-2 group relative min-w-0 rounded-3xl border border-white/15 bg-white/[0.09] backdrop-blur-xl p-7 sm:p-8 shadow-2xl shadow-black/40 hover:bg-white/[0.16] hover:border-sky-300/50 hover:-translate-y-1.5 transition-all duration-300 flex flex-col">
+                <div class="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-gradient-to-r from-sky-400 via-indigo-400 to-sky-400 opacity-80"></div>
+
+                <div class="flex items-start justify-between gap-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-2xl shadow-lg shadow-sky-900/50">
+                        <i class="fa-solid fa-baby"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-sky-200/80 bg-sky-400/15 border border-sky-300/25 rounded-full px-3 py-1">
+                        Pediatría
+                    </span>
+                </div>
+
+                <h2 class="mt-5 text-2xl font-extrabold tracking-tight">Panel de Pediatría</h2>
+                <p class="mt-1.5 text-sm text-white/65 leading-relaxed">
+                    Consulta del niño sano, somatometría con percentiles CDC, diagnóstico y recetas.
+                </p>
+
+                <ul class="mt-5 space-y-2 text-[13px] text-white/75">
+                    <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-sky-300 text-xs"></i> Percentiles de talla y peso (2 a 20 años)</li>
+                    <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-sky-300 text-xs"></i> Expediente pediátrico y antecedentes</li>
+                    <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-sky-300 text-xs"></i> Recetas y vademécum interno</li>
+                </ul>
+
+                <p class="mt-auto pt-7 inline-flex items-center gap-2 text-[11px] font-medium text-white/45">
+                    <i class="fa-solid fa-lock text-sky-300/70 text-[10px]"></i> Panel autónomo: sólo Pediatría
+                </p>
+
+                <span class="mt-3 inline-flex">
+                    <span class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500 group-hover:bg-sky-400 text-white text-sm font-bold py-3 shadow-lg shadow-sky-900/40 transition">
+                        Entrar al panel <i class="fa-solid fa-arrow-right-long text-xs transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                </span>
+            </a>
+
+            <!-- ODONTOLOGÍA + RECEPCIÓN: trabajan juntos -->
+            <div class="flotante-lenta aparece aparece-3 relative min-w-0 rounded-3xl border border-white/15 bg-white/[0.09] backdrop-blur-xl shadow-2xl shadow-black/40 overflow-hidden flex flex-col hover:border-emerald-300/45 transition-colors duration-300">
+                <div class="absolute inset-x-0 top-0 h-1 rounded-t-3xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-400 opacity-80 z-10"></div>
+
+                <a th:href="@{/entrar/odontologia}"
+                   class="group relative flex-1 p-7 sm:p-8 hover:bg-white/[0.07] transition-colors duration-300">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-2xl shadow-lg shadow-emerald-900/50">
+                            <i class="fa-solid fa-tooth"></i>
+                        </div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-200/80 bg-emerald-400/15 border border-emerald-300/25 rounded-full px-3 py-1">
+                            Odontología
+                        </span>
+                    </div>
+
+                    <h2 class="mt-5 text-2xl font-extrabold tracking-tight">Panel de Odontología</h2>
+                    <p class="mt-1.5 text-sm text-white/65 leading-relaxed">
+                        Odontopediatría, historia clínica dental, tratamientos y seguimiento con fotografías.
+                    </p>
+
+                    <ul class="mt-5 space-y-2 text-[13px] text-white/75">
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Historia odontopediátrica y plan de tratamiento</li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Galería clínica y consentimiento de fotos</li>
+                        <li class="flex items-center gap-2.5"><i class="fa-solid fa-circle-check text-emerald-300 text-xs"></i> Informes, recetas y carnet de citas</li>
+                    </ul>
+
+                    <span class="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 group-hover:bg-emerald-400 text-white text-sm font-bold py-3 shadow-lg shadow-emerald-900/40 transition">
+                        Entrar al panel <i class="fa-solid fa-arrow-right-long text-xs transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                </a>
+
+                <!-- Recepción: continúa el trabajo de Odontología -->
+                <a th:href="@{/entrar/recepcion}"
+                   class="group relative flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-white/10 bg-emerald-950/30 hover:bg-emerald-400/[0.14] px-6 sm:px-7 py-5 transition-colors">
+                    <span class="absolute left-8 right-8 -top-px h-px bg-gradient-to-r from-transparent via-emerald-300/70 to-transparent"></span>
+
+                    <div class="w-11 h-11 shrink-0 rounded-xl bg-emerald-500/20 border border-emerald-300/30 text-emerald-200 flex items-center justify-center">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+
+                    <div class="min-w-[140px] flex-1">
+                        <p class="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.18em] text-emerald-300/80">Enlazado a Odontología</p>
+                        <p class="text-sm font-bold leading-tight">Recepción
+                            <span class="font-normal text-white/60 text-xs">· agenda, cobros y caja</span>
+                        </p>
+                    </div>
+
+                    <span class="ml-auto shrink-0 inline-flex items-center gap-2 text-xs font-bold text-emerald-100 bg-emerald-500/20 group-hover:bg-emerald-500/35 border border-emerald-300/30 rounded-lg px-3 py-2 transition">
+                        Entrar <i class="fa-solid fa-arrow-right text-[10px] transition-transform group-hover:translate-x-0.5"></i>
+                    </span>
+                </a>
+            </div>
+        </section>
+
+        <!-- PIE -->
+        <footer class="mt-auto pt-10 sm:pt-14 aparece aparece-3">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 pt-6">
+                <a th:href="@{/entrar/administracion}"
+                   class="sm:hidden inline-flex items-center gap-2 text-xs font-semibold text-white/85 hover:text-white bg-white/10 hover:bg-white/20 border border-white/15 rounded-full px-4 py-2 transition">
+                    <i class="fa-solid fa-user-shield"></i> Administración
+                </a>
+                <p class="text-[11px] text-white/40 text-center sm:text-left">
+                    Clínica Humana
+                </p>
+            </div>
+        </footer>
     </div>
 
-    <div class="sub">Elige tu especialidad para continuar</div>
-
-    <div class="odontograma" role="group" aria-label="Acceso administrativo">
-        <span class="titulo">Administración</span>
-        <div class="dientes" aria-hidden="true">
-            <div th:each="i : ${#numbers.sequence(1, 15)}"
-                 th:classappend="${i % 3 != 0} ? 'activo'"
-                 class="diente"></div>
-        </div>
-        <!-- Ajusta esta ruta si tu acceso de administración es otro -->
-        <a th:href="@{/entrar/admin}" class="admin-link">Ingresar</a>
-    </div>
+    <script>
+        // Foto de la clínica como fondo: se acepta .jpg, .jpeg, .png o .webp con el
+        // mismo nombre, y si el archivo aún no existe queda el fondo degradado.
+        (function () {
+            const candidatos = [
+                '/img/clinica-humana.jpg',
+                '/img/clinica-humana.jpeg',
+                '/img/clinica-humana.png',
+                '/img/clinica-humana.webp'
+            ];
+            const capa = document.getElementById('fotoClinica');
+            if (!capa) return;
+            const probar = i => {
+                if (i >= candidatos.length) return;
+                const img = new Image();
+                img.onload = () => { capa.style.backgroundImage = `url('${candidatos[i]}')`; };
+                img.onerror = () => probar(i + 1);
+                img.src = candidatos[i];
+            };
+            probar(0);
+        })();
+    </script>
 </body>
 </html>

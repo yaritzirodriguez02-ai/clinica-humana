@@ -101,9 +101,11 @@ public class SecurityConfig {
                     String panel = request.getParameter("panel");
                     String destino;
                     if ("ODONTOLOGIA".equalsIgnoreCase(panel)) {
-                        destino = "/entrar/odontologia";
+                        destino = "/entrar/ODONTOLOGIA";
                     } else if ("PEDIATRIA".equalsIgnoreCase(panel)) {
-                        destino = "/entrar/pediatria";
+                        destino = "/entrar/PEDIATRIA";
+                    } else if ("RECEPCION".equalsIgnoreCase(panel)) {
+                        destino = "/entrar/recepcion";
                     } else {
                         destino = "/entrar/recepcion";
                     }

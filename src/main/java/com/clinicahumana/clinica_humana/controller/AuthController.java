@@ -25,25 +25,43 @@ public class AuthController {
     }
 
     /**
-     * Entrada al login desde la portada: la tarjeta elegida define el panel
-     * (Pediatría u Odontología) y el login se pinta con el color de esa especialidad.
+     * Entrada al login desde la portada: cada panel tiene su propia ruta fuerte
+     * para que Spring no pierda el segmento {panel} tras la redirección del
+     * filtro de bienvenida (/) y el login se pinte con el color de esa especialidad.
      */
-    @GetMapping("/entrar/{panel}")
-    public String entrar(@PathVariable("panel") String panel, Principal principal, Model model) {
+    @GetMapping("/entrar/ODONTOLOGIA")
+    public String entrarOdontologia(Principal principal, Model model) {
         if (principal != null) {
             return "redirect:/citas";
         }
-        // Pediatría y Odontología tienen su propio color; cualquier otra entrada
-        // (recepción / administración) usa el estilo neutro del sistema.
-        String area;
-        if ("ODONTOLOGIA".equalsIgnoreCase(panel)) {
-            area = "ODONTOLOGIA";
-        } else if ("PEDIATRIA".equalsIgnoreCase(panel)) {
-            area = "PEDIATRIA";
-        } else {
-            area = null;
+        model.addAttribute("panel", "ODONTOLOGIA");
+        return "login";
+    }
+
+    @GetMapping("/entrar/PEDIATRIA")
+    public String entrarPediatria(Principal principal, Model model) {
+        if (principal != null) {
+            return "redirect:/citas";
         }
-        model.addAttribute("panel", area);
+        model.addAttribute("panel", "PEDIATRIA");
+        return "login";
+    }
+
+    @GetMapping("/entrar/recepcion")
+    public String entrarRecepcion(Principal principal, Model model) {
+        if (principal != null) {
+            return "redirect:/citas";
+        }
+        // Recepción usa el estilo neutro del sistema (no tiene color propio de área)
+        return "login";
+    }
+
+    @GetMapping("/entrar/admin")
+    public String entrarAdmin(Principal principal, Model model) {
+        if (principal != null) {
+            return "redirect:/admin/dashboard";
+        }
+        model.addAttribute("panel", "ADMIN");
         return "login";
     }
 
