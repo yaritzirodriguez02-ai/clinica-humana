@@ -198,6 +198,9 @@
                                 <option value="">-- Primero elige una especialidad --</option>
                             </select>
                             <span class="text-[10px] text-slate-400">El listado se carga según la especialidad seleccionada.</span>
+                            <p id="errorMedico" class="hidden text-[11px] text-rose-600 font-bold mt-1">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Elige la especialidad y luego al especialista.
+                            </p>
                         </div>
                     </div>
 
@@ -364,8 +367,11 @@
             let telefonoMedicoActual = "";
 
             // 1. Carga dinámica de médicos según la especialidad elegida
-            campoEspecialidad.addEventListener("change", async function() {
-                const esp = this.value;
+            campoEspecialidad.addEventListener("change", function() {
+                cargarMedicosDeEspecialidad(this.value);
+            });
+
+            async function cargarMedicosDeEspecialidad(esp) {
                 campoMedico.innerHTML = '<option value="">-- Cargando especialistas... --</option>';
                 campoMedico.disabled = true;
                 desbloquearTodasLasHoras();
@@ -401,6 +407,17 @@
                     actualizarContactoMedico();
                 } catch (e) {
                     campoMedico.innerHTML = '<option value="">-- No se pudieron cargar los especialistas --</option>';
+                }
+            }
+
+            // Si el navegador restauró la especialidad (recarga o volver atrás) sin disparar
+            // el change, se vuelve a cargar el listado para habilitar al especialista.
+            if (campoEspecialidad.value) {
+                cargarMedicosDeEspecialidad(campoEspecialidad.value);
+            }
+            window.addEventListener("pageshow", function(evento) {
+                if (evento.persisted && campoEspecialidad.value) {
+                    cargarMedicosDeEspecialidad(campoEspecialidad.value);
                 }
             });
 
@@ -486,6 +503,20 @@
             const errorMotivo = document.getElementById("errorMotivoCliente");
 
             form.addEventListener("submit", function(e) {
+                // Un select deshabilitado no se envía: se valida aquí para no llegar al servidor con 400
+                const errorMedico = document.getElementById("errorMedico");
+                if (!campoMedico.value) {
+                    e.preventDefault();
+                    errorMedico.classList.toggle("hidden", false);
+                    if (!campoEspecialidad.value) {
+                        campoEspecialidad.focus();
+                    } else {
+                        campoMedico.focus();
+                    }
+                    return;
+                }
+                errorMedico.classList.add("hidden");
+
                 const valor = campoMotivo.value.trim();
                 const palabras = valor.split(/\s+/).filter(function(p) { return p.length > 1; });
                 const tienePalabraRara = palabras.some(function(p) {

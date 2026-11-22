@@ -141,7 +141,7 @@ public class PortalPublicoController {
             @RequestParam("telefonoTutor") String telefonoTutor,
             @RequestParam("emailTutor") String emailTutor,
             @RequestParam("especialidad") String especialidad,
-            @RequestParam("idMedico") Long idMedico,
+            @RequestParam(value = "idMedico", required = false) Long idMedico,
             @RequestParam("fechaCita") String fechaCita,
             @RequestParam("horaCita") String horaCita,
             @RequestParam("motivo") String motivo,
@@ -213,7 +213,12 @@ public class PortalPublicoController {
         }
 
         String rolEsperado = "PEDIATRIA".equals(espNorm) ? "PEDIATRA" : "ODONTOLOGIA";
-        Usuario medico = usuarioService.buscarPorId(idMedico == null ? -1L : idMedico).orElse(null);
+        if (idMedico == null) {
+            // El select de especialista queda deshabilitado hasta elegir especialidad: si el
+            // navegador restaura el formulario sin disparar el change, el campo no se envía.
+            return error(redirectAttributes, "Seleccione al especialista que atenderá la cita (el listado se carga al elegir la especialidad).");
+        }
+        Usuario medico = usuarioService.buscarPorId(idMedico).orElse(null);
         if (medico == null || !rolEsperado.equals(medico.getRol()) || !Boolean.TRUE.equals(medico.getActivo())) {
             return error(redirectAttributes, "El médico seleccionado no está disponible para la especialidad elegida. Vuelva a elegirlo.");
         }
