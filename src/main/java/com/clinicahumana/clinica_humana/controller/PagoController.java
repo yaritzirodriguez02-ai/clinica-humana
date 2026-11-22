@@ -61,7 +61,7 @@ public class PagoController {
                     .filter(id -> id != null)
                     .map(Long::longValue)
                     .toList();
-            citasPendientesCobro = citaService.citasPendientesPorEspecialidad(miEspecialidad).stream()
+            citasPendientesCobro = clinicoService.citasPendientesPorEspecialidad(miEspecialidad).stream()
                     .filter(c -> c.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
                     .filter(c -> !idsCitasPagadas.contains(c.getIdCita()))
                     .toList();
@@ -76,7 +76,7 @@ public class PagoController {
                     .filter(id -> id != null)
                     .map(Long::longValue)
                     .toList();
-            citasPendientesCobro = citaService.citasPendientesPorEspecialidad("ODONTOLOGIA").stream()
+            citasPendientesCobro = clinicoService.citasPendientesPorEspecialidad("ODONTOLOGIA").stream()
                     .filter(c -> !idsCitasPagadas.contains(c.getIdCita()))
                     .toList();
         }

@@ -32,7 +32,7 @@ public class UsuarioService {
 
     public List<Usuario> listarOdontologosActivos() {
         return usuarioRepository.findByRolIn(List.of("ODONTOLOGIA")).stream()
-                .filter(Usuario::getActivo)
+                .filter(u -> Boolean.TRUE.equals(u.getActivo()))
                 .toList();
     }
 
