@@ -53,8 +53,8 @@ public class CitaController {
                     ? citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha)
                     : citaService.listarProximasPorMedico(usuarioConectado.getIdUsuario(), hoy);
         }
-        // 2. ODONTOPEDIATRA: sus propias citas — próximas por defecto
-        else if ("ODONTOPEDIATRA".equals(rol)) {
+        // 2. ODONTOLOGIA: sus propias citas — próximas por defecto
+        else if ("ODONTOLOGIA".equals(rol)) {
             lista = (fecha != null)
                     ? citaService.listarPorMedicoYFecha(usuarioConectado.getIdUsuario(), fecha)
                     : citaService.listarProximasPorMedico(usuarioConectado.getIdUsuario(), hoy);
@@ -97,14 +97,16 @@ public class CitaController {
         Cita cita = new Cita();
         List<Usuario> medicosPermitidos;
 
-        // RECEPCIONISTA u Odontopediatría: Solo Odontología
-        if ("RECEPCIONISTA".equals(rol) || "ODONTOPEDIATRA".equals(rol)) {
+        // RECEPCIONISTA o ODONTOLOGIA: Solo Odontología
+        if ("RECEPCIONISTA".equals(rol) || "ODONTOLOGIA".equals(rol)) {
             cita.setEspecialidad("ODONTOLOGIA");
             medicosPermitidos = usuarioService.listarTodos().stream()
                     .filter(u -> "ODONTOLOGIA".equals(u.getRol()))
                     .toList();
             if ("ODONTOLOGIA".equals(rol)) {
                 cita.setMedico(usuarioConectado);
+            } else if ("RECEPCIONISTA".equals(rol)) {
+                // Recepción agenda en nombre del odontólogo asignado, no como su propio médico.
             }
         }
         // PEDIATRA: Solo Pediatría asignada a ella misma

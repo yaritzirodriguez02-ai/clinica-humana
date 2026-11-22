@@ -54,7 +54,7 @@
                             <td class="py-3 px-4 font-bold text-slate-900" th:text="${emp.nombre + ' ' + emp.apellidos}">Nombre</td>
                             <td class="py-3 px-4">
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold"
-                                      th:classappend="${emp.cargo == 'PEDIATRA'} ? 'bg-amber-100 text-amber-800' : (${emp.cargo == 'ODONTOPEDIATRA'} ? 'bg-teal-100 text-teal-800' : (${emp.cargo == 'RECEPCIONISTA'} ? 'bg-sky-100 text-sky-800' : 'bg-purple-100 text-purple-800'))"
+                                      th:classappend="${emp.cargo == 'PEDIATRA'} ? 'bg-amber-100 text-amber-800' : (${emp.cargo == 'ODONTOLOGIA'} ? 'bg-teal-100 text-teal-800' : (${emp.cargo == 'RECEPCIONISTA'} ? 'bg-sky-100 text-sky-800' : 'bg-purple-100 text-purple-800'))"
                                       th:text="${emp.cargo}">PEDIATRA</span>
                             </td>
                             <td class="py-3 px-4 font-mono text-xs text-slate-600" th:text="${emp.cedulaProfesional != null and !emp.cedulaProfesional.isEmpty() ? emp.cedulaProfesional : 'N/A'}">5505161</td>

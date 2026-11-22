@@ -14,6 +14,10 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
 
     List<Pago> findByFechaPagoBetween(java.time.LocalDateTime inicio, java.time.LocalDateTime fin);
 
+    // Filtrado por área/especialidad (para separar paneles de cobro)
+    List<Pago> findByCitaEspecialidad(String especialidad);
+    List<Pago> findByCitaEspecialidadIn(java.util.Collection<String> especialidades);
+
     // Depuración de registros
     List<Pago> findByCitaIdCitaIn(java.util.Collection<Long> idsCita);
 

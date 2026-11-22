@@ -27,7 +27,7 @@ public class ExpedienteOdontopediatrico {
     @JoinColumn(name = "id_paciente", nullable = false)
     private Paciente paciente;
 
-    @NotNull(message = "La especialista odontopediatra es obligatoria")
+    @NotNull(message = "La odontóloga / cirujana dentista es obligatoria")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_usuario_medico", nullable = false)
     private Usuario medico;

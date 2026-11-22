@@ -165,15 +165,6 @@ import java.util.Map;
                         log.info("Índice único global de CURP '{}' eliminado: ahora es único por área.", indice);
                     }
                 }
-                break;
-            }
-                }
-                for (String indice : indices) {
-                    if (!"uk_paciente_curp_area".equalsIgnoreCase(indice)) {
-                        jdbcTemplate.execute("ALTER TABLE pacientes DROP INDEX `" + indice + "`");
-                        log.info("Índice único global de CURP '{}' eliminado: ahora es único por área.", indice);
-                    }
-                }
             }
         } catch (Exception e) {
             log.warn("No se pudo ajustar el índice único de CURP por área: {}", e.getMessage());
@@ -261,7 +252,7 @@ import java.util.Map;
             if (existente.isPresent()) {
                 // Normaliza la categoría legada al valor canónico usado por el backend
                 Medicamento m = existente.get();
-                if ("ODONTOPEDIATRIA".equalsIgnoreCase(m.getCategoria())) {
+                if ("ODONTOLOGIA".equalsIgnoreCase(m.getCategoria())) {
                     m.setCategoria("ODONTOLOGIA");
                     medicamentoRepo.save(m);
                 }

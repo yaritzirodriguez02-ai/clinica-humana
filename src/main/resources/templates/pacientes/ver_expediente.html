@@ -33,18 +33,18 @@
                th:text="${esAdmin ? 'Historial completo de todas las atenciones previas.' : (esPediatra ? 'Historial de atenciones pediátricas.' : 'Historial de atenciones odontopediátricas.')}"></p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+            <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'RECEPCIONISTA', 'ADMIN')"
                th:if="${paciente.area != null and paciente.area.name() == 'ODONTOLOGIA'}"
                th:href="@{/carnets/odontologia/{id}(id=${idPaciente})}" target="_blank"
                class="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                 <i class="fa-regular fa-id-card"></i> Carnet de citas
             </a>
-            <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'ADMIN')"
+            <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'ADMIN')"
                th:href="@{/informes/nuevo(paciente=${idPaciente})}"
                class="bg-sky-700 hover:bg-sky-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                 <i class="fa-solid fa-file-pen"></i> Redactar informe
             </a>
-            <a th:href="@{/informes}" sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'ADMIN')"
+            <a th:href="@{/informes}" sec:authorize="hasAnyRole('ODONTOLOGIA', 'ADMIN')"
                class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                 <i class="fa-solid fa-folder-open"></i> Informes
             </a>
@@ -305,15 +305,15 @@
 
                 <div class="mt-4 ml-0 sm:ml-[110px] flex flex-wrap gap-2 justify-end">
                     <a th:href="@{/informes/nuevo(paciente=${idPaciente}, cita=${exp.cita.idCita})}"
-                       sec:authorize="hasAnyRole('ODONTOLOGIA', 'ODONTOPEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
+                       sec:authorize="hasAnyRole('ODONTOLOGIA', 'RECEPCIONISTA', 'ADMIN')"
                        class="text-sky-700 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
                         <i class="fa-solid fa-file-signature"></i> Informe
                     </a>
-                    <a th:href="@{/consultas/odontopediatria/expediente/editar/{idExpediente}(idExpediente=${exp.idExpedienteOdonto}, idPaciente=${idPaciente})}"
+                    <a th:href="@{/consultas/odontologia/expediente/editar/{idExpediente}(idExpediente=${exp.idExpedienteOdonto}, idPaciente=${idPaciente})}"
                        class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
                         <i class="fa-solid fa-pen-to-square"></i> Editar
                     </a>
-                    <form th:action="@{/consultas/odontopediatria/expediente/eliminar/{idExpediente}(idExpediente=${exp.idExpedienteOdonto}, idPaciente=${idPaciente})}" method="post" class="inline">
+                    <form th:action="@{/consultas/odontologia/expediente/eliminar/{idExpediente}(idExpediente=${exp.idExpedienteOdonto}, idPaciente=${idPaciente})}" method="post" class="inline">
                         <button type="submit" class="text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition"
                                 onclick="return confirm('¿Eliminar esta atención odontopediátrica del historial?')">
                             <i class="fa-solid fa-trash-can"></i> Eliminar

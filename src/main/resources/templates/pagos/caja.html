@@ -12,10 +12,10 @@
     <!-- Barra de Navegación Global Unificada -->
     <div th:replace="~{fragments/navbar :: barraNavegacion}">    </div>
 
-    <!-- Filtro de especialidad para administrador -->
-    <form th:action="@{/pagos}" method="get" class="max-w-7xl mx-auto px-4 pt-4 flex flex-wrap gap-3 items-end">
+    <!-- Filtro de especialidad: solo visible para administrador; los médicos y recepción ven solo su área -->
+    <form th:action="@{/pagos}" method="get" class="max-w-7xl mx-auto px-4 pt-4 flex flex-wrap gap-3 items-end" th:if="${esAdmin}">
         <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Filtrar por especialidad:</label>
-        <select th:if="${esAdmin}" name="especialidad"
+        <select name="especialidad"
                 class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
             <option value="">Todas las especialidades</option>
             <option value="PEDIATRIA" th:selected="${filtroEspecialidad == 'PEDIATRIA'}">Pediatría</option>
@@ -25,6 +25,15 @@
             <i class="fa-solid fa-filter"></i> Filtrar
         </button>
     </form>
+
+    <!-- Encabezado contextual: cada rol ve el título de su propia área -->
+    <div class="max-w-7xl mx-auto px-4 mb-6" th:if="${not esAdmin}">
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-500">
+            <span th:if="${#strings.equals(usuarioActual.rol, 'PEDIATRA')}">Panel de Pediatría — Caja y Cobros</span>
+            <span th:if="${#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')}">Panel de Odontología (CISO) — Caja y Cobros</span>
+            <span th:if="${#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')}">Recepción — Caja y Cobros (Odontología)</span>
+        </div>
+    </div>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
         
@@ -75,11 +84,13 @@
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-8 overflow-hidden">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
                 <div>
-                    <h3 class="font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+                    <h3 class="font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide"
+                    th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Consultas de Pediatría Listas para Cobro en Ventanilla' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Consultas Odontológicas Listas para Cobro en Ventanilla' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Consultas de Odontología Listas para Cobro en Ventanilla' : 'Consultas Clínicas Listas para Cobro en Ventanilla')">
                         <i class="fa-solid fa-hand-holding-dollar text-blue-700"></i>
                         Consultas Clínicas Listas para Cobro en Ventanilla
                     </h3>
-                    <p class="text-xs text-slate-500 uppercase tracking-wider">Pacientes que concluyeron su consulta médica/dental y tienen pago pendiente.</p>
+                    <p class="text-xs text-slate-500 uppercase tracking-wider"
+                    th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Niños que concluded su consulta pediátrica y tienen pago pendiente.' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Pacientes que concluyeron su consulta dental y tienen pago pendiente.' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Pacientes de odontología que concluyeron su consulta y tienen pago pendiente.' : 'Pacientes que concluyeron su consulta médica/dental y tienen pago pendiente.')">Pacientes que concluyeron su consulta médica/dental y tienen pago pendiente.</p>
                 </div>
             </div>
 
@@ -128,7 +139,8 @@
         <!-- SECCIÓN 2: HISTORIAL DE PAGOS REGISTRADOS -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
-                <h3 class="font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+                <h3 class="font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide"
+                    th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Historial de Cobros del Consultorio de Pediatría' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Historial de Cobros de la Clínica Dental (CISO)' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Historial de Cobros de Odontología (Recepción)' : 'Historial de Cobros Realizados')">
                     <i class="fa-solid fa-receipt text-blue-700"></i>
                     Historial de Cobros Realizados
                 </h3>

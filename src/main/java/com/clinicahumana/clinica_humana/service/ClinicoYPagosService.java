@@ -128,6 +128,15 @@ public class ClinicoYPagosService {
         return citaRepo.findById(idCita);
     }
 
+    /** Citas completadas pendientes de cobro de un área/especialidad (para panel de caja separado). */
+    public List<Cita> citasPendientesPorEspecialidad(String especialidad) {
+        return citaRepo.findByEspecialidadAndEstadoOrderByFechaAscHoraAsc(especialidad, "COMPLETADA");
+    }
+
+    public long countCitasPendientesPorEspecialidad(String especialidad) {
+        return citaRepo.countByEspecialidadAndEstado(especialidad, "COMPLETADA");
+    }
+
     public Optional<ExpedientePediatrico> buscarExpedientePediatricoPorCita(Long idCita) {
         return expPediatricoRepo.findByCitaIdCita(idCita);
     }

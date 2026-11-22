@@ -34,6 +34,10 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     long countByFecha(java.time.LocalDate fecha);
 
+    // Citas completadas pendientes de cobro por área/especialidad
+    List<Cita> findByEspecialidadAndEstadoOrderByFechaAscHoraAsc(String especialidad, String estado);
+    long countByEspecialidadAndEstado(String especialidad, String estado);
+
     // Depuración de registros por área clínica (odontología / pediatría)
     List<Cita> findByEspecialidadIn(java.util.List<String> especialidades);
 

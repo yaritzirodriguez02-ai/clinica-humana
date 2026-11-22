@@ -109,11 +109,11 @@
                 </div>
 
                 <div class="mt-4 ml-0 sm:ml-[110px] flex flex-wrap gap-2 justify-end">
-                    <a th:href="@{/consultas/odontopediatria/expediente/editar/{idExpediente}(idPaciente=${idPaciente}, idExpediente=${exp.idExpedienteOdonto})}"
+                    <a th:href="@{/consultas/odontologia/expediente/editar/{idExpediente}(idPaciente=${idPaciente}, idExpediente=${exp.idExpedienteOdonto})}"
                        class="text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition">
                         <i class="fa-solid fa-pen-to-square"></i> Editar
                     </a>
-                    <form th:action="@{/consultas/odontopediatria/expediente/eliminar/{idExpediente}(idPaciente=${idPaciente}, idExpediente=${exp.idExpedienteOdonto})}" method="post" class="inline">
+                    <form th:action="@{/consultas/odontologia/expediente/eliminar/{idExpediente}(idPaciente=${idPaciente}, idExpediente=${exp.idExpedienteOdonto})}" method="post" class="inline">
                         <button type="submit" class="text-rose-700 hover:text-rose-900 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg text-xs font-medium inline-flex items-center gap-1 transition"
                                 onclick="return confirm('¿Eliminar esta atención odontopediátrica del historial?')">
                         <i class="fa-solid fa-trash-can"></i> Eliminar

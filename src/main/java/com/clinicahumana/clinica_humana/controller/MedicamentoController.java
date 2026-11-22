@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * CRUD del catálogo de medicamentos (Vademécum interno de la clínica).
- * Acceso: PEDIATRA, ODONTOPEDIATRA y ADMIN (restringido en SecurityConfig).
+ * Acceso: PEDIATRA, ODONTOLOGIA y ADMIN (restringido en SecurityConfig).
  */
 @Controller
 @RequestMapping("/medicamentos")

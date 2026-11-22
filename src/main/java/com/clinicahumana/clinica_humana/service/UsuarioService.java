@@ -24,26 +24,17 @@ public class UsuarioService {
     }
 
     /**
-     * Alias para compatibilidad con el rol actual de odontología/CISO.
+     * Alias por compatibilidad interna: sigue apuntando a odontólogos/CISO.
      */
     public List<Usuario> listarOdontopediatrasActivos() {
         return listarOdontologosActivos();
     }
 
     public List<Usuario> listarOdontologosActivos() {
-        return usuarioRepository.findByRolIn(List.of("ODONTOLOGIA"));
+        return usuarioRepository.findByRolIn(List.of("ODONTOLOGIA")).stream()
+                .filter(Usuario::getActivo)
+                .toList();
     }
-}
-}
-    }
-
-    /**
-     * Médicos odontólogos activos: incluye tanto el rol legado como el nombre actual del panel.
-     */
-    public List<Usuario> listarOdontologosActivos() {
-        return usuarioRepository.findByRolIn(List.of("ODONTOLOGIA"));
-    }
-}
 
     public Optional<Usuario> buscarPorId(Long id) {
         return usuarioRepository.findById(id);
@@ -68,10 +59,4 @@ public class UsuarioService {
         usuario.setActivo(activo);
         usuarioRepository.save(usuario);
     }
-
-    /**
-     * Alias para compatibilidad con el rol actual de odontología/CISO.
-     */
-    public List<Usuario> listarOdontopediatrasActivos() {
-        return listarOdontologosActivos();
-    }
+}

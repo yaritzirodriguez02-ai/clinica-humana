@@ -64,21 +64,22 @@ public class SecurityConfig {
 
                 // Informes en hoja membretada de CISO: la odontóloga/CISO los redacta,
                 // recepción los consulta/imprime y el administrador tiene acceso total
-                .requestMatchers("/informes/**").hasAnyRole("ODONTOLOGIA", "RECEPCIONISTA", "ADMIN")
+                .requestMatchers("/informes/**").hasAnyRole("ODONTOLOGIA", "ADMIN")
 
                 // Carnet de citas del consultorio (CISO): lo imprime la odontóloga/CISO,
                 // recepción y el administrador también pueden reimprimirlo
-                .requestMatchers("/carnets/**").hasAnyRole("ODONTOLOGIA", "RECEPCIONISTA", "ADMIN")
+                .requestMatchers("/carnets/**").hasAnyRole("ODONTOLOGIA", "ADMIN")
 
                 // Limpieza de registros por área: odontología/CISO y recepción comparten el
                 // área dental, pediatría administra la suya y el admin controla ambas
-                .requestMatchers("/registros/**").hasAnyRole("ODONTOLOGIA", "RECEPCIONISTA", "PEDIATRA", "ADMIN")
+                .requestMatchers("/registros/**").hasAnyRole("ODONTOLOGIA", "PEDIATRA", "ADMIN")
 
                 // Catálogo de medicamentos (Vademécum interno): personal médico y admin
                 .requestMatchers("/medicamentos/**").hasAnyRole("PEDIATRA", "ODONTOLOGIA", "ADMIN")
 
-                // Módulo CU06 (Cobros, Caja y Corte): RECEPCIÓN, ADMIN y MÉDICOS
-                .requestMatchers("/pagos/**").hasAnyRole("RECEPCIONISTA", "ADMIN", "PEDIATRA", "ODONTOLOGIA")
+                // Módulo CU06 (Cobros, Caja y Corte): cada panel maneja sus propios cobros.
+                // Pediatra cobra dentro de su panel; recepción solo odontología; admin ve todo (con filtro).
+                .requestMatchers("/pagos/**").hasAnyRole("RECEPCIONISTA", "PEDIATRA", "ODONTOLOGIA", "ADMIN")
                 
                 // El resto de rutas requiere sesión iniciada
                 .anyRequest().authenticated()

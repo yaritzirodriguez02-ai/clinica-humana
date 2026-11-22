@@ -23,6 +23,7 @@ import java.util.List;
  * Todas las rutas (/empleados/**) están reservadas EXCLUSIVAMENTE al rol ADMIN en SecurityConfig.
  *
  * Roles válidos para nuevas cuentas: ADMIN, PEDIATRA, ODONTOLOGIA, RECEPCIONISTA.
+ */
 @Controller
 @RequestMapping("/empleados")
 public class EmpleadoController {

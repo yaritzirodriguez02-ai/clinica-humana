@@ -44,51 +44,70 @@ public class PagoController {
         String username = principal.getName();
         Usuario usuarioActual = usuarioService.buscarPorUsername(username).orElse(null);
 
-        List<Pago> todosLosPagos = pagoRepository.findAll();
-        List<Cita> todasLasCitas = citaService.listarTodas();
-
-        // Filtrar citas completadas que aún NO han sido pagadas
-        List<Long> idsCitasPagadas = todosLosPagos.stream()
-                .map(p -> p.getCita().getIdCita())
-                .toList();
-
-        List<Cita> citasPendientesCobro = todasLasCitas.stream()
-                .filter(c -> "COMPLETADA".equalsIgnoreCase(c.getEstado()))
-                .filter(c -> !idsCitasPagadas.contains(c.getIdCita()))
-                .collect(Collectors.toList());
+        List<Pago> todosLosPagos;
+        List<Cita> citasPendientesCobro;
 
         String rolActual = usuarioActual != null ? usuarioActual.getRol() : "";
 
-        // MÉDICOS (Pediatra/Odontopediatra): consultan únicamente su propia actividad
-        if ("PEDIATRA".equals(rolActual) || "ODONTOPEDIATRA".equals(rolActual)) {
-            todosLosPagos = todosLosPagos.stream()
-                    .filter(p -> p.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
+        // MÉDICOS (Pediatra/Odontóloga): ven únicamente su propia actividad,
+        // filtrada además por especialidad para que cada panel no vea lo del otro.
+        if ("PEDIATRA".equals(rolActual) || "ODONTOLOGIA".equals(rolActual)) {
+            String miEspecialidad = ("PEDIATRA".equals(rolActual)) ? "PEDIATRIA" : "ODONTOLOGIA";
+            todosLosPagos = pagoRepository.findByCitaEspecialidad(miEspecialidad).stream()
+                    .filter(p -> p.getMedico() != null && p.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
                     .toList();
-            citasPendientesCobro = citasPendientesCobro.stream()
+            List<Long> idsCitasPagadas = todosLosPagos.stream()
+                    .map(p -> p.getCita() != null ? p.getCita().getIdCita() : null)
+                    .filter(id -> id != null)
+                    .map(Long::longValue)
+                    .toList();
+            citasPendientesCobro = citaService.citasPendientesPorEspecialidad(miEspecialidad).stream()
                     .filter(c -> c.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
+                    .filter(c -> !idsCitasPagadas.contains(c.getIdCita()))
                     .toList();
         }
-        // RECEPCIÓN: trabaja exclusivamente con citas y cobros de Odontología
+        // RECEPCIONISTA: trabaja exclusivamente con citas y cobros de Odontología
         else if ("RECEPCIONISTA".equals(rolActual)) {
-            todosLosPagos = todosLosPagos.stream()
-                    .filter(p -> p.getCita() != null && "ODONTOLOGIA".equalsIgnoreCase(p.getCita().getEspecialidad()))
+            todosLosPagos = pagoRepository.findByCitaEspecialidad("ODONTOLOGIA").stream()
+                    .filter(p -> p.getMedico() != null)
                     .toList();
-            citasPendientesCobro = citasPendientesCobro.stream()
-                    .filter(c -> "ODONTOLOGIA".equalsIgnoreCase(c.getEspecialidad()))
+            List<Long> idsCitasPagadas = todosLosPagos.stream()
+                    .map(p -> p.getCita() != null ? p.getCita().getIdCita() : null)
+                    .filter(id -> id != null)
+                    .map(Long::longValue)
+                    .toList();
+            citasPendientesCobro = citaService.citasPendientesPorEspecialidad("ODONTOLOGIA").stream()
+                    .filter(c -> !idsCitasPagadas.contains(c.getIdCita()))
                     .toList();
         }
         // ADMIN: vista global con filtro opcional por especialidad
-        boolean esAdmin = "ADMIN".equals(rolActual);
-        String filtroEspecialidad = (especialidad != null && !especialidad.isBlank())
-                ? especialidad.trim().toUpperCase() : null;
-
-        if (esAdmin && filtroEspecialidad != null) {
-            todosLosPagos = todosLosPagos.stream()
-                    .filter(p -> p.getCita() != null && filtroEspecialidad.equalsIgnoreCase(p.getCita().getEspecialidad()))
+        else {
+            todosLosPagos = pagoRepository.findAll();
+            citasPendientesCobro = citaService.listarTodas().stream()
+                    .filter(c -> "COMPLETADA".equalsIgnoreCase(c.getEstado()))
+                    .collect(Collectors.toList());
+            List<Long> idsCitasPagadas = todosLosPagos.stream()
+                    .map(p -> p.getCita() != null ? p.getCita().getIdCita() : null)
+                    .filter(id -> id != null)
+                    .map(Long::longValue)
                     .toList();
             citasPendientesCobro = citasPendientesCobro.stream()
-                    .filter(c -> filtroEspecialidad.equalsIgnoreCase(c.getEspecialidad()))
+                    .filter(c -> !idsCitasPagadas.contains(c.getIdCita()))
                     .toList();
+            boolean esAdmin = "ADMIN".equals(rolActual);
+            String filtroEspecialidad = (especialidad != null && !especialidad.isBlank())
+                    ? especialidad.trim().toUpperCase() : null;
+
+            if (esAdmin && filtroEspecialidad != null) {
+                todosLosPagos = todosLosPagos.stream()
+                        .filter(p -> p.getCita() != null && filtroEspecialidad.equalsIgnoreCase(p.getCita().getEspecialidad()))
+                        .toList();
+                citasPendientesCobro = citasPendientesCobro.stream()
+                        .filter(c -> filtroEspecialidad.equalsIgnoreCase(c.getEspecialidad()))
+                        .toList();
+            }
+            model.addAttribute("esAdmin", true);
+            model.addAttribute("filtroEspecialidad", filtroEspecialidad);
         }
 
         BigDecimal totalRecaudado = todosLosPagos.stream()
@@ -99,8 +118,6 @@ public class PagoController {
         model.addAttribute("citasPendientes", citasPendientesCobro);
         model.addAttribute("totalRecaudado", totalRecaudado);
         model.addAttribute("usuarioActual", usuarioActual);
-        model.addAttribute("esAdmin", esAdmin);
-        model.addAttribute("filtroEspecialidad", filtroEspecialidad);
 
         return "pagos/caja";
     }
@@ -209,20 +226,29 @@ public class PagoController {
         String username = principal.getName();
         Usuario usuarioActual = usuarioService.buscarPorUsername(username).orElse(null);
 
-        List<Pago> pagosDia = pagoRepository.findAll().stream()
-                .filter(p -> p.getFechaPago() != null && p.getFechaPago().toLocalDate().isEqual(fechaConsulta))
-                .toList();
+        String rolActual = usuarioActual != null ? usuarioActual.getRol() : "";
+        String miEspecialidad = null;
 
-        // Si es médico, filtrar solo sus ingresos
-        if (usuarioActual != null && ("PEDIATRA".equals(usuarioActual.getRol()) || "ODONTOPEDIATRA".equals(usuarioActual.getRol()))) {
-            pagosDia = pagosDia.stream()
-                    .filter(p -> p.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
-                    .toList();
+        // Cada rol define el alcance del corte: ninguno ve los cobros del otro panel.
+        if ("PEDIATRA".equals(rolActual) || "ODONTOLOGIA".equals(rolActual)) {
+            miEspecialidad = ("PEDIATRA".equals(rolActual)) ? "PEDIATRIA" : "ODONTOLOGIA";
+        } else if ("RECEPCIONISTA".equals(rolActual)) {
+            miEspecialidad = "ODONTOLOGIA";
         }
-        // Recepción: el corte se limita a la especialidad de Odontología
-        else if (usuarioActual != null && "RECEPCIONISTA".equals(usuarioActual.getRol())) {
-            pagosDia = pagosDia.stream()
-                    .filter(p -> p.getCita() != null && "ODONTOLOGIA".equalsIgnoreCase(p.getCita().getEspecialidad()))
+
+        List<Pago> pagosDia;
+        if (miEspecialidad != null) {
+            pagosDia = pagoRepository.findByCitaEspecialidad(miEspecialidad).stream()
+                    .filter(p -> p.getFechaPago() != null && p.getFechaPago().toLocalDate().isEqual(fechaConsulta))
+                    .toList();
+            if ("PEDIATRA".equals(rolActual) || "ODONTOLOGIA".equals(rolActual)) {
+                pagosDia = pagosDia.stream()
+                        .filter(p -> p.getMedico() != null && p.getMedico().getIdUsuario().equals(usuarioActual.getIdUsuario()))
+                        .toList();
+            }
+        } else {
+            pagosDia = pagoRepository.findAll().stream()
+                    .filter(p -> p.getFechaPago() != null && p.getFechaPago().toLocalDate().isEqual(fechaConsulta))
                     .toList();
         }
 
