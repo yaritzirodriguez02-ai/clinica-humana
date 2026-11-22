@@ -85,12 +85,12 @@
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
                 <div>
                     <h3 class="font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide"
-                    th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Consultas de Pediatría Listas para Cobro en Ventanilla' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Consultas Odontológicas Listas para Cobro en Ventanilla' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Consultas de Odontología Listas para Cobro en Ventanilla' : 'Consultas Clínicas Listas para Cobro en Ventanilla')">
+                    th:text="${usuarioActual.rol == 'PEDIATRA' ? 'Consultas de Pediatría Listas para Cobro en Ventanilla' : usuarioActual.rol == 'ODONTOLOGIA' ? 'Consultas Odontológicas Listas para Cobro en Ventanilla' : usuarioActual.rol == 'RECEPCIONISTA' ? 'Consultas de Odontología Listas para Cobro en Ventanilla' : 'Consultas Clínicas Listas para Cobro en Ventanilla'}">
                         <i class="fa-solid fa-hand-holding-dollar text-blue-700"></i>
                         Consultas Clínicas Listas para Cobro en Ventanilla
                     </h3>
                     <p class="text-xs text-slate-500 uppercase tracking-wider"
-                    th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Niños que concluded su consulta pediátrica y tienen pago pendiente.' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Pacientes que concluyeron su consulta dental y tienen pago pendiente.' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Pacientes de odontología que concluyeron su consulta y tienen pago pendiente.' : 'Pacientes que concluyeron su consulta médica/dental y tienen pago pendiente.')">Pacientes que concluyeron su consulta médica/dental y tienen pago pendiente.</p>
+                    th:text="${usuarioActual.rol == 'PEDIATRA' ? 'Niños que concluyeron su consulta pediátrica y tienen pago pendiente.' : usuarioActual.rol == 'ODONTOLOGIA' ? 'Pacientes que concluyeron su consulta dental y tienen pago pendiente.' : usuarioActual.rol == 'RECEPCIONISTA' ? 'Pacientes de odontología que concluyeron su consulta y tienen pago pendiente.' : 'Pacientes que concluyeron su consulta médica/dental y tienen pago pendiente.'}">Pacientes que concluyeron su consulta médica/dental y tienen pago pendiente.</p>
                 </div>
             </div>
 
@@ -140,7 +140,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-200">
                 <h3 class="font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide"
-                    th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Historial de Cobros del Consultorio de Pediatría' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Historial de Cobros de la Clínica Dental (CISO)' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Historial de Cobros de Odontología (Recepción)' : 'Historial de Cobros Realizados')">
+                    th:text="${usuarioActual.rol == 'PEDIATRA' ? 'Historial de Cobros del Consultorio de Pediatría' : usuarioActual.rol == 'ODONTOLOGIA' ? 'Historial de Cobros de la Clínica Dental (CISO)' : usuarioActual.rol == 'RECEPCIONISTA' ? 'Historial de Cobros de Odontología (Recepción)' : 'Historial de Cobros Realizados'}">
                     <i class="fa-solid fa-receipt text-blue-700"></i>
                     Historial de Cobros Realizados
                 </h3>

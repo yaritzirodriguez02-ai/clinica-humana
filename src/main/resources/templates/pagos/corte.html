@@ -40,9 +40,9 @@
         <!-- Cabecera del negocio: solo aparece en el PDF/impresión -->
         <div class="solo-impresion text-center border-b-2 border-slate-800 pb-3 mb-4">
             <h1 class="text-lg font-black uppercase tracking-wide text-slate-900"
-                th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Consultorio de Pediatría — Clínica Médica Humana' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'CISO — Clínica Dental' : 'Clínica Humana'">Hospital Humana — Clínica Humana</h1>
+                th:text="${usuarioActual.rol == 'PEDIATRA' ? 'Consultorio de Pediatría — Clínica Médica Humana' : usuarioActual.rol == 'ODONTOLOGIA' ? 'CISO — Clínica Dental' : 'Clínica Humana'}">Hospital Humana — Clínica Humana</h1>
             <p class="text-[11px] text-slate-700"
-                th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Pediatría · Av. Lázaro Cárdenas #59, 3er. Piso, Col. Haciendita, C.P. 39087, Chilpancingo de los Bravo, Gro. · Tel. 747-472-9051' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'CISO - Odontología · Av. Lázaro Cárdenas #59, 3er. Piso, Col. Haciendita, C.P. 39087, Chilpancingo de los Bravo, Gro. · Tel. 747-472-9051' : 'CISO - Pediatría &amp; Odontología · Av. Lázaro Cárdenas #59, 3er. Piso, Col. Haciendita, C.P. 39087, Chilpancingo de los Bravo, Gro. · Tel. 747-472-9051')">CISO - Pediatría &amp; Odontología · Av. Lázaro Cárdenas #59, 3er. Piso, Col. Haciendita, C.P. 39087, Chilpancingo de los Bravo, Gro. · Tel. 747-472-9051</p>
+                th:text="${usuarioActual.rol == 'PEDIATRA' ? 'Pediatría · Av. Lázaro Cárdenas #59, 3er. Piso, Col. Haciendita, C.P. 39087, Chilpancingo de los Bravo, Gro. · Tel. 747-472-9051' : usuarioActual.rol == 'ODONTOLOGIA' ? 'CISO - Odontología · Av. Lázaro Cárdenas #59, 3er. Piso, Col. Haciendita, C.P. 39087, Chilpancingo de los Bravo, Gro. · Tel. 747-472-9051' : 'CISO - Pediatría &amp; Odontología · Av. Lázaro Cárdenas #59, 3er. Piso, Col. Haciendita, C.P. 39087, Chilpancingo de los Bravo, Gro. · Tel. 747-472-9051'}">CISO - Pediatría &amp; Odontología · Av. Lázaro Cárdenas #59, 3er. Piso, Col. Haciendita, C.P. 39087, Chilpancingo de los Bravo, Gro. · Tel. 747-472-9051</p>
             <p class="text-sm font-black text-slate-900 mt-2">CORTE Y ARQUEO DE CAJA — Fecha: <span th:text="${fechaConsulta != null ? #temporals.format(fechaConsulta, 'dd/MM/yyyy') : ''}">01/01/2026</span></p>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-700">Transacciones Registradas el día de hoy</p>
         </div>
@@ -51,9 +51,9 @@
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-wrap justify-between items-center gap-4 no-impresion">
             <div>
                 <h2 class="text-xl font-bold text-slate-900"
-            th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Arqueo — Panel de Pediatría' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Arqueo — Panel de Odontología (CISO)' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Arqueo — Recepción (Odontología)' : 'Arqueo y Cierre de Caja')">Arqueo y Cierre de Caja</h2>
+            th:text="${usuarioActual.rol == 'PEDIATRA' ? 'Arqueo — Panel de Pediatría' : usuarioActual.rol == 'ODONTOLOGIA' ? 'Arqueo — Panel de Odontología (CISO)' : usuarioActual.rol == 'RECEPCIONISTA' ? 'Arqueo — Recepción (Odontología)' : 'Arqueo y Cierre de Caja'}">Arqueo y Cierre de Caja</h2>
                 <p class="text-xs text-slate-500"
-                    th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Desglose de ingresos del consultorio de pediatría.' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Desglose de ingresos de la clínica dental.' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Desglose de ingresos de odontología en recepción.' : 'Desglose de ingresos por método de pago y especialista.')">Desglose de ingresos por método de pago y especialista.</p>
+                    th:text="${usuarioActual.rol == 'PEDIATRA' ? 'Desglose de ingresos del consultorio de pediatría.' : usuarioActual.rol == 'ODONTOLOGIA' ? 'Desglose de ingresos de la clínica dental.' : usuarioActual.rol == 'RECEPCIONISTA' ? 'Desglose de ingresos de odontología en recepción.' : 'Desglose de ingresos por método de pago y especialista.'}">Desglose de ingresos por método de pago y especialista.</p>
             </div>
             <form th:action="@{/pagos/corte}" method="get" class="flex items-center gap-3">
                 <label class="text-xs font-bold text-slate-600 uppercase">Consultar Fecha:</label>
@@ -96,7 +96,7 @@
     <div class="tabla-reportable bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center no-impresion">
             <h3 class="font-bold text-slate-900 text-sm"
-                th:text="${#strings.equals(usuarioActual.rol, 'PEDIATRA')} ? 'Transacciones del Consultorio de Pediatría' : (#strings.equals(usuarioActual.rol, 'ODONTOLOGIA')} ? 'Transacciones de la Clínica Dental (CISO)' : (#strings.equals(usuarioActual.rol, 'RECEPCIONISTA')} ? 'Transacciones de Odontología — Recepción' : 'Transacciones Registradas el día de hoy')">Transacciones Registradas el día de hoy</h3>
+                th:text="${usuarioActual.rol == 'PEDIATRA' ? 'Transacciones del Consultorio de Pediatría' : usuarioActual.rol == 'ODONTOLOGIA' ? 'Transacciones de la Clínica Dental (CISO)' : usuarioActual.rol == 'RECEPCIONISTA' ? 'Transacciones de Odontología — Recepción' : 'Transacciones Registradas el día de hoy'}">Transacciones Registradas el día de hoy</h3>
             <button onclick="window.print()" class="no-impresion text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg font-semibold transition">
                 <i class="fa-solid fa-print"></i> Imprimir Corte
             </button>

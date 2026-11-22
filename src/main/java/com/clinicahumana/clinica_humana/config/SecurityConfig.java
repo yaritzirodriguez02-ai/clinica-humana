@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,7 +17,42 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new EncoderCompatible();
+    }
+
+    /**
+     * Encoder tolerante: el DelegatingPasswordEncoder de Spring exige que la contraseña
+     * guardada lleve prefijo ({bcrypt}, {noop}). Las cuentas sembradas por versiones
+     * anteriores quedaron en la BD con el hash bcrypt "pelado" ($2a$10$...) o con texto
+     * plano, lo que provocaba IllegalArgumentException en el login y acababa en 403.
+     * Aquí se aceptan las tres formas: con prefijo, hash bcrypt sin prefijo y texto plano.
+     */
+    static class EncoderCompatible implements PasswordEncoder {
+
+        private final PasswordEncoder delegating = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        private final BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+
+        @Override
+        public String encode(CharSequence rawPassword) {
+            // Las cuentas nuevas se guardan con prefijo {bcrypt}
+            return delegating.encode(rawPassword);
+        }
+
+        @Override
+        public boolean matches(CharSequence rawPassword, String encodedPassword) {
+            if (rawPassword == null || encodedPassword == null) {
+                return false;
+            }
+            String guardada = encodedPassword.trim();
+            if (guardada.startsWith("{")) {
+                return delegating.matches(rawPassword, guardada);
+            }
+            if (guardada.matches("^\\$2[aby]\\$\\d{2}\\$.*")) {
+                return bcrypt.matches(rawPassword, guardada);
+            }
+            // Contraseña legada en texto plano
+            return rawPassword.toString().equals(guardada);
+        }
     }
 
     /**
@@ -37,6 +73,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Portada de entrada (elección de panel: Pediatría / Odontología) y recursos estáticos
                 .requestMatchers("/", "/entrar/**", "/img/**", "/css/**", "/js/**", "/images/**", "/portal-citas/**").permitAll()
+                // Página de error: nunca debe exigir sesión (si no, un fallo se convierte en 403)
+                .requestMatchers("/error").permitAll()
 
                 // Portal Público de Citas para Tutores (agendamiento en línea SIN sesión):
                 // incluye /public/agendar-cita y sus endpoints JSON de médicos y horarios ocupados

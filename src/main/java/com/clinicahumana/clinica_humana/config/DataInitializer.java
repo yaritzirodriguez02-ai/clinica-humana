@@ -94,6 +94,15 @@ import java.util.Map;
         // 4. Odontólogas / CISO
         crearUsuarioSiNoExiste("gloria.gonzalez", NOMBRE_OFICIAL_DRA_GONZALEZ_HERRERA, "ODONTOLOGIA", CLAVE_DEMO);
         crearUsuarioSiNoExiste("sofia.castro", "Dra. Sofía Castro", "ODONTOLOGIA", CLAVE_DEMO);
+        // Si alguien tiene el rol incorrecto ODONTOPEDIATRA, corregirlo a ODONTOLOGIA
+        if (usuarioRepository.existsByUsername("gloria.gonzalez")) {
+            Usuario gl = usuarioRepository.findByUsername("gloria.gonzalez").orElse(null);
+            if (gl != null && !"ODONTOLOGIA".equals(gl.getRol())) {
+                gl.setRol("ODONTOLOGIA");
+                usuarioRepository.save(gl);
+                log.warn("Rol de gloria.gonzalez corregido de '{}' a 'ODONTOLOGIA'", gl.getRol());
+            }
+        }
 
         log.info("=== Usuarios iniciales listos | admin: '{}' | cuentas demo: '{}' ===",
                 CLAVE_ADMIN, CLAVE_DEMO);

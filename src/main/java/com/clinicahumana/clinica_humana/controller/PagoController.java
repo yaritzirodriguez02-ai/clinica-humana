@@ -48,6 +48,10 @@ public class PagoController {
         List<Cita> citasPendientesCobro;
 
         String rolActual = usuarioActual != null ? usuarioActual.getRol() : "";
+        // La plantilla usa estos atributos en todos los roles: se declaran siempre
+        boolean esAdmin = "ADMIN".equals(rolActual);
+        String filtroEspecialidad = (especialidad != null && !especialidad.isBlank())
+                ? especialidad.trim().toUpperCase() : null;
 
         // MÉDICOS (Pediatra/Odontóloga): ven únicamente su propia actividad,
         // filtrada además por especialidad para que cada panel no vea lo del otro.
@@ -94,10 +98,6 @@ public class PagoController {
             citasPendientesCobro = citasPendientesCobro.stream()
                     .filter(c -> !idsCitasPagadas.contains(c.getIdCita()))
                     .toList();
-            boolean esAdmin = "ADMIN".equals(rolActual);
-            String filtroEspecialidad = (especialidad != null && !especialidad.isBlank())
-                    ? especialidad.trim().toUpperCase() : null;
-
             if (esAdmin && filtroEspecialidad != null) {
                 todosLosPagos = todosLosPagos.stream()
                         .filter(p -> p.getCita() != null && filtroEspecialidad.equalsIgnoreCase(p.getCita().getEspecialidad()))
@@ -106,9 +106,10 @@ public class PagoController {
                         .filter(c -> filtroEspecialidad.equalsIgnoreCase(c.getEspecialidad()))
                         .toList();
             }
-            model.addAttribute("esAdmin", true);
-            model.addAttribute("filtroEspecialidad", filtroEspecialidad);
         }
+
+        model.addAttribute("esAdmin", esAdmin);
+        model.addAttribute("filtroEspecialidad", filtroEspecialidad);
 
         BigDecimal totalRecaudado = todosLosPagos.stream()
                 .map(Pago::getMontoTotal)
