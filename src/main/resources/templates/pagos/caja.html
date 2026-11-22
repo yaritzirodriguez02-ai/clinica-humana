@@ -116,7 +116,8 @@
                         <tr th:each="cp : ${citasPendientes}" class="hover:bg-blue-50/40 transition">
                             <td class="py-3 px-4 font-mono font-extrabold text-blue-800" th:text="'#' + ${cp.idCita}">#1</td>
                             <td class="py-3 px-4 font-semibold text-slate-900" th:text="${cp.paciente.nombre + ' ' + cp.paciente.apellidos}">Nombre Niño</td>
-                            <td class="py-3 px-4 text-slate-600" th:text="${cp.paciente.tutor.nombre + ' ' + cp.paciente.tutor.apellidos + ' (' + cp.paciente.tutor.telefono + ')'}">Tutor</td>
+                            <td class="py-3 px-4 text-slate-600"
+                                th:text="${cp.paciente.tutor != null ? (cp.paciente.tutor.nombre + ' ' + cp.paciente.tutor.apellidos + ' (' + cp.paciente.tutor.telefono + ')') : 'Sin tutor (paciente adulto)'}">Tutor</td>
                             <td class="py-3 px-4 text-slate-700">
                                 <span class="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded"
                                       th:classappend="${cp.especialidad == 'PEDIATRIA'} ? 'bg-amber-100 text-amber-800' : 'bg-teal-100 text-teal-800'"

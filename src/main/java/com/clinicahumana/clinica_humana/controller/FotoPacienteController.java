@@ -109,6 +109,40 @@ public class FotoPacienteController {
         return volver;
     }
 
+    /**
+     * Marca una imagen de la galería clínica como foto de perfil del paciente.
+     * La imagen no se copia: se mueve de la galería al retrato del expediente y
+     * cualquier retrato anterior deja de ser el perfil.
+     */
+    @PostMapping("/{idFoto}/perfil")
+    @Transactional
+    public String usarComoFotoPerfil(@PathVariable("idFoto") Long idFoto, RedirectAttributes redirectAttributes) {
+        FotoPaciente foto = fotoRepository.findById(idFoto).orElse(null);
+        if (foto == null) {
+            redirectAttributes.addFlashAttribute("mensajeError", "La imagen ya no existe.");
+            return "redirect:/pacientes";
+        }
+
+        Long idPaciente = foto.getPaciente().getIdPaciente();
+
+        // Un paciente tiene un solo retrato de perfil: se liberan los anteriores
+        fotoRepository.findByPacienteIdPacienteAndPerfilTrue(idPaciente).forEach(anterior -> {
+            if (!anterior.getIdFoto().equals(idFoto)) {
+                anterior.setPerfil(Boolean.FALSE);
+                fotoRepository.save(anterior);
+            }
+        });
+
+        foto.setPerfil(Boolean.TRUE);
+        if (foto.getDescripcion() == null || foto.getDescripcion().isBlank()) {
+            foto.setDescripcion("Foto de perfil");
+        }
+        fotoRepository.save(foto);
+
+        redirectAttributes.addFlashAttribute("mensajeExito", "La imagen se estableció como foto de perfil del paciente.");
+        return "redirect:/pacientes/expediente/" + idPaciente + "#foto-perfil";
+    }
+
     @PostMapping("/{idFoto}/eliminar")
     @Transactional
     public String eliminarFoto(@PathVariable("idFoto") Long idFoto, RedirectAttributes redirectAttributes) {

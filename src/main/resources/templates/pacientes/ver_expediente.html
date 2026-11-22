@@ -48,6 +48,14 @@
                class="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                 <i class="fa-solid fa-folder-open"></i> Informes
             </a>
+            <a th:if="${paciente.area != null and paciente.area.name() == 'ODONTOLOGIA'}" href="#fotos-clinicas"
+               class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                <i class="fa-solid fa-images"></i> Fotos y radiografías
+            </a>
+            <a th:if="${paciente.area != null and paciente.area.name() == 'ODONTOLOGIA'}" href="#foto-perfil"
+               class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                <i class="fa-solid fa-id-badge"></i> Foto de perfil
+            </a>
             <a th:href="@{/pacientes}" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
                 <i class="fa-solid fa-arrow-left"></i> Volver a Pacientes
             </a>
@@ -223,7 +231,7 @@
     </section>
 
     <!-- Historia Odontopediátrica: solo para pacientes del área de Odontología -->
-    <section th:if="${(esAdmin or (esOdontopediatra or esRecepcionista)) and paciente.area != null and paciente.area.name() == 'ODONTOLOGIA'}" class="mb-8">
+    <section th:if="${(esAdmin or esOdontologa or esRecepcionista) and paciente.area != null and paciente.area.name() == 'ODONTOLOGIA'}" class="mb-8">
         <div class="flex items-center gap-3 mb-4">
             <i class="fa-solid fa-tooth text-teal-600 text-xl"></i>
             <h3 class="text-lg font-bold text-slate-900">Atenciones Odontopediátricas</h3>
@@ -444,6 +452,12 @@
                                 class="text-xs bg-teal-50 hover:bg-teal-100 text-teal-700 px-2.5 py-1.5 rounded-lg font-semibold transition">
                             <i class="fa-solid fa-magnifying-glass-plus"></i> Ver
                         </button>
+                        <form th:action="@{/pacientes/fotos/{id}/perfil(id=${f.idFoto})}" method="post">
+                            <button type="submit" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-2.5 py-1.5 rounded-lg font-semibold transition"
+                                    title="Usar esta imagen como foto de perfil del paciente">
+                                <i class="fa-solid fa-id-badge"></i> Usar como perfil
+                            </button>
+                        </form>
                         <form th:action="@{/pacientes/fotos/{id}/eliminar(id=${f.idFoto})}" method="post"
                               onsubmit="return confirm('¿Eliminar esta imagen de la galería clínica?');">
                             <button type="submit" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 px-2.5 py-1.5 rounded-lg font-semibold transition">

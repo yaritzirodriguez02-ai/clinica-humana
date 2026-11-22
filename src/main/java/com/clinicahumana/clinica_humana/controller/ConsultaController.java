@@ -79,7 +79,7 @@ public class ConsultaController {
             exp.setMedico(cita.getMedico());
             model.addAttribute("expediente", exp);
             model.addAttribute("historial", clinicoService.obtenerHistorialOdontopediatrico(cita.getPaciente().getIdPaciente()));
-            return "consultas/consulta_odontologia";
+            return "consultas/consulta_odontopediatrica";
         }
     }
 
@@ -145,7 +145,7 @@ public class ConsultaController {
             model.addAttribute("erroresValidacion", result.getAllErrors().stream()
                     .map(e -> e.getDefaultMessage()).toList());
             model.addAttribute("historial", clinicoService.obtenerHistorialOdontopediatrico(expediente.getPaciente().getIdPaciente()));
-            return "consultas/consulta_odontologia";
+            return "consultas/consulta_odontopediatrica";
         }
 
         clinicoService.guardarConsultaOdontopediatrica(expediente);
