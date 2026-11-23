@@ -98,7 +98,7 @@
                     <thead>
                         <tr class="bg-gradient-to-r from-slate-100 to-slate-50 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
                             <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Horario</th>
-                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Paciente Infantil</th>
+                            <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Paciente</th>
                             <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Especialidad</th>
                             <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Médico Asignado</th>
                             <th class="py-3.5 px-4 font-semibold uppercase tracking-wider text-slate-700">Motivo</th>
@@ -119,8 +119,21 @@
                                 <span class="text-xs font-mono font-extrabold text-blue-700" th:text="${c.hora}">10:00</span>
                             </td>
                             <td class="py-3 px-4">
-                                <div class="font-medium text-slate-900" th:text="${c.paciente.nombre + ' ' + c.paciente.apellidos}">Nombre Niño</div>
+                                <div class="font-medium text-slate-900" th:text="${c.paciente.nombre + ' ' + c.paciente.apellidos}">Nombre Paciente</div>
                                 <span class="text-xs text-slate-400 font-mono" th:text="'CURP: ' + ${c.paciente.curp}"></span>
+                                <!-- Consentimiento de imágenes clínicas: solo aplica a Odontología -->
+                                <div th:if="${c.especialidad == 'ODONTOLOGIA'}" class="mt-1">
+                                    <span th:if="${c.aceptaUsoFotosClinicas}"
+                                          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold uppercase tracking-wide"
+                                          title="El tutor o el paciente adulto autorizó el uso de fotografías, placas y radiografías exclusivamente con fines clínicos.">
+                                        <i class="fa-solid fa-shield-halved"></i> Imágenes clínicas autorizadas
+                                    </span>
+                                    <span th:unless="${c.aceptaUsoFotosClinicas}"
+                                          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold uppercase tracking-wide"
+                                          title="La cita se registró sin autorización de uso de imágenes clínicas.">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Sin autorización de imágenes
+                                    </span>
+                                </div>
                             </td>
                             <td class="py-3 px-4">
                                 <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-full"
