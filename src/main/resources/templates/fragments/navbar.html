@@ -3,7 +3,7 @@
 <head><meta charset="UTF-8"></head>
 <body>
 
-<header th:fragment="barraNavegacion" class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50 border-b border-indigo-700/70">
+<header th:fragment="barraNavegacion" class="ciso-navbar bg-indigo-900 text-white shadow-lg sticky top-0 z-50 border-b border-indigo-700/70">
     <!-- Tema propio del panel dental: azul del logotipo, Times New Roman y papel tapiz -->
     <link rel="stylesheet" sec:authorize="hasRole('ODONTOLOGIA')" th:href="@{/css/panel-odontologia.css}">
     <div class="max-w-[1500px] mx-auto px-4">
@@ -50,6 +50,18 @@
             <!-- Menu central condicionado por rol -->
             <nav class="hidden lg:flex items-center gap-0.5 min-w-0 overflow-x-auto [scrollbar-width:none]">
 
+                <!-- Identidad dentro de la barra lateral de la odontóloga -->
+                <div sec:authorize="hasRole('ODONTOLOGIA')" class="ciso-sidebar__brand">
+                    <img th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg"
+                         alt="Clinica Integral de Servicios Odontologicos" class="ciso-sidebar__logo">
+                    <div class="ciso-sidebar__who">
+                        <span class="ciso-sidebar__doctor">
+                            Dra. <span th:text="${#strings.capitalizeWords(#strings.replace(#strings.replace(#authentication.name, '.', ' '), '_', ' '))}">Gloria Gonzalez</span>
+                        </span>
+                        <span class="ciso-sidebar__role">Cirujana Dentista · CISO</span>
+                    </div>
+                </div>
+
                 <!-- 0. PANEL ADMIN (Solo Administrador) -->
                 <a sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')"
                    th:href="@{/admin/dashboard}"
@@ -81,6 +93,20 @@
                     <i class="fa-solid fa-pills text-blue-300"></i> Medicamentos
                 </a>
 
+                <!-- 3c. COBROS Y CAJA DE LA DOCTORA (exclusivo de su panel) -->
+                <a sec:authorize="hasRole('ODONTOLOGIA')"
+                   th:href="@{/pagos}"
+                   class="ciso-nav-cash px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap transition flex items-center gap-1.5 text-blue-50 bg-blue-950/30 border border-blue-400/40">
+                    <i class="fa-solid fa-cash-register"></i> Cobros y Caja
+                </a>
+
+                <!-- 3d. LIMPIEZA DE REGISTROS DEL AREA DENTAL -->
+                <a sec:authorize="hasRole('ODONTOLOGIA')"
+                   th:href="@{/registros}"
+                   class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap transition flex items-center gap-1.5 text-blue-100">
+                    <i class="fa-solid fa-broom"></i> Limpieza de Registros
+                </a>
+
                 <!-- 4. AGENDAR NUEVA CITA -->
                 <a sec:authorize="hasAnyRole('PEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
                    th:href="@{/citas/nueva}" class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-100">
@@ -104,7 +130,12 @@
             <!-- Perfil de Usuario y Logout -->
             <div class="flex items-center gap-3 shrink-0">
                 <div class="text-right">
-                    <span class="block text-xs font-bold text-white leading-tight" sec:authentication="name">Usuario</span>
+                    <span sec:authorize="hasRole('ODONTOLOGIA')" class="ciso-header__doctor">
+                        <span class="ciso-header__doctor-label">Bienvenida</span>
+                        <span class="ciso-header__doctor-name"
+                              th:text="${#strings.capitalizeWords(#strings.replace(#strings.replace(#authentication.name, '.', ' '), '_', ' '))}">Gloria Gonzalez</span>
+                    </span>
+                    <span class="ciso-header__user block text-xs font-bold text-white leading-tight" sec:authentication="name">Usuario</span>
                     <span sec:authorize="hasRole('PEDIATRA')" class="bg-amber-100 text-amber-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">PEDIATRIA</span>
                     <span sec:authorize="hasRole('ODONTOLOGIA')" class="bg-blue-800/50 text-blue-50 border border-blue-400/40 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-block">CISO Especialista Dental</span>
                     <span sec:authorize="hasRole('RECEPCIONISTA')" class="bg-sky-100 text-sky-900 text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full inline-block">Recepcion y Caja</span>

@@ -365,3 +365,341 @@ div[class*="fixed"][class*="inset-0"] > div {
     }
     body::after { animation: none; }
 }
+
+/* ==========================================================================
+   BARRA LATERAL VERTICAL DE LA ODONTÓLOGA
+   Sólo se activa en las páginas que incluyen la barra de navegación
+   (body:has(> header.ciso-navbar)); las pantallas de impresión y las vistas
+   sueltas (receta, consulta, medicamentos) conservan su ancho completo.
+   Fondo: diente luminoso, ondas y destellos sobre azul profundo (arte CISO).
+   ========================================================================== */
+
+body:has(> header.ciso-navbar) {
+    padding-left: 272px;
+}
+
+/* En la barra lateral vive la identidad: se oculta la marca duplicada del encabezado */
+header.ciso-navbar > div > div > a:first-child {
+    display: none;
+}
+
+header.ciso-navbar > div > div {
+    justify-content: flex-end;
+}
+
+/* --- La navegación se convierte en columna fija a la izquierda --- */
+header.ciso-navbar nav {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 272px;
+    height: 100vh;
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 7px;
+    padding: 18px 14px 22px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background-color: #03101d;
+    background-image:
+        linear-gradient(180deg, rgba(3, 16, 29, .78) 0%, rgba(4, 24, 38, .66) 45%, rgba(2, 10, 18, .88) 100%),
+        url("/img/sidebar-ciso.svg");
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    border-right: 1px solid rgba(128, 226, 255, .22);
+    box-shadow: 18px 0 46px -30px rgba(0, 0, 0, .95), inset -1px 0 0 rgba(140, 240, 255, .12);
+    z-index: 60;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(140, 230, 255, .35) transparent;
+}
+
+/* Tarjeta de identidad: logo CISO + nombre de la doctora */
+.ciso-sidebar__brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 4px 6px 16px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(151, 232, 255, .22);
+}
+
+.ciso-sidebar__logo {
+    height: 56px;
+    width: auto;
+    flex-shrink: 0;
+    padding: 5px 7px;
+    background: #ffffff;
+    border-radius: 13px;
+    box-shadow: 0 12px 26px -12px rgba(0, 0, 0, .85), 0 0 0 1px rgba(163, 240, 255, .35);
+}
+
+.ciso-sidebar__who {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    text-align: left;
+}
+
+.ciso-sidebar__doctor {
+    font: 700 15px/1.15 var(--ciso-serif) !important;
+    letter-spacing: .05em !important;
+    text-transform: uppercase;
+    color: #f4feff;
+    text-shadow: 0 0 18px rgba(95, 225, 255, .6), 0 1px 2px rgba(0, 0, 0, .8);
+}
+
+.ciso-sidebar__doctor span {
+    color: #d6f8ff;
+}
+
+.ciso-sidebar__role {
+    font: 600 9.5px/1 var(--ciso-serif) !important;
+    letter-spacing: .16em !important;
+    text-transform: uppercase;
+    color: #6ddcf2;
+    white-space: normal;
+}
+
+/* --- Botones de navegación verticales --- */
+header.ciso-navbar nav > a {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 11px !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    font-size: 12.5px !important;
+    letter-spacing: .07em !important;
+    color: #d9eefb !important;
+    background: rgba(9, 40, 58, .52);
+    border: 1px solid rgba(120, 220, 255, .16);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, .75);
+    backdrop-filter: blur(2px);
+    transition: transform .22s var(--ciso-ease), background-color .22s ease,
+                border-color .22s ease, box-shadow .22s ease, color .22s ease !important;
+}
+
+header.ciso-navbar nav > a i {
+    width: 18px;
+    text-align: center;
+    font-size: 13px !important;
+    color: #63dcf5 !important;
+    filter: drop-shadow(0 0 6px rgba(80, 220, 255, .55));
+}
+
+/* Brillo al pasar: mismo destello que el resto de los botones */
+header.ciso-navbar nav > a::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: auto;
+    left: -120%;
+    right: auto;
+    width: 60%;
+    height: 100%;
+    border-radius: 0;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .32), transparent);
+    transform: skewX(-18deg);
+    transition: left .55s var(--ciso-ease);
+    pointer-events: none;
+}
+
+header.ciso-navbar nav > a:hover::after {
+    left: 135%;
+}
+
+header.ciso-navbar nav > a:hover {
+    transform: translateX(6px);
+    background: rgba(30, 140, 172, .28) !important;
+    border-color: rgba(130, 240, 255, .58) !important;
+    color: #ffffff !important;
+    box-shadow: 0 12px 26px -16px rgba(0, 226, 255, .85);
+}
+
+/* Hundido al presionar: conserva la sensación de los botones actuales */
+header.ciso-navbar nav > a:active {
+    transform: translateX(2px) scale(.975);
+    background: rgba(46, 200, 235, .35) !important;
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, .55);
+}
+
+/* Cobros y Caja: botón protagonista de la doctora */
+header.ciso-navbar nav > a.ciso-nav-cash {
+    margin-top: 12px;
+    background: linear-gradient(135deg, rgba(22, 202, 236, .34) 0%, rgba(26, 96, 178, .40) 100%) !important;
+    border: 1px solid rgba(150, 246, 255, .70) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 1px rgba(150, 246, 255, .16), 0 14px 30px -18px rgba(0, 224, 255, .95);
+    animation: ciso-cash-pulse 3.8s ease-in-out infinite;
+}
+
+header.ciso-navbar nav > a.ciso-nav-cash i {
+    color: #b8fbff !important;
+    font-size: 15px !important;
+}
+
+@keyframes ciso-cash-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px rgba(150, 246, 255, .16), 0 14px 30px -18px rgba(0, 224, 255, .75); }
+    50%      { box-shadow: 0 0 0 1px rgba(190, 252, 255, .55), 0 16px 34px -14px rgba(0, 224, 255, 1); }
+}
+
+/* --- Nombre de la doctora en el encabezado --- */
+header.ciso-navbar .ciso-header__doctor {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    margin-right: 8px;
+    line-height: 1.1;
+}
+
+.ciso-header__doctor-label {
+    font: 600 9px/1 var(--ciso-serif) !important;
+    letter-spacing: .24em !important;
+    text-transform: uppercase;
+    color: #8fe9ff;
+}
+
+.ciso-header__doctor-name {
+    font: 700 17px/1.1 var(--ciso-serif) !important;
+    letter-spacing: .07em !important;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 18px rgba(90, 220, 255, .6), 0 2px 4px rgba(0, 0, 0, .6);
+}
+
+header.ciso-navbar .ciso-header__user {
+    display: none !important;
+}
+
+/* --- Legibilidad sobre fondos claros ---
+   Se limita a tarjetas, tablas y formularios con fondo claro: así no se
+   oscurecen los textos que van sobre paneles azules o degradados. */
+div[class*="bg-white"] [class*="text-slate-300"],
+div[class*="bg-white"] [class*="text-slate-400"],
+div[class*="bg-white"] [class*="text-gray-300"],
+div[class*="bg-white"] [class*="text-gray-400"],
+div[class*="bg-slate-50"] [class*="text-slate-300"],
+div[class*="bg-slate-50"] [class*="text-slate-400"],
+div[class*="bg-sky-50"] [class*="text-slate-300"],
+div[class*="bg-sky-50"] [class*="text-slate-400"],
+div[class*="bg-blue-50"] [class*="text-slate-300"],
+div[class*="bg-blue-50"] [class*="text-slate-400"],
+div[class*="bg-indigo-50"] [class*="text-slate-300"],
+div[class*="bg-indigo-50"] [class*="text-slate-400"],
+td [class*="text-slate-300"],
+td [class*="text-slate-400"],
+td [class*="text-gray-300"],
+td [class*="text-gray-400"] {
+    color: #5a6784 !important;
+}
+
+div[class*="bg-white"] [class*="text-sky-300"],
+div[class*="bg-white"] [class*="text-sky-400"],
+div[class*="bg-white"] [class*="text-blue-300"],
+div[class*="bg-white"] [class*="text-blue-400"],
+div[class*="bg-white"] [class*="text-indigo-300"],
+div[class*="bg-white"] [class*="text-indigo-400"],
+div[class*="bg-slate-50"] [class*="text-sky-300"],
+div[class*="bg-slate-50"] [class*="text-sky-400"],
+div[class*="bg-slate-50"] [class*="text-blue-300"],
+div[class*="bg-slate-50"] [class*="text-blue-400"],
+div[class*="bg-sky-50"] [class*="text-sky-300"],
+div[class*="bg-sky-50"] [class*="text-sky-400"],
+td [class*="text-sky-300"],
+td [class*="text-sky-400"],
+td [class*="text-blue-300"],
+td [class*="text-blue-400"] {
+    color: #1f5f86 !important;
+}
+
+div[class*="bg-white"] [class*="text-amber-300"],
+div[class*="bg-white"] [class*="text-amber-400"],
+div[class*="bg-slate-50"] [class*="text-amber-300"],
+div[class*="bg-slate-50"] [class*="text-amber-400"] {
+    color: #8a5a06 !important;
+}
+
+div[class*="bg-white"] [class*="text-emerald-300"],
+div[class*="bg-white"] [class*="text-emerald-400"],
+div[class*="bg-slate-50"] [class*="text-emerald-300"],
+div[class*="bg-slate-50"] [class*="text-emerald-400"] {
+    color: #0c6b4f !important;
+}
+
+main input::placeholder,
+main textarea::placeholder {
+    color: #6a7794 !important;
+    opacity: 1;
+}
+
+/* --- Pantallas angostas: la columna vuelve a fila desplazable --- */
+@media (max-width: 1023px) {
+    body:has(> header.ciso-navbar) {
+        padding-left: 0;
+    }
+
+    header.ciso-navbar > div > div {
+        flex-wrap: wrap;
+        height: auto !important;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        justify-content: space-between;
+    }
+
+    header.ciso-navbar > div > div > a:first-child {
+        display: flex;
+    }
+
+    header.ciso-navbar nav {
+        position: static;
+        order: 3;
+        flex-basis: 100%;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        height: auto;
+        padding: 6px 0 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        background: none;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .ciso-sidebar__brand {
+        display: none;
+    }
+
+    header.ciso-navbar nav > a {
+        width: auto;
+        flex: 0 0 auto;
+        padding: 9px 12px !important;
+        font-size: 11px !important;
+    }
+
+    header.ciso-navbar nav > a.ciso-nav-cash {
+        margin-top: 0;
+    }
+
+    header.ciso-navbar .ciso-header__doctor {
+        display: none;
+    }
+}
+
+/* --- Impresión: sin barra lateral ni desplazamiento --- */
+@media print {
+    body:has(> header.ciso-navbar) {
+        padding-left: 0 !important;
+    }
+
+    header.ciso-navbar nav,
+    header.ciso-navbar .ciso-header__doctor {
+        display: none !important;
+    }
+}
