@@ -1,0 +1,367 @@
+/* ==========================================================================
+   PANEL DE ODONTOLOGÍA · CISO
+   Identidad tomada del logotipo: azul marino profundo sobre blanco hueso.
+   Tipografía Times New Roman en MAYÚSCULAS, papel tapiz dental, animaciones
+   de botones y tarjetas. Se carga sólo cuando la sesión es de ODONTOLOGÍA.
+   ========================================================================== */
+
+:root {
+    --ciso-navy:      #16265a;
+    --ciso-navy-2:    #1f3579;
+    --ciso-blue:      #2f4f9e;
+    --ciso-sky:       #7189c4;
+    --ciso-sky-soft:  #a9b7dd;
+    --ciso-ivory:     #f4f6fb;
+    --ciso-paper:     #ffffff;
+    --ciso-ink:       #14203c;
+    --ciso-mute:      #5d6a8c;
+    --ciso-line:      rgba(22, 38, 90, .16);
+    --ciso-glow:      rgba(47, 79, 158, .22);
+    --ciso-serif:     'Times New Roman', 'Liberation Serif', 'Nimbus Roman', Times, Georgia, serif;
+    --ciso-ease:      cubic-bezier(.22, .61, .36, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Fondo de pantalla: papel tapiz con dientes y coronas dibujados en SVG
+   -------------------------------------------------------------------------- */
+body {
+    font-family: var(--ciso-serif) !important;
+    color: var(--ciso-ink);
+    background-color: var(--ciso-ivory) !important;
+    background-image:
+        radial-gradient(circle at 12% 6%, rgba(113, 137, 196, .28), transparent 42%),
+        radial-gradient(circle at 88% 92%, rgba(22, 38, 90, .22), transparent 46%),
+        linear-gradient(160deg, #f7f9fd 0%, #eef1f8 52%, #e6ebf6 100%) !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+}
+
+/* Patrón de molares y coronas (dibujo propio, tono azul muy tenue) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='190' height='190' viewBox='0 0 190 190'><g fill='none' stroke='%2316265a' stroke-width='1.4' stroke-opacity='0.13'><path d='M44 34c6 0 9 5 9 11 0 8-6 13-9 17-3-4-9-9-9-17 0-6 3-11 9-11z'/><path d='M35 45v18M53 45v18'/><path d='M138 118c7 0 11 5 11 12 0 9-7 15-11 20-4-5-11-11-11-20 0-7 4-12 11-12z'/><path d='M127 131v21M149 131v21'/><circle cx='150' cy='44' r='13'/><path d='M150 31v-8M150 65v-8M137 44h-8M171 44h-8'/><circle cx='40' cy='146' r='11'/><path d='M40 135v-7M40 168v-7M29 146h-7M58 146h-7'/></g></svg>");
+    background-size: 190px 190px;
+    opacity: .85;
+}
+
+/* Halo decorativo inferior (diente gigante insinuado) */
+body::after {
+    content: "";
+    position: fixed;
+    right: -90px;
+    bottom: -110px;
+    width: 420px;
+    height: 420px;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><path d='M100 22c22 0 34 16 34 38 0 26-20 44-34 58-14-14-34-32-34-58 0-22 12-38 34-38z' fill='none' stroke='%2316265a' stroke-width='3' stroke-opacity='0.20'/><path d='M74 60v96M126 60v96' stroke='%2316265a' stroke-width='3' stroke-opacity='0.16'/></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: .8;
+    animation: ciso-float-bg 16s ease-in-out infinite alternate;
+}
+
+/* El contenido siempre por encima del papel tapiz */
+body > * {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes ciso-float-bg {
+    from { transform: translate3d(0, 0, 0) rotate(0deg); }
+    to   { transform: translate3d(-16px, -22px, 0) rotate(-2.5deg); }
+}
+
+/* --------------------------------------------------------------------------
+   Tipografía: Times New Roman en mayúsculas para títulos, etiquetas y botones
+   -------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6,
+th, label, legend, summary,
+button, .btn, .od-btn,
+nav a,
+a[class*="font-black"],
+a[class*="font-bold"] {
+    font-family: var(--ciso-serif) !important;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--ciso-navy) !important;
+    letter-spacing: .08em;
+}
+
+h1 { border-bottom: 2px solid var(--ciso-line); padding-bottom: 10px; }
+
+p, span, div, td, li, input, select, textarea, strong, b, small {
+    font-family: var(--ciso-serif) !important;
+}
+
+td, input, select, textarea { letter-spacing: .015em; }
+
+label, th, thead th {
+    color: var(--ciso-navy) !important;
+    letter-spacing: .1em !important;
+}
+
+/* --------------------------------------------------------------------------
+   Barra de navegación con el azul del logotipo
+   -------------------------------------------------------------------------- */
+header {
+    background: linear-gradient(120deg, var(--ciso-navy) 0%, var(--ciso-navy-2) 55%, var(--ciso-blue) 100%) !important;
+    border-bottom: 3px solid var(--ciso-sky-soft) !important;
+    box-shadow: 0 14px 32px -20px rgba(22, 38, 90, .85) !important;
+}
+
+header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(135deg,
+        rgba(255, 255, 255, .05) 0 2px, transparent 2px 12px);
+    mix-blend-mode: screen;
+}
+
+header a:hover,
+header button:hover {
+    transform: translateY(-2px);
+}
+
+header span[class*="bg-white"] {
+    transition: transform .3s var(--ciso-ease), box-shadow .3s var(--ciso-ease);
+}
+
+header a:hover span[class*="bg-white"] {
+    transform: rotate(-2deg) scale(1.03);
+    box-shadow: 0 10px 24px -14px rgba(0, 0, 0, .55);
+}
+
+/* --------------------------------------------------------------------------
+   Tarjetas, secciones y tablas
+   -------------------------------------------------------------------------- */
+main > div,
+section,
+article {
+    scroll-margin-top: 96px;
+}
+
+/* Aparición suave de bloques principales */
+main > * {
+    animation: ciso-rise .5s var(--ciso-ease) both;
+}
+
+@keyframes ciso-rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Tarjetas blancas: filo azul marino y sombra del logotipo */
+div[class*="bg-white"][class*="rounded"] {
+    border-color: var(--ciso-line) !important;
+    box-shadow: 0 18px 38px -30px rgba(22, 38, 90, .65);
+    transition: transform .28s var(--ciso-ease), box-shadow .28s var(--ciso-ease);
+}
+
+div[class*="bg-white"][class*="rounded"]:hover {
+    box-shadow: 0 22px 44px -28px rgba(22, 38, 90, .55);
+}
+
+/* Encabezados de tabla con el azul del logotipo */
+thead,
+thead[class*="bg-"] {
+    background: linear-gradient(90deg, var(--ciso-navy) 0%, var(--ciso-blue) 100%) !important;
+}
+
+thead th,
+thead td {
+    color: #ffffff !important;
+    background: transparent !important;
+    border-color: rgba(255, 255, 255, .18) !important;
+}
+
+tbody tr {
+    transition: background-color .22s ease, transform .22s var(--ciso-ease);
+}
+
+tbody tr:hover {
+    background-color: rgba(113, 137, 196, .12) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Botones: movimiento al tocar, brillo al pasar y hundido al presionar
+   -------------------------------------------------------------------------- */
+button, .btn,
+a[class*="rounded-lg"],
+a[class*="rounded-xl"] {
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s var(--ciso-ease),
+                box-shadow .2s var(--ciso-ease),
+                background-color .2s ease,
+                color .2s ease,
+                filter .2s ease !important;
+}
+
+/* Destello que recorre el botón */
+button::after,
+a[class*="rounded-lg"]::after,
+a[class*="rounded-xl"]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .45), transparent);
+    transform: skewX(-18deg);
+    transition: left .55s var(--ciso-ease);
+    pointer-events: none;
+}
+
+button:hover::after,
+a[class*="rounded-lg"]:hover::after,
+a[class*="rounded-xl"]:hover::after {
+    left: 130%;
+}
+
+button:hover,
+.btn:hover,
+a[class*="rounded-lg"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 26px -18px rgba(22, 38, 90, .8);
+}
+
+button:active,
+.btn:active,
+a[class*="rounded-lg"]:active {
+    transform: translateY(1px) scale(.975);
+    box-shadow: 0 4px 10px -6px rgba(22, 38, 90, .7);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--ciso-blue);
+    outline-offset: 2px;
+}
+
+/* Campos */
+input, select, textarea {
+    transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--ciso-blue) !important;
+    box-shadow: 0 0 0 3px var(--ciso-glow) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Detalles decorativos de odontología
+   -------------------------------------------------------------------------- */
+/* Línea de encabezado con guiño a la arcada dental */
+h1::after {
+    content: "";
+    display: block;
+    width: 68px;
+    height: 6px;
+    margin-top: 8px;
+    border-radius: 3px;
+    background: repeating-linear-gradient(90deg,
+        var(--ciso-blue) 0 6px, transparent 6px 10px);
+    opacity: .7;
+}
+
+/* Distintivos */
+span[class*="rounded-full"],
+span[class*="rounded"][class*="px-2"] {
+    letter-spacing: .07em;
+    transition: transform .2s var(--ciso-ease);
+}
+
+span[class*="rounded-full"]:hover {
+    transform: translateY(-1px) scale(1.03);
+}
+
+/* Enlaces del menú: subrayado animado */
+nav a {
+    position: relative;
+}
+
+nav a::after {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 3px;
+    height: 2px;
+    background: var(--ciso-sky-soft);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .28s var(--ciso-ease);
+}
+
+nav a:hover::after {
+    transform: scaleX(1);
+}
+
+/* Avisos flash */
+div[class*="bg-emerald-50"],
+div[class*="bg-rose-50"],
+div[class*="bg-sky-50"],
+div[class*="bg-amber-50"] {
+    animation: ciso-rise .4s var(--ciso-ease) both;
+    border-left-width: 5px !important;
+}
+
+/* Modales */
+div[class*="fixed"][class*="inset-0"] > div {
+    animation: ciso-pop .3s var(--ciso-ease) both;
+}
+
+@keyframes ciso-pop {
+    from { opacity: 0; transform: translateY(14px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Scrollbar del panel */
+* {
+    scrollbar-color: var(--ciso-sky-soft) transparent;
+}
+
+/* --------------------------------------------------------------------------
+   Impresión: sin papel tapiz ni animaciones
+   -------------------------------------------------------------------------- */
+@media print {
+    body {
+        background: #ffffff !important;
+    }
+    body::before,
+    body::after {
+        display: none !important;
+    }
+    * {
+        animation: none !important;
+        transition: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Accesibilidad: respetar la preferencia de menos movimiento
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+    }
+    body::after { animation: none; }
+}

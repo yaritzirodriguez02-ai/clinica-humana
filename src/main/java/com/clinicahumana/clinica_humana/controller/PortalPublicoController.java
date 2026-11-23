@@ -313,6 +313,9 @@ public class PortalPublicoController {
             cita.setHora(hCita);
             cita.setMotivo(motivoNorm);
             cita.setAceptaUsoFotosClinicas(aceptoFotos);
+            // Cita solicitada desde el portal: queda pendiente de que la especialista la acepte
+            cita.setOrigen("EN_LINEA");
+            cita.setAceptada(Boolean.FALSE);
             cita.setNotificarWhatsapp(avisoWhatsapp);
             cita.setNotificarSms(avisoSms);
             Cita citaGuardada = citaService.agendarCita(cita);

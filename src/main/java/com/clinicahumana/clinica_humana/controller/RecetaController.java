@@ -91,11 +91,9 @@ if (!recetasExistentes.isEmpty()) {
         return "recetas/captura_receta";
     }
 
-    // Carga el datalist del catálogo según la especialidad de la cita
+    // Carga el vademécum completo: la especialista puede prescribir cualquier fármaco del catálogo
     private void cargarCatalogo(Model model, Cita cita) {
-        String categoriaCatalogo = "PEDIATRIA".equalsIgnoreCase(cita.getEspecialidad()) ? "PEDIATRIA" : "ODONTOLOGIA";
-        model.addAttribute("medicamentosCatalogo",
-                medicamentoRepo.findByCategoriaInOrderByNombreComercialAsc(List.of("GENERAL", categoriaCatalogo)));
+        model.addAttribute("medicamentosCatalogo", medicamentoRepo.findAllByOrderByNombreComercialAsc());
     }
 
     private String valor(String[] arreglo, int i) {

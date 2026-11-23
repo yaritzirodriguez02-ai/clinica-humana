@@ -144,6 +144,15 @@ public class CitaService {
         return citaRepository.save(cita);
     }
 
+    // Acepta una cita solicitada en línea (la integra a la agenda de la especialista)
+    @Transactional
+    public Cita aceptarCita(Long idCita) {
+        Cita cita = citaRepository.findById(idCita)
+                .orElseThrow(() -> new IllegalArgumentException("Cita no encontrada con ID: " + idCita));
+        cita.setAceptada(Boolean.TRUE);
+        return citaRepository.save(cita);
+    }
+
     @Transactional
     public void cancelarCita(Long idCita, String motivoCancelacion) {
         Cita cita = citaRepository.findById(idCita)

@@ -65,6 +65,20 @@ public class Cita {
     @Column(name = "acepta_uso_fotos_clinicas", columnDefinition = "BIT DEFAULT 0")
     private Boolean aceptaUsoFotosClinicas = Boolean.FALSE;
 
+    /**
+     * Origen de la cita: 'PANEL' cuando se agenda en el consultorio y 'EN_LINEA'
+     * cuando llega desde el portal público o el portal del tutor.
+     */
+    @Column(name = "origen", length = 20)
+    private String origen = "PANEL";
+
+    /**
+     * Las citas del portal quedan pendientes hasta que la especialista las acepta;
+     * las que se agendan en el panel nacen aceptadas.
+     */
+    @Column(name = "aceptada", columnDefinition = "BIT DEFAULT 1")
+    private Boolean aceptada = Boolean.TRUE;
+
     /** Canales elegidos por el tutor para recibir la confirmación y el recordatorio de la cita. */
     @Column(name = "notificar_whatsapp", columnDefinition = "BIT DEFAULT 1")
     private Boolean notificarWhatsapp = Boolean.TRUE;
@@ -174,6 +188,23 @@ public class Cita {
 
     public void setAceptaUsoFotosClinicas(Boolean aceptaUsoFotosClinicas) {
         this.aceptaUsoFotosClinicas = aceptaUsoFotosClinicas;
+    }
+
+    public String getOrigen() {
+        return origen == null || origen.isBlank() ? "PANEL" : origen;
+    }
+
+    public void setOrigen(String origen) {
+        this.origen = origen;
+    }
+
+    /** Las citas antiguas (sin valor guardado) se consideran aceptadas para no bloquear la agenda. */
+    public Boolean getAceptada() {
+        return aceptada == null ? Boolean.TRUE : aceptada;
+    }
+
+    public void setAceptada(Boolean aceptada) {
+        this.aceptada = aceptada;
     }
 
     public Boolean getNotificarWhatsapp() {

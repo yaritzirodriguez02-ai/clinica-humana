@@ -65,6 +65,7 @@ public class DepuracionController {
         model.addAttribute("areasPermitidas", permitidas);
         model.addAttribute("esAdmin", esAdmin(principal));
         model.addAttribute("esOdontologia", area == Area.ODONTOLOGIA);
+        model.addAttribute("puedeBorrar", puedeBorrar(principal, area));
         return "registros/limpieza";
     }
 
@@ -77,6 +78,7 @@ public class DepuracionController {
                          RedirectAttributes redirectAttributes) {
 
         Area area = areaAutorizada(slug, principal);
+        verificarBorrado(area, principal);
 
         if (confirmacion == null || !"VACIAR".equalsIgnoreCase(confirmacion.trim())) {
             redirectAttributes.addFlashAttribute("mensajeError",
@@ -105,6 +107,7 @@ public class DepuracionController {
     public String eliminarCita(@PathVariable("area") String slug, @PathVariable("id") Long id,
                                Principal principal, RedirectAttributes redirectAttributes) {
         Area area = areaAutorizada(slug, principal);
+        verificarBorrado(area, principal);
         return ejecutar(area, redirectAttributes,
                 () -> depuracionService.eliminarCita(area, id),
                 "Cita eliminada junto con su consulta, receta y cobro asociados.");
@@ -114,6 +117,7 @@ public class DepuracionController {
     public String eliminarConsulta(@PathVariable("area") String slug, @PathVariable("id") Long id,
                                    Principal principal, RedirectAttributes redirectAttributes) {
         Area area = areaAutorizada(slug, principal);
+        verificarBorrado(area, principal);
         return ejecutar(area, redirectAttributes,
                 () -> depuracionService.eliminarConsulta(area, id),
                 "Consulta eliminada del expediente.");
@@ -123,6 +127,7 @@ public class DepuracionController {
     public String eliminarReceta(@PathVariable("area") String slug, @PathVariable("id") Long id,
                                  Principal principal, RedirectAttributes redirectAttributes) {
         Area area = areaAutorizada(slug, principal);
+        verificarBorrado(area, principal);
         return ejecutar(area, redirectAttributes,
                 () -> depuracionService.eliminarReceta(area, id),
                 "Receta eliminada.");
@@ -132,6 +137,7 @@ public class DepuracionController {
     public String eliminarPago(@PathVariable("area") String slug, @PathVariable("id") Long id,
                                Principal principal, RedirectAttributes redirectAttributes) {
         Area area = areaAutorizada(slug, principal);
+        verificarBorrado(area, principal);
         return ejecutar(area, redirectAttributes,
                 () -> depuracionService.eliminarPago(area, id),
                 "Cobro eliminado de la caja.");
@@ -141,6 +147,7 @@ public class DepuracionController {
     public String eliminarInforme(@PathVariable("area") String slug, @PathVariable("id") Long id,
                                   Principal principal, RedirectAttributes redirectAttributes) {
         Area area = areaAutorizada(slug, principal);
+        verificarBorrado(area, principal);
         return ejecutar(area, redirectAttributes,
                 () -> depuracionService.eliminarInforme(area, id),
                 "Informe membretado eliminado.");
@@ -150,6 +157,7 @@ public class DepuracionController {
     public String eliminarCarnet(@PathVariable("area") String slug, @PathVariable("id") Long id,
                                  Principal principal, RedirectAttributes redirectAttributes) {
         Area area = areaAutorizada(slug, principal);
+        verificarBorrado(area, principal);
         return ejecutar(area, redirectAttributes,
                 () -> depuracionService.eliminarCarnet(area, id),
                 "Carnet de citas eliminado.");
@@ -160,6 +168,7 @@ public class DepuracionController {
                                    Principal principal, RedirectAttributes redirectAttributes) {
         Area area = areaAutorizada(slug, principal);
         boolean admin = esAdmin(principal);
+        verificarBorrado(area, principal);
         return ejecutar(area, redirectAttributes,
                 () -> depuracionService.eliminarPaciente(area, id, admin),
                 "Paciente eliminado con todo su historial clínico.");
@@ -182,6 +191,31 @@ public class DepuracionController {
         return (e.getMessage() != null && !e.getMessage().isBlank())
                 ? e.getMessage()
                 : "Ocurrió un error inesperado al borrar el registro.";
+    }
+
+    /**
+     * Borrar registros clínicos y cobros es privilegio de la especialista del área
+     * (odontología para la doctora dental) y del administrador; recepción sólo consulta.
+     */
+    private boolean puedeBorrar(Principal principal, Area area) {
+        String rol = rolActual(principal);
+        if ("ADMIN".equals(rol) || "ADMINISTRADOR".equals(rol)) {
+            return true;
+        }
+        if (area == Area.ODONTOLOGIA) {
+            return "ODONTOLOGIA".equals(rol);
+        }
+        if (area == Area.PEDIATRIA) {
+            return "PEDIATRA".equals(rol);
+        }
+        return false;
+    }
+
+    private void verificarBorrado(Area area, Principal principal) {
+        if (!puedeBorrar(principal, area)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Solo la especialista del área puede eliminar registros clínicos y cobros.");
+        }
     }
 
     private Area areaAutorizada(String slug, Principal principal) {

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
 <head>
+    <link rel="stylesheet" sec:authorize="hasRole('ODONTOLOGIA')" th:href="@{/css/panel-odontologia.css}">
     <meta charset="UTF-8">
     <title>Prescripción de Receta Médica - Clínica Humana</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -46,6 +47,63 @@
                 </a>
             </div>
         </div>
+
+        <!-- Mensajes del vademécum (alta rápida de medicamentos) -->
+        <div th:if="${mensajeExito}" class="mb-4 p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-800 text-sm font-semibold flex items-start gap-2">
+            <i class="fa-solid fa-circle-check mt-0.5"></i>
+            <span th:text="${mensajeExito}">Medicamento agregado al vademécum.</span>
+        </div>
+        <div th:if="${mensajeInfo}" class="mb-4 p-3 bg-sky-50 border border-sky-300 rounded-xl text-sky-800 text-sm font-semibold flex items-start gap-2">
+            <i class="fa-solid fa-circle-info mt-0.5"></i>
+            <span th:text="${mensajeInfo}">Ese medicamento ya está en el vademécum.</span>
+        </div>
+        <div th:if="${mensajeError}" class="mb-4 p-3 bg-rose-50 border border-rose-300 rounded-xl text-rose-800 text-sm font-semibold flex items-start gap-2">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+            <span th:text="${mensajeError}">No se pudo completar la operación.</span>
+        </div>
+
+        <!-- Alta rápida al vademécum: se puede prescribir cualquier fármaco, aunque no esté en el catálogo -->
+        <details class="mb-6 bg-sky-50/70 border border-sky-200 rounded-xl p-4">
+            <summary class="cursor-pointer text-xs font-black uppercase tracking-wider text-sky-900 flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i> Agregar un medicamento nuevo al vademécum
+            </summary>
+            <form th:action="@{/medicamentos/rapido}" method="post" class="grid grid-cols-12 gap-2 mt-4">
+                <input type="hidden" name="volver"
+                       th:value="${'/recetas/nueva/' + receta.cita.idCita}">
+                <input type="hidden" name="categoria"
+                       th:value="${receta.cita.especialidad == 'PEDIATRIA' ? 'PEDIATRIA' : 'ODONTOLOGIA'}">
+                <div class="col-span-12 sm:col-span-4">
+                    <input type="text" name="nombreComercial" required maxlength="120"
+                           placeholder="Nombre comercial *"
+                           class="w-full text-xs px-2.5 py-1.5 border border-sky-300 rounded-lg bg-white">
+                </div>
+                <div class="col-span-12 sm:col-span-3">
+                    <input type="text" name="sustanciaActiva" maxlength="120"
+                           placeholder="Sustancia activa"
+                           class="w-full text-xs px-2.5 py-1.5 border border-sky-300 rounded-lg bg-white">
+                </div>
+                <div class="col-span-6 sm:col-span-2">
+                    <input type="text" name="presentacion" maxlength="60"
+                           placeholder="Presentación"
+                           class="w-full text-xs px-2.5 py-1.5 border border-sky-300 rounded-lg bg-white">
+                </div>
+                <div class="col-span-6 sm:col-span-2">
+                    <input type="text" name="concentracion" maxlength="60"
+                           placeholder="Concentración"
+                           class="w-full text-xs px-2.5 py-1.5 border border-sky-300 rounded-lg bg-white">
+                </div>
+                <div class="col-span-12 sm:col-span-1 flex items-center">
+                    <button type="submit"
+                            class="w-full px-2 py-1.5 bg-sky-700 hover:bg-sky-800 text-white rounded-lg text-xs font-bold">
+                        Guardar
+                    </button>
+                </div>
+            </form>
+            <p class="text-[11px] text-sky-800/80 mt-2">
+                También puedes escribir cualquier otro medicamento directamente en el renglón de la receta:
+                el vademécum es una ayuda, no una restricción.
+            </p>
+        </details>
 
         <form id="formReceta" th:action="@{/recetas/guardar}" th:object="${receta}" method="post" class="space-y-6">
             <input type="hidden" th:field="*{cita.idCita}">

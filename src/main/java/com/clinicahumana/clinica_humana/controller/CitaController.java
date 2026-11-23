@@ -271,6 +271,38 @@ public class CitaController {
         }
     }
 
+    // Aceptar una cita solicitada en línea (solo la especialista asignada o el administrador)
+    @PostMapping("/aceptar")
+    public String aceptarCita(@RequestParam("idCita") Long idCita,
+                              Principal principal,
+                              RedirectAttributes redirectAttributes) {
+        Cita cita = citaService.buscarPorId(idCita).orElse(null);
+        if (cita == null) {
+            redirectAttributes.addFlashAttribute("mensajeError", "La cita no existe.");
+            return "redirect:/citas";
+        }
+
+        Usuario usuarioActual = principal != null
+                ? usuarioService.buscarPorUsername(principal.getName()).orElse(null) : null;
+        boolean esAdmin = usuarioActual != null && "ADMIN".equalsIgnoreCase(usuarioActual.getRol());
+        boolean esAsignada = usuarioActual != null && cita.getMedico() != null
+                && usuarioActual.getIdUsuario().equals(cita.getMedico().getIdUsuario());
+        if (!esAdmin && !esAsignada) {
+            redirectAttributes.addFlashAttribute("mensajeError",
+                    "Solo la especialista asignada a la cita (o el administrador) puede aceptarla.");
+            return "redirect:/citas";
+        }
+
+        try {
+            citaService.aceptarCita(idCita);
+            redirectAttributes.addFlashAttribute("mensajeExito",
+                    "Cita en línea aceptada: ya quedó confirmada en la agenda de la especialista.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "No se pudo aceptar la cita: " + e.getMessage());
+        }
+        return "redirect:/citas";
+    }
+
     // Cancelar cita con motivo
     @PostMapping("/cancelar")
     public String cancelarCita(@RequestParam("idCita") Long idCita,

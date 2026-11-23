@@ -83,6 +83,47 @@ public class MedicamentoController {
         return "redirect:/medicamentos";
     }
 
+    /**
+     * Alta rápida desde la captura de receta: la especialista agrega un medicamento
+     * nuevo al vademécum sin salir de la receta que está redactando.
+     */
+    @PostMapping("/rapido")
+    public String guardarRapido(@RequestParam("nombreComercial") String nombreComercial,
+                                @RequestParam(name = "sustanciaActiva", required = false) String sustanciaActiva,
+                                @RequestParam(name = "presentacion", required = false) String presentacion,
+                                @RequestParam(name = "concentracion", required = false) String concentracion,
+                                @RequestParam(name = "categoria", required = false, defaultValue = "GENERAL") String categoria,
+                                @RequestParam(name = "volver", required = false) String volver,
+                                RedirectAttributes redirectAttributes) {
+        String destino = (volver != null && volver.startsWith("/recetas/") && !volver.contains("//"))
+                ? volver : "/medicamentos";
+
+        String nombre = nombreComercial != null ? nombreComercial.trim() : "";
+        if (nombre.isEmpty()) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Escribe el nombre comercial del medicamento.");
+            return "redirect:" + destino;
+        }
+
+        boolean duplicado = medicamentoRepo.findByNombreComercialIgnoreCase(nombre).isPresent();
+        if (duplicado) {
+            redirectAttributes.addFlashAttribute("mensajeInfo",
+                    "El medicamento '" + nombre + "' ya estaba en el vademécum.");
+            return "redirect:" + destino;
+        }
+
+        Medicamento nuevo = new Medicamento();
+        nuevo.setNombreComercial(nombre);
+        nuevo.setSustanciaActiva(sustanciaActiva != null ? sustanciaActiva.trim() : null);
+        nuevo.setPresentacion(presentacion != null ? presentacion.trim() : null);
+        nuevo.setConcentracion(concentracion != null ? concentracion.trim() : null);
+        nuevo.setCategoria(categoria != null && !categoria.isBlank() ? categoria.toUpperCase() : "GENERAL");
+        medicamentoRepo.save(nuevo);
+
+        redirectAttributes.addFlashAttribute("mensajeExito",
+                "Medicamento '" + nombre + "' agregado al vademécum.");
+        return "redirect:" + destino;
+    }
+
     // Baja del catálogo (las recetas impresas no se ven afectadas: guardan el texto)
     @PostMapping("/eliminar")
     public String eliminar(@RequestParam("id") Long id, RedirectAttributes redirectAttributes) {

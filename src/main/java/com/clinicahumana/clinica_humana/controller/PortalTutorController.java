@@ -146,6 +146,9 @@ paciente.setSexo(sexoNormalizado);
             cita.setMotivo(motivo);
             cita.setEstado("PROGRAMADA");
             cita.setAceptaUsoFotosClinicas(aceptoFotos);
+            // Cita solicitada desde el portal: queda pendiente de que la especialista la acepte
+            cita.setOrigen("EN_LINEA");
+            cita.setAceptada(Boolean.FALSE);
             cita.setNotificarWhatsapp(Boolean.TRUE);
             cita.setNotificarSms(Boolean.TRUE);
             citaRepo.save(cita);
