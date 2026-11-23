@@ -6,11 +6,33 @@
 <header th:fragment="barraNavegacion" class="ciso-navbar bg-indigo-900 text-white shadow-lg sticky top-0 z-50 border-b border-indigo-700/70">
     <!-- Tema propio del panel dental: azul del logotipo, Times New Roman y papel tapiz -->
     <link rel="stylesheet" sec:authorize="hasRole('ODONTOLOGIA')" th:href="@{/css/panel-odontologia.css}">
+
+    <!-- Identidad fija de la barra lateral: logo grande y nombre de la doctora debajo -->
+    <div sec:authorize="hasRole('ODONTOLOGIA')" class="ciso-sidebar__brand">
+        <img th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg"
+             alt="Clinica Integral de Servicios Odontologicos" class="ciso-sidebar__logo">
+        <div class="ciso-sidebar__who">
+            <span class="ciso-sidebar__doctor">
+                Dra. <span th:text="${#strings.capitalizeWords(#strings.replace(#strings.replace(#authentication.name, '.', ' '), '_', ' '))}">Gloria Gonzalez</span>
+            </span>
+            <span class="ciso-sidebar__role">Cirujana Dentista · CISO</span>
+        </div>
+    </div>
+
     <div class="max-w-[1500px] mx-auto px-4">
         <div class="flex justify-between items-center gap-4 h-20">
 
+            <!-- Identidad del consultorio dentro de la barra azul -->
+            <div sec:authorize="hasRole('ODONTOLOGIA')" class="ciso-header__brand">
+                <i class="fa-solid fa-tooth"></i>
+                <div class="ciso-header__brand-text">
+                    <span class="ciso-header__brand-title">Consultorio de Odontología</span>
+                    <span class="ciso-header__brand-sub">Dra. Gloria González Herrera · Cirujana Dentista · CISO</span>
+                </div>
+            </div>
+
             <!-- Marca: logo de la especialidad + nombre del panel -->
-            <a th:href="@{/citas}" class="flex items-center gap-3 shrink-0 group">
+            <a th:href="@{/citas}" class="ciso-brand-link flex items-center gap-3 shrink-0 group">
 
                 <!-- PANEL PEDIATRIA -->
                 <span sec:authorize="hasRole('PEDIATRA')"
@@ -49,18 +71,6 @@
 
             <!-- Menu central condicionado por rol -->
             <nav class="hidden lg:flex items-center gap-0.5 min-w-0 overflow-x-auto [scrollbar-width:none]">
-
-                <!-- Identidad dentro de la barra lateral de la odontóloga -->
-                <div sec:authorize="hasRole('ODONTOLOGIA')" class="ciso-sidebar__brand">
-                    <img th:src="@{/img/logo-ciso.jpg}" src="/img/logo-ciso.jpg"
-                         alt="Clinica Integral de Servicios Odontologicos" class="ciso-sidebar__logo">
-                    <div class="ciso-sidebar__who">
-                        <span class="ciso-sidebar__doctor">
-                            Dra. <span th:text="${#strings.capitalizeWords(#strings.replace(#strings.replace(#authentication.name, '.', ' '), '_', ' '))}">Gloria Gonzalez</span>
-                        </span>
-                        <span class="ciso-sidebar__role">Cirujana Dentista · CISO</span>
-                    </div>
-                </div>
 
                 <!-- 0. PANEL ADMIN (Solo Administrador) -->
                 <a sec:authorize="hasAnyRole('ADMIN', 'ADMINISTRADOR')"
@@ -125,10 +135,23 @@
                    th:href="@{/pagos/corte}" class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-100">
                     <i class="fa-solid fa-chart-line text-blue-300"></i> Corte de Caja
                 </a>
+
+                <!-- Pie de la barra lateral: bienvenida y salida de la doctora -->
+                <div sec:authorize="hasRole('ODONTOLOGIA')" class="ciso-sidebar__footer">
+                    <span class="ciso-sidebar__welcome">Bienvenida</span>
+                    <span class="ciso-sidebar__welcome-name"
+                          th:text="${#strings.capitalizeWords(#strings.replace(#strings.replace(#authentication.name, '.', ' '), '_', ' '))}">Gloria Gonzalez</span>
+                    <span class="ciso-sidebar__welcome-role">CISO Especialista Dental</span>
+                    <form th:action="@{/logout}" method="post" class="ciso-sidebar__logout-form">
+                        <button type="submit" title="Cerrar sesion" class="ciso-sidebar__logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </form>
+                </div>
             </nav>
 
             <!-- Perfil de Usuario y Logout -->
-            <div class="flex items-center gap-3 shrink-0">
+            <div class="ciso-header__profile flex items-center gap-3 shrink-0">
                 <div class="text-right">
                     <span sec:authorize="hasRole('ODONTOLOGIA')" class="ciso-header__doctor">
                         <span class="ciso-header__doctor-label">Bienvenida</span>

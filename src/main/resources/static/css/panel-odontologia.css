@@ -397,12 +397,12 @@ div[class*="fixed"][class*="inset-0"] > div {
    ========================================================================== */
 
 body:has(> header.ciso-navbar) {
-    padding-left: 272px;
+    padding-left: 310px;
 }
 
 /* En la barra lateral vive la identidad: se oculta la marca duplicada del encabezado */
-header.ciso-navbar > div > div > a:first-child {
-    display: none;
+header.ciso-navbar .ciso-brand-link {
+    display: none !important;
 }
 
 header.ciso-navbar > div > div {
@@ -415,14 +415,14 @@ header.ciso-navbar nav {
     top: 0;
     bottom: 0;
     left: 0;
-    width: 272px;
+    width: 310px;
     height: 100vh;
     display: flex !important;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    gap: 7px;
-    padding: 18px 14px 22px;
+    gap: 8px;
+    padding: 208px 16px 18px;
     overflow-x: hidden;
     overflow-y: auto;
     background-color: #03101d;
@@ -439,37 +439,54 @@ header.ciso-navbar nav {
     scrollbar-color: rgba(140, 230, 255, .35) transparent;
 }
 
-/* Tarjeta de identidad: logo CISO + nombre de la doctora */
+/* Identidad fija en la cabeza de la barra lateral: logo grande y nombre debajo */
 .ciso-sidebar__brand {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 310px;
+    box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 11px;
-    padding: 4px 6px 16px;
-    margin-bottom: 10px;
+    gap: 12px;
+    padding: 20px 16px 16px;
+    background-color: #03101d;
+    background-image:
+        linear-gradient(180deg, rgba(3, 16, 29, .78) 0%, rgba(4, 24, 38, .66) 70%, rgba(2, 10, 18, .88) 100%),
+        url("/img/sidebar-ciso.svg");
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    border-right: 1px solid rgba(128, 226, 255, .22);
     border-bottom: 1px solid rgba(151, 232, 255, .22);
+    box-shadow: 18px 0 46px -30px rgba(0, 0, 0, .95), inset -1px 0 0 rgba(140, 240, 255, .12);
+    z-index: 65;
 }
 
 .ciso-sidebar__logo {
-    height: 56px;
+    height: 104px;
     width: auto;
-    flex-shrink: 0;
-    padding: 5px 7px;
+    max-width: 100%;
+    object-fit: contain;
+    padding: 8px 14px;
     background: #ffffff;
-    border-radius: 13px;
-    box-shadow: 0 12px 26px -12px rgba(0, 0, 0, .85), 0 0 0 1px rgba(163, 240, 255, .35);
+    border-radius: 16px;
+    box-shadow: 0 16px 32px -14px rgba(0, 0, 0, .9), 0 0 0 1px rgba(163, 240, 255, .45), 0 0 34px -10px rgba(80, 220, 255, .55);
 }
 
 .ciso-sidebar__who {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 5px;
     min-width: 0;
-    text-align: left;
+    text-align: center;
 }
 
 .ciso-sidebar__doctor {
-    font: 700 15px/1.15 var(--ciso-serif) !important;
-    letter-spacing: .05em !important;
+    font: 700 16px/1.2 var(--ciso-serif) !important;
+    letter-spacing: .06em !important;
     text-transform: uppercase;
     color: #f4feff;
     text-shadow: 0 0 18px rgba(95, 225, 255, .6), 0 1px 2px rgba(0, 0, 0, .8);
@@ -480,7 +497,7 @@ header.ciso-navbar nav {
 }
 
 .ciso-sidebar__role {
-    font: 600 9.5px/1 var(--ciso-serif) !important;
+    font: 600 10px/1 var(--ciso-serif) !important;
     letter-spacing: .16em !important;
     text-transform: uppercase;
     color: #6ddcf2;
@@ -549,53 +566,131 @@ header.ciso-navbar nav > a:active {
     box-shadow: inset 0 3px 10px rgba(0, 0, 0, .55);
 }
 
-/* Cobros y Caja: botón protagonista de la doctora */
-header.ciso-navbar nav > a.ciso-nav-cash {
-    margin-top: 12px;
-    background: linear-gradient(135deg, rgba(22, 202, 236, .34) 0%, rgba(26, 96, 178, .40) 100%) !important;
-    border: 1px solid rgba(150, 246, 255, .70) !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 0 1px rgba(150, 246, 255, .16), 0 14px 30px -18px rgba(0, 224, 255, .95);
-    animation: ciso-cash-pulse 3.8s ease-in-out infinite;
-}
-
-header.ciso-navbar nav > a.ciso-nav-cash i {
-    color: #b8fbff !important;
-    font-size: 15px !important;
-}
-
-@keyframes ciso-cash-pulse {
-    0%, 100% { box-shadow: 0 0 0 1px rgba(150, 246, 255, .16), 0 14px 30px -18px rgba(0, 224, 255, .75); }
-    50%      { box-shadow: 0 0 0 1px rgba(190, 252, 255, .55), 0 16px 34px -14px rgba(0, 224, 255, 1); }
-}
-
-/* --- Nombre de la doctora en el encabezado --- */
-header.ciso-navbar .ciso-header__doctor {
+/* --- Pie de la barra lateral: bienvenida y salida --- */
+.ciso-sidebar__footer {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(151, 232, 255, .22);
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 3px;
-    margin-right: 8px;
-    line-height: 1.1;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
 }
 
-.ciso-header__doctor-label {
+.ciso-sidebar__welcome {
     font: 600 9px/1 var(--ciso-serif) !important;
     letter-spacing: .24em !important;
     text-transform: uppercase;
     color: #8fe9ff;
 }
 
-.ciso-header__doctor-name {
-    font: 700 17px/1.1 var(--ciso-serif) !important;
-    letter-spacing: .07em !important;
+.ciso-sidebar__welcome-name {
+    font: 700 15px/1.15 var(--ciso-serif) !important;
+    letter-spacing: .06em !important;
     text-transform: uppercase;
     color: #ffffff;
     text-shadow: 0 0 18px rgba(90, 220, 255, .6), 0 2px 4px rgba(0, 0, 0, .6);
 }
 
+.ciso-sidebar__welcome-role {
+    font: 700 9px/1 var(--ciso-serif) !important;
+    letter-spacing: .12em !important;
+    text-transform: uppercase;
+    color: #dceeff;
+    background: rgba(22, 55, 110, .78);
+    border: 1px solid rgba(140, 200, 255, .45);
+    border-radius: 999px;
+    padding: 6px 12px 5px;
+    margin-top: 3px;
+}
+
+.ciso-sidebar__logout-form {
+    margin-top: 9px;
+}
+
+.ciso-sidebar__logout {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #c0304a;
+    border: 1px solid rgba(255, 255, 255, .28);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0 12px 24px -14px rgba(0, 0, 0, .9);
+    transition: transform .2s var(--ciso-ease), background-color .2s ease;
+}
+
+.ciso-sidebar__logout:hover {
+    background: #a32340;
+    transform: translateY(-2px);
+}
+
+/* El perfil del encabezado se oculta: vive en el pie de la barra lateral */
+header.ciso-navbar .ciso-header__profile {
+    display: none !important;
+}
+
+/* --- Nombre del consultorio dentro de la barra azul --- */
+header.ciso-navbar .ciso-header__brand {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    min-width: 0;
+    color: #ffffff;
+}
+
+header.ciso-navbar .ciso-header__brand > i {
+    font-size: 30px;
+    color: #eaf8ff;
+    filter: drop-shadow(0 0 12px rgba(120, 230, 255, .75));
+}
+
+.ciso-header__brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.ciso-header__brand-title {
+    font: 700 19px/1.1 var(--ciso-serif) !important;
+    letter-spacing: .1em !important;
+    text-transform: uppercase;
+    color: #ffffff;
+    text-shadow: 0 0 18px rgba(90, 220, 255, .55), 0 2px 4px rgba(0, 0, 0, .55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ciso-header__brand-sub {
+    font: 600 10.5px/1.1 var(--ciso-serif) !important;
+    letter-spacing: .14em !important;
+    text-transform: uppercase;
+    color: #cfe8ff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 header.ciso-navbar .ciso-header__user {
     display: none !important;
+}
+
+/* Títulos que quedan sobre la barra azul deben ser claros */
+header h1, header h2, header h3 {
+    color: #ffffff !important;
+}
+
+header h1 {
+    border-bottom-color: rgba(255, 255, 255, .28) !important;
 }
 
 /* --- Legibilidad sobre fondos claros ---
@@ -673,8 +768,8 @@ main textarea::placeholder {
         justify-content: space-between;
     }
 
-    header.ciso-navbar > div > div > a:first-child {
-        display: flex;
+    header.ciso-navbar .ciso-brand-link {
+        display: flex !important;
     }
 
     header.ciso-navbar nav {
@@ -695,7 +790,19 @@ main textarea::placeholder {
     }
 
     .ciso-sidebar__brand {
-        display: none;
+        display: none !important;
+    }
+
+    header.ciso-navbar .ciso-header__brand {
+        display: none !important;
+    }
+
+    header.ciso-navbar .ciso-header__profile {
+        display: flex !important;
+    }
+
+    .ciso-sidebar__footer {
+        display: none !important;
     }
 
     header.ciso-navbar nav > a {
@@ -721,7 +828,9 @@ main textarea::placeholder {
     }
 
     header.ciso-navbar nav,
-    header.ciso-navbar .ciso-header__doctor {
+    header.ciso-navbar .ciso-header__doctor,
+    .ciso-sidebar__brand,
+    .ciso-sidebar__footer {
         display: none !important;
     }
 }

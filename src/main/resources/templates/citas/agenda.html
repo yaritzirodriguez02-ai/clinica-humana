@@ -40,20 +40,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- Vista para Odontología / CISO -->
-                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ODONTOLOGIA'}" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 overflow-hidden">
-                    <div class="absolute top-0 right-0 w-36 h-36 bg-gradient-to-bl from-blue-200/40 to-transparent rounded-full -mr-10 -mt-10 blur-2xl"></div>
-                    <div class="flex items-start gap-4 relative">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-900 to-blue-600 flex items-center justify-center text-white shadow-md shrink-0">
-                            <img th:src="@{/img/logo-odontologia.png}" src="/img/logo-odontologia.png" alt="Logo Odontología" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
-                            <i class="fa-solid fa-tooth text-2xl"></i>
-                        </div>
-                        <div class="min-w-0">
-                            <h2 class="text-xl font-extrabold uppercase tracking-wide text-slate-900">Consultorio de Odontología</h2>
-                            <p class="text-sm text-slate-600">Dra. Gloria González Herrera · CIRUJANA DENTISTA · CISO.</p>
-                        </div>
-                    </div>
-                </div>
                 <!-- Vista para Recepción / Admin -->
                 <div th:if="${usuarioActual != null and (usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}">
                     <h2 class="text-2xl font-bold text-slate-900">Agenda General de Consultas y Recepción</h2>
