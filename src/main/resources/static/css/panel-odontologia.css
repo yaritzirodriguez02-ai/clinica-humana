@@ -178,11 +178,19 @@ thead[class*="bg-"] {
     background: linear-gradient(90deg, var(--ciso-navy) 0%, var(--ciso-blue) 100%) !important;
 }
 
+/* Las filas del encabezado traen su propio fondo claro (bg-slate-100, gradientes
+   grises): hay que anularlo o tapa el azul y deja el texto blanco invisible. */
+thead tr,
+thead tr[class*="bg-"] {
+    background: transparent !important;
+    background-image: none !important;
+}
+
 thead th,
 thead td {
     color: #ffffff !important;
     background: transparent !important;
-    border-color: rgba(255, 255, 255, .18) !important;
+    border-color: rgba(255, 255, 255, .22) !important;
 }
 
 tbody tr {
@@ -351,6 +359,20 @@ div[class*="fixed"][class*="inset-0"] > div {
         animation: none !important;
         transition: none !important;
         box-shadow: none !important;
+    }
+
+    /* Tablas: la impresora no pinta el degradado azul, así que el encabezado
+       pasa a fondo claro con letra oscura para que no desaparezca. */
+    thead,
+    thead tr {
+        background: #e7ecf7 !important;
+        background-image: none !important;
+    }
+
+    thead th,
+    thead td {
+        color: var(--ciso-ink) !important;
+        border-color: #aab8d6 !important;
     }
 }
 
@@ -702,4 +724,111 @@ main textarea::placeholder {
     header.ciso-navbar .ciso-header__doctor {
         display: none !important;
     }
+}
+
+/* --------------------------------------------------------------------------
+   Paleta unificada: los acentos fríos (índigo, cielo, azul brillante) pasan al
+   azul institucional CISO. Se conservan verde (cobros), rojo (eliminar) y
+   ámbar (avisos) como colores semánticos, para no perder la formalidad.
+   -------------------------------------------------------------------------- */
+.bg-indigo-500,
+.bg-indigo-600,
+.bg-indigo-700,
+.bg-indigo-800,
+.bg-indigo-900,
+.bg-sky-500,
+.bg-sky-600,
+.bg-sky-700,
+.bg-sky-800,
+.bg-blue-600,
+.bg-blue-700,
+.bg-blue-800 {
+    background-color: var(--ciso-blue) !important;
+    background-image: linear-gradient(135deg, var(--ciso-navy) 0%, var(--ciso-blue) 100%) !important;
+    color: #ffffff !important;
+}
+
+.bg-indigo-50,
+.bg-sky-50 {
+    background-color: #eef2fa !important;
+}
+
+.bg-indigo-100,
+.bg-sky-100 {
+    background-color: #e2e9f6 !important;
+}
+
+.text-indigo-500,
+.text-indigo-600,
+.text-indigo-700,
+.text-indigo-800,
+.text-sky-600,
+.text-sky-700,
+.text-sky-800 {
+    color: #24468f !important;
+}
+
+.border-indigo-500,
+.border-indigo-600,
+.border-indigo-700,
+.border-sky-500,
+.border-sky-600,
+.border-sky-700 {
+    border-color: #6f88bd !important;
+}
+
+.from-indigo-400,
+.from-indigo-500,
+.from-indigo-600,
+.from-indigo-700,
+.from-indigo-800,
+.from-indigo-900,
+.from-sky-400,
+.from-sky-500,
+.from-sky-600,
+.from-sky-700 {
+    --tw-gradient-from: var(--ciso-navy) var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgba(22, 38, 90, 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+
+.via-indigo-400,
+.via-indigo-500,
+.via-indigo-600,
+.via-indigo-700,
+.via-sky-400,
+.via-sky-500,
+.via-sky-600 {
+    --tw-gradient-via: var(--ciso-blue) var(--tw-gradient-via-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
+}
+
+.to-indigo-400,
+.to-indigo-500,
+.to-indigo-600,
+.to-indigo-700,
+.to-sky-400,
+.to-sky-500,
+.to-sky-600 {
+    --tw-gradient-to: var(--ciso-blue) var(--tw-gradient-to-position) !important;
+}
+
+.hover\:bg-indigo-600:hover,
+.hover\:bg-indigo-700:hover,
+.hover\:bg-indigo-800:hover,
+.hover\:bg-indigo-900:hover,
+.hover\:bg-sky-600:hover,
+.hover\:bg-sky-700:hover,
+.hover\:bg-sky-800:hover,
+.hover\:bg-blue-700:hover,
+.hover\:bg-blue-800:hover,
+.hover\:bg-blue-900:hover {
+    background-image: linear-gradient(135deg, #0f1c44 0%, var(--ciso-navy-2) 100%) !important;
+}
+
+.hover\:text-indigo-700:hover,
+.hover\:text-indigo-800:hover,
+.hover\:text-sky-700:hover,
+.hover\:text-sky-800:hover {
+    color: var(--ciso-navy) !important;
 }
