@@ -6,11 +6,11 @@ import com.clinicahumana.clinica_humana.model.Empleado;
 import com.clinicahumana.clinica_humana.model.Paciente;
 import com.clinicahumana.clinica_humana.model.Tutor;
 import com.clinicahumana.clinica_humana.model.Usuario;
-import com.clinicahumana.clinica_humana.repository.CitaRepository;
 import com.clinicahumana.clinica_humana.repository.EmpleadoRepository;
 import com.clinicahumana.clinica_humana.repository.PacienteRepository;
 import com.clinicahumana.clinica_humana.repository.TutorRepository;
 import com.clinicahumana.clinica_humana.repository.UsuarioRepository;
+import com.clinicahumana.clinica_humana.service.CitaService;
 import com.clinicahumana.clinica_humana.service.NotificacionCitaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,7 +38,7 @@ public class PortalTutorController {
     private UsuarioRepository usuarioRepo;
 
     @Autowired
-    private CitaRepository citaRepo;
+    private CitaService citaService;
 
     @Autowired
     private EmpleadoRepository empleadoRepo;
@@ -124,19 +124,12 @@ paciente.setSexo(sexoNormalizado);
             Usuario medico = usuarioRepo.findByUsername(usernameMedico)
                     .orElseThrow(() -> new IllegalArgumentException("No se encontró especialista para " + especialidad));
 
-            // 4. Validar que no haya empalme en la misma fecha y hora para el médico
+            // 4. Crear la Cita. Se usa CitaService para que el candado de agenda y la
+            //    validación de empalme sean los mismos del panel interno: así un doble
+            //    clic o dos envíos simultáneos no generan citas duplicadas.
             LocalDate f = LocalDate.parse(fechaCita);
             LocalTime h = LocalTime.parse(horaCita);
-            boolean ocupado = citaRepo.findByMedicoIdUsuarioAndFecha(medico.getIdUsuario(), f)
-                    .stream()
-                    .anyMatch(c -> c.getHora().equals(h) && !"CANCELADA".equalsIgnoreCase(c.getEstado()));
 
-            if (ocupado) {
-                redirectAttributes.addFlashAttribute("mensajeError", "El horario seleccionado ya se encuentra ocupado para este médico. Por favor, elija otra hora o fecha.");
-                return "redirect:/portal-citas";
-            }
-
-            // 5. Crear la Cita
             Cita cita = new Cita();
             cita.setPaciente(paciente);
             cita.setMedico(medico);
@@ -151,7 +144,7 @@ paciente.setSexo(sexoNormalizado);
             cita.setAceptada(Boolean.FALSE);
             cita.setNotificarWhatsapp(Boolean.TRUE);
             cita.setNotificarSms(Boolean.TRUE);
-            citaRepo.save(cita);
+            cita = citaService.agendarCita(cita);
 
             // Confirmación inmediata por WhatsApp y SMS (un fallo no impide agendar)
             try {
@@ -184,6 +177,9 @@ paciente.setSexo(sexoNormalizado);
                             : " (Aviso interno: la mensajería está en modo de prueba; configure Twilio para enviar los mensajes reales)."));
             return "redirect:/portal-citas/confirmacion";
 
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("mensajeError", e.getMessage());
+            return "redirect:/portal-citas";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensajeError", "Error al agendar la cita: " + e.getMessage());
             return "redirect:/portal-citas";

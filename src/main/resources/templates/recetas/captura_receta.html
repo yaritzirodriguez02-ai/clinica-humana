@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="es">
 <head>
     <link rel="stylesheet" sec:authorize="hasRole('ODONTOLOGIA')" th:href="@{/css/panel-odontologia.css}">
+    <link rel="stylesheet" sec:authorize="hasRole('PEDIATRA')" th:href="@{/css/panel-pediatria.css}">
     <meta charset="UTF-8">
     <title>Prescripción de Receta Médica - Clínica Humana</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -336,6 +337,12 @@
                     cont.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 } else {
                     cont.classList.add('hidden');
+                    // Evita recetas duplicadas por doble clic
+                    const botonGuardar = form.querySelector('button[type="submit"]');
+                    if (botonGuardar) {
+                        botonGuardar.disabled = true;
+                        botonGuardar.classList.add('opacity-60', 'cursor-not-allowed');
+                    }
                 }
             });
         });

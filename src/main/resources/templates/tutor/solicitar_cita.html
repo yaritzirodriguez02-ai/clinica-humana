@@ -225,6 +225,14 @@
                 } else {
                     error.classList.add("hidden");
                 }
+                if (!e.defaultPrevented) {
+                    const boton = form.querySelector('button[type="submit"]');
+                    if (boton) {
+                        boton.disabled = true;
+                        boton.classList.add('opacity-60', 'cursor-not-allowed');
+                        boton.textContent = 'Agendando cita…';
+                    }
+                }
             });
         });
     </script>

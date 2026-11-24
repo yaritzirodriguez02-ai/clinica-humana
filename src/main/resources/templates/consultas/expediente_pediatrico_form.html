@@ -6,6 +6,7 @@
     <title th:text="${tituloFormulario}">Atención Pediátrica</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/panel-pediatria.css}">
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
 
@@ -79,6 +80,7 @@
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Talla (cm) *</label>
                     <input type="number" step="0.01" min="40.00" max="200.00" th:field="*{talla}" required
                            class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                    <span class="text-[10px] text-slate-500">Máximo 200 cm (adolescentes de hasta 15 años).</span>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Temperatura (°C) *</label>

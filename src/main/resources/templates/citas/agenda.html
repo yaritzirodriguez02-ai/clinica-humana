@@ -49,15 +49,47 @@
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
                 <!-- Vista para Dra. Pilar -->
-                <div th:if="${usuarioActual != null and usuarioActual.rol == 'PEDIATRA'}" class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 h-12 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0 shadow-sm">
-                            <img th:src="@{/img/logo-pediatria.png}" src="/img/logo-pediatria.png" alt="Logo Pediatría" class="w-10 h-10 object-contain" onerror="this.style.display='none'">
-                            <i class="fa-solid fa-user-injured text-2xl"></i>
-                        </div>
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'PEDIATRA'}"
+                     class="ped-hero bg-white rounded-xl border border-slate-200 shadow-sm p-5 w-full">
+                    <div class="flex items-center gap-4 flex-wrap sm:flex-nowrap">
+                        <!-- Ilustración infantil: niños, sol y globos -->
+                        <svg class="ped-ilustracion" viewBox="0 0 150 108" aria-hidden="true">
+                            <circle cx="24" cy="22" r="12" fill="#f2c94c"/>
+                            <g stroke="#f2c94c" stroke-width="2.4" stroke-linecap="round">
+                                <line x1="24" y1="4" x2="24" y2="0"/><line x1="44" y1="22" x2="49" y2="22"/>
+                                <line x1="38" y1="8" x2="42" y2="4"/><line x1="10" y1="8" x2="6" y2="4"/>
+                                <line x1="4" y1="22" x2="-1" y2="22"/><line x1="38" y1="36" x2="42" y2="40"/>
+                            </g>
+                            <ellipse cx="90" cy="20" rx="14" ry="7" fill="#ffffff" opacity=".9"/>
+                            <ellipse cx="101" cy="17" rx="9" ry="6" fill="#ffffff" opacity=".9"/>
+                            <!-- Niña -->
+                            <circle cx="58" cy="50" r="12" fill="#f7c9a3"/>
+                            <path d="M46 47 q12 -16 24 0" fill="#8b5a2b"/>
+                            <circle cx="53" cy="51" r="1.6" fill="#33324a"/><circle cx="63" cy="51" r="1.6" fill="#33324a"/>
+                            <path d="M54 56 q4 3 8 0" stroke="#d9534f" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                            <path d="M46 64 h24 l-3 26 h-18 z" fill="#8e5ca8"/>
+                            <path d="M49 90 l-2 12 M67 90 l2 12" stroke="#33324a" stroke-width="3" stroke-linecap="round"/>
+                            <!-- Niño -->
+                            <circle cx="92" cy="54" r="12" fill="#f7c9a3"/>
+                            <path d="M80 51 q12 -15 24 0 l0 -3 q-12 -12 -24 0 z" fill="#8b5a2b"/>
+                            <circle cx="87" cy="55" r="1.6" fill="#33324a"/><circle cx="97" cy="55" r="1.6" fill="#33324a"/>
+                            <path d="M88 60 q4 3 8 0" stroke="#d9534f" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                            <path d="M80 68 h24 l-2 24 h-20 z" fill="#d9534f"/>
+                            <path d="M84 92 l-2 12 M100 92 l2 12" stroke="#2f6db3" stroke-width="4" stroke-linecap="round"/>
+                            <!-- Globo -->
+                            <ellipse cx="128" cy="44" rx="9" ry="11" fill="#6bbf8a"/>
+                            <path d="M128 55 l-3 14 M128 55 l3 14" stroke="#6c3f85" stroke-width="1.8"/>
+                            <text x="112" y="82" font-size="18" fill="#f2c94c">★</text>
+                        </svg>
                         <div class="min-w-0">
-                            <h2 class="text-xl font-extrabold text-slate-900">Consultorio Pediátrico</h2>
-                            <p class="text-sm text-slate-600">Dr/a Pediatra · Atención de bebés y menores hasta 15 años.</p>
+                            <span class="ped-pastilla">Panel de Pediatría</span>
+                            <h2 class="text-xl font-extrabold text-slate-900 mt-2">Consultorio Pediátrico</h2>
+                            <p class="text-sm text-slate-600">Dra. Pilar Ríos · Atención de recién nacidos y niños hasta 15 años.</p>
+                            <p th:if="${solicitudesEnLinea != null and solicitudesEnLinea > 0}"
+                               class="mt-2 inline-flex items-center gap-2 rounded-full bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1 text-xs font-bold">
+                                <i class="fa-solid fa-globe"></i>
+                                <span th:text="${solicitudesEnLinea + (solicitudesEnLinea == 1 ? ' solicitud en línea por aceptar' : ' solicitudes en línea por aceptar')}">Solicitudes en línea por aceptar</span>
+                            </p>
                         </div>
                     </div>
                 </div>

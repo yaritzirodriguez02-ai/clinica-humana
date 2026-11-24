@@ -1,0 +1,397 @@
+/* ============================================================
+   PANEL DE PEDIATRÍA · Clínica Médica Pediátrica
+   Paleta tomada del logotipo: azul, rojo, morado y amarillo.
+   Tipografía Times New Roman para todo el panel.
+   ============================================================ */
+
+:root {
+    --ped-azul: #2f6db3;
+    --ped-azul-oscuro: #234f86;
+    --ped-morado: #8e5ca8;
+    --ped-morado-oscuro: #6c3f85;
+    --ped-rojo: #d9534f;
+    --ped-amarillo: #f2c94c;
+    --ped-verde: #6bbf8a;
+    --ped-crema: #fffaf0;
+    --ped-tinta: #33324a;
+    --ped-linea: #efdfc8;
+    --ped-sombra: 0 10px 24px rgba(142, 92, 168, .12);
+}
+
+/* ---------- Base ---------- */
+body {
+    font-family: "Times New Roman", "Liberation Serif", Times, Georgia, serif !important;
+    color: var(--ped-tinta);
+    background-color: var(--ped-crema) !important;
+    background-image:
+        radial-gradient(circle at 8% 12%, rgba(242, 201, 76, .22) 0 9px, transparent 10px),
+        radial-gradient(circle at 92% 8%, rgba(111, 179, 224, .20) 0 12px, transparent 13px),
+        radial-gradient(circle at 18% 82%, rgba(142, 92, 168, .14) 0 8px, transparent 9px),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23e8d9bf' stroke-width='1' opacity='.55'%3E%3Ccircle cx='18' cy='18' r='4'/%3E%3Ccircle cx='102' cy='40' r='3'/%3E%3Ccircle cx='60' cy='96' r='5'/%3E%3Cpath d='M44 52l4 4m0-4l-4 4'/%3E%3C/g%3E%3C/svg%3E");
+    background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, label, button, input, select, textarea, table, a, span, p, li {
+    font-family: "Times New Roman", "Liberation Serif", Times, Georgia, serif;
+}
+
+h1, h2, h3 { letter-spacing: .01em; }
+h2, h3 { color: #3d2b52; }
+
+/* ---------- Barra superior ---------- */
+.ciso-navbar {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(120deg, #234f86 0%, #2f6db3 34%, #6b5aa8 68%, #8e5ca8 100%) !important;
+    border-bottom: 0 !important;
+    box-shadow: 0 12px 30px rgba(47, 109, 179, .28) !important;
+    overflow: hidden;
+}
+
+/* Arcoíris y puntitos decorativos al pie de la barra */
+.ciso-navbar::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 5px;
+    background: repeating-linear-gradient(90deg,
+        var(--ped-rojo) 0 22px,
+        var(--ped-amarillo) 22px 44px,
+        var(--ped-verde) 44px 66px,
+        #6fb3e0 66px 88px,
+        var(--ped-morado) 88px 110px);
+    z-index: 2;
+}
+
+.ciso-navbar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 22% -20%, rgba(255, 255, 255, .22) 0 42px, transparent 43px),
+        radial-gradient(circle at 78% 120%, rgba(255, 255, 255, .16) 0 60px, transparent 61px),
+        radial-gradient(circle at 50% 130%, rgba(242, 201, 76, .18) 0 36px, transparent 37px);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.ped-doodles {
+    position: absolute;
+    right: 18%;
+    top: 6px;
+    width: 210px;
+    height: 86px;
+    opacity: .95;
+    pointer-events: none;
+    animation: ped-flotar 5.5s ease-in-out infinite;
+    z-index: 0;
+}
+
+.ciso-navbar .max-w-\[1500px\] { position: relative; z-index: 1; }
+
+.ciso-brand-link img {
+    transition: transform .35s ease;
+    animation: ped-latido 4s ease-in-out infinite;
+}
+.ciso-brand-link:hover img { transform: rotate(-4deg) scale(1.06); }
+
+.ciso-brand-link span.font-extrabold {
+    font-family: "Times New Roman", Times, serif;
+    letter-spacing: .03em;
+}
+
+.ciso-navbar nav a {
+    border-radius: 999px;
+    position: relative;
+    flex: 0 0 auto;
+    font-size: 10px !important;
+    padding-left: .45rem !important;
+    padding-right: .45rem !important;
+    white-space: nowrap !important;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.ciso-navbar nav a:hover {
+    background: rgba(255, 255, 255, .20) !important;
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .16);
+}
+.ciso-navbar nav a:active { transform: translateY(1px) scale(.98); }
+.ciso-navbar nav a i { color: #ffe28a !important; }
+
+/* Pie de sesión y perfil */
+.ciso-header__profile {
+    background: rgba(255, 255, 255, .14);
+    border: 1px solid rgba(255, 255, 255, .30);
+    border-radius: 18px;
+    padding: 6px 10px;
+}
+.ciso-header__profile .bg-amber-100 {
+    background: #ffe9a8 !important;
+    color: #6b4b00 !important;
+    border-radius: 999px;
+}
+.ciso-header__profile .ciso-header__user { color: #fff; }
+
+/* ---------- Tarjetas y secciones ---------- */
+main .bg-white {
+    background-color: #fffdf8 !important;
+    border-color: var(--ped-linea) !important;
+    border-radius: 22px !important;
+    box-shadow: var(--ped-sombra) !important;
+}
+
+main .bg-slate-50,
+main .bg-slate-100 {
+    background-color: #fdf7ec !important;
+}
+
+main .border-slate-200,
+main .border-slate-100 { border-color: var(--ped-linea) !important; }
+
+main > div,
+main > form > div {
+    animation: ped-aparecer .45s ease both;
+}
+
+main h2, main h3 {
+    font-weight: 700;
+}
+main h3 > i {
+    background: #fff4d6;
+    color: var(--ped-morado) !important;
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 3px 0 #f0d79a;
+    transition: transform .25s ease;
+}
+main h3:hover > i { transform: rotate(-8deg) scale(1.08); }
+
+/* ---------- Botones ---------- */
+main button[type="submit"],
+main a[class*="bg-indigo-"],
+main a[class*="bg-blue-"],
+main button[class*="bg-indigo-"],
+main button[class*="bg-blue-"],
+main button[class*="bg-emerald-"],
+main .btn-ped {
+    border-radius: 999px !important;
+    font-weight: 700 !important;
+    letter-spacing: .015em;
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease !important;
+    box-shadow: 0 5px 0 rgba(47, 109, 179, .30) !important;
+}
+main button[type="submit"]:hover,
+main a[class*="bg-indigo-"]:hover,
+main a[class*="bg-blue-"]:hover,
+main button[class*="bg-indigo-"]:hover,
+main button[class*="bg-blue-"]:hover,
+main button[class*="bg-emerald-"]:hover,
+main .btn-ped:hover {
+    transform: translateY(-2px) scale(1.03);
+    filter: saturate(1.08);
+}
+main button[type="submit"]:active,
+main a[class*="bg-indigo-"]:active,
+main button[class*="bg-indigo-"]:active,
+main .btn-ped:active {
+    transform: translateY(3px) scale(.99);
+    box-shadow: 0 2px 0 rgba(47, 109, 179, .30) !important;
+}
+
+main button[type="submit"] i { animation: ped-meneo 2.4s ease-in-out infinite; }
+
+main a[class*="bg-slate-200"] {
+    border-radius: 999px !important;
+}
+
+/* Botón principal de la agenda */
+main a[class*="from-blue-700"] {
+    background-image: linear-gradient(120deg, var(--ped-azul-oscuro), var(--ped-azul) 55%, var(--ped-morado)) !important;
+    border: 0 !important;
+}
+
+/* ---------- Formularios ---------- */
+main input[type="text"],
+main input[type="number"],
+main input[type="date"],
+main input[type="email"],
+main input[type="tel"],
+main select,
+main textarea {
+    background-color: #fffdf8 !important;
+    border: 1.5px solid #dcC8a8 !important;
+    border-radius: 14px !important;
+    color: var(--ped-tinta) !important;
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+main input:focus,
+main select:focus,
+main textarea:focus {
+    border-color: var(--ped-morado) !important;
+    box-shadow: 0 0 0 4px rgba(142, 92, 168, .16) !important;
+    outline: none;
+    transform: translateY(-1px);
+}
+main label {
+    color: #6b5470 !important;
+    letter-spacing: .04em;
+}
+
+/* ---------- Tabla de agenda ---------- */
+main table thead tr {
+    background: linear-gradient(90deg, #f7ead2, #f1e6f7 55%, #e5f0fb) !important;
+}
+main table thead th { color: #5b4a74 !important; }
+main table tbody tr { transition: background .18s ease, transform .18s ease; }
+main table tbody tr:hover { background: #fff7e8 !important; }
+main table tbody td { border-color: #f4e8d6 !important; }
+
+main table .rounded-full { border-radius: 999px !important; }
+
+/* ---------- Avisos ---------- */
+main .bg-emerald-100 { background-color: #e4f7e8 !important; border-color: #b7e2bf !important; }
+main .bg-rose-100 { background-color: #fde8e6 !important; border-color: #f3bdb7 !important; }
+main .bg-amber-100 { background-color: #fff3ce !important; border-color: #efd68f !important; }
+
+/* Encabezados internos sin navbar (alta de paciente, etc.) */
+body > header:not(.ciso-navbar):not(.ped-header) {
+    background: linear-gradient(120deg, #234f86 0%, #2f6db3 45%, #8e5ca8 100%) !important;
+    border-bottom: 5px solid #f2c94c;
+}
+
+/* ---------- Encabezado de la consulta ---------- */
+.ped-header {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(120deg, #234f86 0%, #2f6db3 42%, #8e5ca8 100%) !important;
+    border-bottom: 5px solid #f2c94c;
+}
+.ped-header::after {
+    content: "";
+    position: absolute;
+    right: -30px; top: -40px;
+    width: 150px; height: 150px;
+    background: radial-gradient(circle, rgba(242, 201, 76, .35) 0 30%, transparent 31%);
+    pointer-events: none;
+}
+.ped-header a {
+    border-radius: 999px !important;
+    transition: transform .2s ease, background .2s ease;
+}
+.ped-header a:hover { transform: translateY(-2px) scale(1.03); background: rgba(255, 255, 255, .22) !important; }
+
+/* Recuadro de firma: nunca provoca desplazamiento horizontal */
+.firma-caja {
+    display: block;
+    width: 100%;
+    max-width: 466px;
+}
+.firma-caja #canvasFirma {
+    display: block;
+    width: 100%;
+    max-width: 450px;
+    height: auto;
+    touch-action: none;
+}
+
+/* Pasos numerados de la consulta */
+.ped-step {
+    position: relative;
+    overflow: hidden;
+    border-left: 6px solid #f2c94c !important;
+}
+.ped-step:nth-of-type(2) { border-left-color: #6fb3e0 !important; }
+.ped-step:nth-of-type(3) { border-left-color: #8e5ca8 !important; }
+.ped-step:nth-of-type(4) { border-left-color: #d9534f !important; }
+.ped-step h3 { color: #4a2d63 !important; }
+
+/* ---------- Encabezado pediátrico de la agenda ---------- */
+.ped-hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(120deg, #fff6dc 0%, #fdeaf0 45%, #e9f2fd 100%) !important;
+    border: 2px dashed #e6c98f !important;
+    border-radius: 24px !important;
+}
+.ped-hero::after {
+    content: "";
+    position: absolute;
+    right: -22px;
+    bottom: -34px;
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(142, 92, 168, .16) 0 34%, transparent 35%),
+                radial-gradient(circle, rgba(242, 201, 76, .35) 0 16%, transparent 17%);
+    pointer-events: none;
+}
+.ped-hero h2 { color: var(--ped-morado-oscuro) !important; }
+
+.ped-ilustracion {
+    width: 118px;
+    height: 86px;
+    flex: 0 0 auto;
+    animation: ped-flotar 4.5s ease-in-out infinite;
+}
+
+.ped-pastilla {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    border-radius: 999px;
+    padding: .22rem .7rem;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: #fff;
+    border: 1.5px dashed var(--ped-morado);
+    color: var(--ped-morado-oscuro);
+}
+
+/* ---------- Animaciones ---------- */
+@keyframes ped-flotar {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(-2deg); }
+}
+@keyframes ped-latido {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+@keyframes ped-meneo {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-6deg); }
+    75% { transform: rotate(6deg); }
+}
+@keyframes ped-aparecer {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Adaptación móvil ---------- */
+@media (max-width: 1023px) {
+    .ped-doodles { display: none; }
+    .ciso-navbar nav { padding-bottom: .35rem; }
+    .ciso-navbar nav a { white-space: nowrap; }
+    .ciso-header__profile { padding: 4px 8px; }
+}
+
+@media (max-width: 640px) {
+    main .bg-white { border-radius: 18px !important; }
+    .ped-ilustracion { width: 92px; height: 70px; }
+    main h2 { font-size: 1.35rem; }
+}
+
+/* ---------- Impresión limpia ---------- */
+@media print {
+    body { background: #fff !important; }
+    .ped-doodles, .ped-ilustracion { display: none !important; }
+    main .bg-white { box-shadow: none !important; border-color: #ccc !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}

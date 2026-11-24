@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" sec:authorize="hasAnyRole('ODONTOLOGIA', 'RECEPCIONISTA')" th:href="@{/css/panel-odontologia.css}">
     <link rel="stylesheet" sec:authorize="hasRole('RECEPCIONISTA')" th:href="@{/css/panel-recepcion.css}">
+    <link rel="stylesheet" sec:authorize="hasRole('PEDIATRA')" th:href="@{/css/panel-pediatria.css}">
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
 
@@ -19,6 +20,8 @@
                 <span th:text="${paciente.idPaciente == null ? ('Nuevo Paciente - ' + areaActual.etiqueta) : ('Modificar Datos de Paciente - ' + areaActual.etiqueta)}"></span>
                 <span sec:authorize="hasRole('RECEPCIONISTA')"
                       class="ciso-header__brand-tag text-[9px]">Panel de Recepción</span>
+                <span sec:authorize="hasRole('PEDIATRA')"
+                      class="ped-pastilla text-[9px]">Panel de Pediatría</span>
             </h1>
             <a th:href="@{/pacientes(area=${areaActual.slug})}" class="text-sm bg-indigo-800 hover:bg-indigo-900 px-3 py-1.5 rounded-lg transition border border-indigo-500">
                 <i class="fa-solid fa-arrow-left"></i> Volver a la lista

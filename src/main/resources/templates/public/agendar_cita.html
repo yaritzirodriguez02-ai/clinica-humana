@@ -549,6 +549,17 @@
                 e.preventDefault();
                 errorAvisoFotos.classList.remove("oculto");
                 campoAvisoFotos.focus();
+                return;
+            }
+
+            // Un solo envío: evita citas duplicadas por doble clic o por un segundo toque
+            if (!e.defaultPrevented) {
+                const boton = form.querySelector('button[type="submit"]');
+                if (boton) {
+                    boton.disabled = true;
+                    boton.classList.add('opacity-60', 'cursor-not-allowed');
+                    boton.textContent = 'Agendando cita…';
+                }
             }
         });
     });

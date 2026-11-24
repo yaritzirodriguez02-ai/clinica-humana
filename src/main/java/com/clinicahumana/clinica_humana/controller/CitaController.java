@@ -85,8 +85,8 @@ public class CitaController {
         model.addAttribute("vistaFutura", fecha == null);
         model.addAttribute("esAdmin", "ADMIN".equals(rol));
 
-        // Recepción atiende las solicitudes en línea de Odontología que la doctora aún no recibió
-        if ("RECEPCIONISTA".equals(rol)) {
+        // Recepción atiende las solicitudes de Odontología y la pediatra las de su propia agenda
+        if ("RECEPCIONISTA".equals(rol) || "PEDIATRA".equals(rol)) {
             long solicitudesEnLinea = lista.stream()
                     .filter(c -> "EN_LINEA".equals(c.getOrigen()) && !Boolean.TRUE.equals(c.getAceptada()))
                     .count();

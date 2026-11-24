@@ -171,12 +171,12 @@ if (!recetasExistentes.isEmpty()) {
             for (int i = 0; i < medicamentos.length; i++) {
                 if (medicamentos[i] != null && !medicamentos[i].trim().isEmpty()) {
                     RecetaDetalle d = new RecetaDetalle();
-                    d.setMedicamento(medicamentos[i].trim());
-                    d.setPresentacion(presentaciones != null && presentaciones.length > i ? presentaciones[i] : "");
-                    d.setDosis(dosis != null && dosis.length > i ? dosis[i].trim() : "");
-                    d.setFrecuencia(frecuencias != null && frecuencias.length > i ? frecuencias[i].trim() : "");
-                    d.setDuracion(duraciones != null && duraciones.length > i ? duraciones[i].trim() : "");
-                    d.setIndicacionesEspecificas(indicaciones != null && indicaciones.length > i ? indicaciones[i] : "");
+                    d.setMedicamento(valor(medicamentos, i));
+                    d.setPresentacion(valor(presentaciones, i));
+                    d.setDosis(valor(dosis, i));
+                    d.setFrecuencia(valor(frecuencias, i));
+                    d.setDuracion(valor(duraciones, i));
+                    d.setIndicacionesEspecificas(valor(indicaciones, i));
                     receta.agregarDetalle(d);
                 }
             }

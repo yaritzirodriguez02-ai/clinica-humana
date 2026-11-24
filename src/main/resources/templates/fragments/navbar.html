@@ -7,6 +7,32 @@
     <!-- Tema propio del panel dental: azul del logotipo, Times New Roman y papel tapiz -->
     <link rel="stylesheet" sec:authorize="hasAnyRole('ODONTOLOGIA', 'RECEPCIONISTA')" th:href="@{/css/panel-odontologia.css}">
     <link rel="stylesheet" sec:authorize="hasRole('RECEPCIONISTA')" th:href="@{/css/panel-recepcion.css}">
+    <!-- Tema infantil del Panel de Pediatría: Times New Roman y paleta del logotipo -->
+    <link rel="stylesheet" sec:authorize="hasRole('PEDIATRA')" th:href="@{/css/panel-pediatria.css}">
+
+    <!-- Ilustración de bienvenida (solo Pediatría): sol, nubes y globos -->
+    <svg sec:authorize="hasRole('PEDIATRA')" class="ped-doodles" viewBox="0 0 220 90" aria-hidden="true">
+        <circle cx="34" cy="28" r="15" fill="#ffd166"/>
+        <g stroke="#ffd166" stroke-width="3" stroke-linecap="round">
+            <line x1="34" y1="4" x2="34" y2="0"/><line x1="58" y1="28" x2="64" y2="28"/>
+            <line x1="51" y1="11" x2="55" y2="7"/><line x1="17" y1="11" x2="13" y2="7"/>
+            <line x1="10" y1="28" x2="4" y2="28"/><line x1="51" y1="45" x2="55" y2="49"/>
+        </g>
+        <g fill="#ffffff" opacity=".9">
+            <ellipse cx="118" cy="20" rx="18" ry="9"/><ellipse cx="132" cy="16" rx="12" ry="8"/>
+            <ellipse cx="104" cy="17" rx="10" ry="7"/>
+        </g>
+        <g>
+            <ellipse cx="168" cy="34" rx="11" ry="14" fill="#ef7d7d"/>
+            <path d="M168 48 L164 62 M168 48 L172 62" stroke="#8e5ca8" stroke-width="2"/>
+            <ellipse cx="196" cy="42" rx="10" ry="13" fill="#6fb3e0"/>
+            <path d="M196 55 L192 68 M196 55 L200 68" stroke="#8e5ca8" stroke-width="2"/>
+        </g>
+        <g fill="#ffd166">
+            <path d="M78 58 l2.6 5.4 6 .8-4.4 4.2 1.1 6-5.3-3-5.3 3 1.1-6-4.4-4.2 6-.8z"/>
+            <path d="M142 70 l2 4.2 4.7.6-3.4 3.2.8 4.7-4.1-2.3-4.1 2.3.8-4.7-3.4-3.2 4.7-.6z"/>
+        </g>
+    </svg>
 
     <!-- Identidad fija de la barra lateral del Panel de Recepción -->
     <div sec:authorize="hasRole('RECEPCIONISTA')" class="ciso-sidebar__brand ciso-sidebar__brand--recepcion">
@@ -116,7 +142,9 @@
 
                 <!-- 3. PACIENTES Y TUTORES -->
                 <a th:href="@{/pacientes}" class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-100">
-                    <i class="fa-solid fa-user-injured text-blue-300"></i> Pacientes y Tutores
+                    <i class="fa-solid fa-user-injured text-blue-300"></i>
+                    <span sec:authorize="hasRole('PEDIATRA')">Pacientes</span>
+                    <span sec:authorize="!hasRole('PEDIATRA')">Pacientes y Tutores</span>
                 </a>
 
                 <!-- 3b. CATALOGO DE MEDICAMENTOS (Personal medico y Admin) -->
@@ -133,30 +161,38 @@
                     <i class="fa-solid fa-cash-register"></i> Cobros y Caja
                 </a>
 
-                <!-- 3d. LIMPIEZA DE REGISTROS DEL AREA DENTAL -->
-                <a sec:authorize="hasRole('ODONTOLOGIA')"
+                <!-- 3d. LIMPIEZA DE REGISTROS (cada especialista administra la de su área) -->
+                <a sec:authorize="hasAnyRole('ODONTOLOGIA', 'PEDIATRA')"
                    th:href="@{/registros}"
                    class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap transition flex items-center gap-1.5 text-blue-100">
-                    <i class="fa-solid fa-broom"></i> Limpieza de Registros
+                    <i class="fa-solid fa-broom"></i>
+                    <span sec:authorize="hasRole('PEDIATRA')">Limpieza</span>
+                    <span sec:authorize="!hasRole('PEDIATRA')">Limpieza de Registros</span>
                 </a>
 
                 <!-- 4. AGENDAR NUEVA CITA (Recepción agenda en Odontología) -->
                 <a sec:authorize="hasAnyRole('PEDIATRA', 'RECEPCIONISTA', 'ADMIN')"
                    th:href="@{/citas/nueva}" class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-100">
-                    <i class="fa-solid fa-calendar-plus text-blue-300"></i> Agendar Cita
+                    <i class="fa-solid fa-calendar-plus text-blue-300"></i>
+                    <span sec:authorize="hasRole('PEDIATRA')">Agendar</span>
+                    <span sec:authorize="!hasRole('PEDIATRA')">Agendar Cita</span>
                 </a>
 
                 <!-- 5. CONTROL DE CAJA Y COBROS -->
                 <!-- Visible para recepción (odontología), pediatra (su panel) y admin; odontóloga accede desde su panel dental -->
                 <a sec:authorize="hasAnyRole('RECEPCIONISTA', 'PEDIATRA', 'ADMIN')"
                    th:href="@{/pagos}" class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-50 bg-blue-950/30 border border-blue-400/40">
-                    <i class="fa-solid fa-cash-register"></i> Caja y Cobros
+                    <i class="fa-solid fa-cash-register"></i>
+                    <span sec:authorize="hasRole('PEDIATRA')">Caja</span>
+                    <span sec:authorize="!hasRole('PEDIATRA')">Caja y Cobros</span>
                 </a>
 
                 <!-- 6. CORTE DIARIO / REPORTES FINANCIEROS -->
                 <a sec:authorize="hasAnyRole('RECEPCIONISTA', 'PEDIATRA', 'ADMIN')"
                    th:href="@{/pagos/corte}" class="px-2 py-2 rounded-lg text-[11px] font-bold uppercase whitespace-nowrap hover:bg-indigo-800 transition flex items-center gap-1.5 text-blue-100">
-                    <i class="fa-solid fa-chart-line text-blue-300"></i> Corte de Caja
+                    <i class="fa-solid fa-chart-line text-blue-300"></i>
+                    <span sec:authorize="hasRole('PEDIATRA')">Corte</span>
+                    <span sec:authorize="!hasRole('PEDIATRA')">Corte de Caja</span>
                 </a>
 
                 <!-- Pie de la barra lateral: sesión de Recepción -->

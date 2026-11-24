@@ -1,10 +1,7 @@
 package com.clinicahumana.clinica_humana.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import com.clinicahumana.clinica_humana.validation.ValidacionesClinicas;
 
 @Entity
 @Table(name = "receta_detalles")
@@ -19,26 +16,24 @@ public class RecetaDetalle {
     @JoinColumn(name = "id_receta", nullable = false)
     private Receta receta;
 
-    @NotBlank(message = "El medicamento es obligatorio")
-    @Pattern(regexp = ValidacionesClinicas.MEDICAMENTO_REGEX, message = "El medicamento debe ser un nombre de fármaco real (letras, números y signos básicos), sin texto aleatorio")
+    // Prescripción libre: se acepta cualquier medicamento, venga del catálogo o se escriba a mano.
+    @Size(max = 120, message = "El medicamento no debe exceder 120 caracteres")
     @Column(nullable = false, length = 120)
     private String medicamento;
 
     @Column(length = 80)
     private String presentacion;
 
-    @NotBlank(message = "La dosis es obligatoria")
+    // Dosis, frecuencia y duración en texto libre: sin formatos ni catálogos obligatorios.
     @Size(max = 60, message = "La dosis no debe exceder 60 caracteres")
     @Column(nullable = false, length = 60)
     private String dosis;
 
-    @NotBlank(message = "La frecuencia es obligatoria")
-    @Pattern(regexp = ValidacionesClinicas.FRECUENCIA_REGEX, message = "La frecuencia debe tener formato estructurado (ej. cada 8 horas, 8 hrs, c/8h)")
+    @Size(max = 60, message = "La frecuencia no debe exceder 60 caracteres")
     @Column(nullable = false, length = 60)
     private String frecuencia;
 
-    @NotBlank(message = "La duración es obligatoria")
-    @Pattern(regexp = ValidacionesClinicas.DURACION_REGEX, message = "La duración debe tener formato estructurado (ej. por 5 días)")
+    @Size(max = 40, message = "La duración no debe exceder 40 caracteres")
     @Column(nullable = false, length = 40)
     private String duracion;
 
