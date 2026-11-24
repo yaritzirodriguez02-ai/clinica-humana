@@ -127,6 +127,7 @@ public class ExpedienteClinicoController {
         existente.setPresionArterial(expediente.getPresionArterial());
         existente.setFrecuenciaCardiaca(expediente.getFrecuenciaCardiaca());
         existente.setSaturacionOxigeno(expediente.getSaturacionOxigeno());
+        existente.setPerimetroCefalico(expediente.getPerimetroCefalico());
 
         clinicoService.actualizarExpedientePediatrico(existente);
         redirectAttributes.addFlashAttribute("mensajeExito", "Atención pediátrica actualizada exitosamente.");

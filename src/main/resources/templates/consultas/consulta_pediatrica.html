@@ -184,14 +184,22 @@
                                title="El porcentaje de saturación de oxígeno debe ubicarse entre 50% y 100%"
                                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
                     </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Perímetro cefálico (cm)</label>
+                        <input type="number" step="0.1" min="25.0" max="60.0" id="perimetroCefalico" th:field="*{perimetroCefalico}"
+                               placeholder="Ej. 44.5" oninput="actualizarPercentiles()"
+                               title="Perímetro cefálico entre 25 y 60 cm"
+                               class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                        <span class="text-[10px] text-slate-500">Opcional; se grafica de 0 a 36 meses.</span>
+                    </div>
                 </div>
 
-                <!-- PERCENTILES DE CRECIMIENTO (CDC 2000, 2 a 20 años) -->
+                <!-- PERCENTILES DE CRECIMIENTO (CDC 2000, 0 a 20 años) -->
                 <div id="panelPercentiles" class="mt-5 pt-4 border-t border-slate-100"
                      th:attr="data-nacimiento=${expediente.paciente.fechaNacimiento},data-sexo=${expediente.paciente.sexo}">
                     <div class="flex items-center justify-between flex-wrap gap-2">
                         <h4 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-line text-emerald-600"></i> Percentiles de crecimiento (2 a 20 años)
+                            <i class="fa-solid fa-chart-line text-emerald-600"></i> Percentiles de crecimiento (0 a 20 años)
                         </h4>
                         <span id="avisoPercentiles" class="text-[11px] text-slate-500"></span>
                     </div>
@@ -211,8 +219,31 @@
                             <svg id="graficaPeso" viewBox="0 0 340 200" class="w-full h-auto mt-1"></svg>
                         </div>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div id="cardImc" class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs font-bold uppercase text-slate-600">IMC para la edad</span>
+                                <span id="resultadoImc" class="text-xs font-bold text-emerald-700">--</span>
+                            </div>
+                            <svg id="graficaImc" viewBox="0 0 340 200" class="w-full h-auto mt-1"></svg>
+                        </div>
+                        <div id="cardPerimetro" class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs font-bold uppercase text-slate-600">Perímetro cefálico</span>
+                                <span id="resultadoPerimetro" class="text-xs font-bold text-emerald-700">--</span>
+                            </div>
+                            <svg id="graficaPerimetro" viewBox="0 0 340 200" class="w-full h-auto mt-1"></svg>
+                        </div>
+                        <div id="cardPesoTalla" class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-xs font-bold uppercase text-slate-600">Peso para la talla</span>
+                                <span id="resultadoPesoTalla" class="text-xs font-bold text-emerald-700">--</span>
+                            </div>
+                            <svg id="graficaPesoTalla" viewBox="0 0 340 200" class="w-full h-auto mt-1"></svg>
+                        </div>
+                    </div>
                     <p class="text-[10px] text-slate-400 mt-2">
-                        Cálculo orientativo con las tablas de crecimiento CDC 2000 (LMS) para 2 a 20 años. No sustituye el juicio clínico.
+                        Cálculo orientativo con las tablas de crecimiento CDC 2000 (LMS): 0 a 36 meses y 2 a 20 años. No sustituye el juicio clínico.
                     </p>
                 </div>
             </div>
@@ -406,31 +437,32 @@
 
         const Z_P3 = -1.880794, Z_P10 = -1.281552, Z_P50 = 0, Z_P90 = 1.281552, Z_P97 = 1.880794;
 
-        function dibujarGrafica(idSvg, metrica, sexo, edadMeses, valor, yMin, yMax) {
+        // cfg define el dominio de la gráfica y cómo traducir la x dibujada a la
+        // edad (meses), años o talla (cm) que espera la tabla LMS correspondiente.
+        function dibujarGrafica(idSvg, serie, xPunto, valor, cfg) {
             const svg = document.getElementById(idSvg);
-            if (!svg || !DATOS_CDC) return;
-            const serie = DATOS_CDC[metrica][sexo];
+            if (!svg || !serie) return;
             const W = 340, H = 200, ml = 38, mb = 26, mt = 10, mr = 34;
-            const x = edad => ml + ((edad - 2) / 18) * (W - ml - mr);
-            const y = v => H - mb - ((v - yMin) / (yMax - yMin)) * (H - mb - mt);
+            const x = v => ml + ((v - cfg.xMin) / (cfg.xMax - cfg.xMin)) * (W - ml - mr);
+            const y = v => H - mb - ((v - cfg.yMin) / (cfg.yMax - cfg.yMin)) * (H - mb - mt);
             let partes = [];
 
             // Rejilla horizontal y etiquetas del eje Y
             for (let i = 0; i <= 4; i++) {
-                const valorY = yMin + (yMax - yMin) * i / 4;
+                const valorY = cfg.yMin + (cfg.yMax - cfg.yMin) * i / 4;
                 const py = y(valorY);
                 partes.push('<line x1="' + ml + '" y1="' + py.toFixed(1) + '" x2="' + (W - mr) + '" y2="' + py.toFixed(1) + '" stroke="#e2e8f0" stroke-width="1"/>');
                 partes.push('<text x="' + (ml - 4) + '" y="' + (py + 3).toFixed(1) + '" font-size="8" fill="#94a3b8" text-anchor="end">' + Math.round(valorY) + '</text>');
             }
-            // Rejilla vertical y años
-            for (let edad = 2; edad <= 20; edad += 2) {
-                const px = x(edad);
+            // Rejilla vertical: meses en lactantes, años en escolares, cm en peso/talla
+            for (let v = cfg.xMin; v <= cfg.xMax + 0.001; v += cfg.xStep) {
+                const px = x(v);
                 partes.push('<line x1="' + px.toFixed(1) + '" y1="' + mt + '" x2="' + px.toFixed(1) + '" y2="' + (H - mb) + '" stroke="#eef2f7" stroke-width="1"/>');
-                partes.push('<text x="' + px.toFixed(1) + '" y="' + (H - mb + 12) + '" font-size="8" fill="#94a3b8" text-anchor="middle">' + edad + '</text>');
+                partes.push('<text x="' + px.toFixed(1) + '" y="' + (H - mb + 12) + '" font-size="8" fill="#94a3b8" text-anchor="middle">' + Math.round(v) + '</text>');
             }
             partes.push('<line x1="' + ml + '" y1="' + (H - mb) + '" x2="' + (W - mr) + '" y2="' + (H - mb) + '" stroke="#94a3b8" stroke-width="1"/>');
             partes.push('<line x1="' + ml + '" y1="' + mt + '" x2="' + ml + '" y2="' + (H - mb) + '" stroke="#94a3b8" stroke-width="1"/>');
-            partes.push('<text x="' + (W - mr + 2) + '" y="' + (H - mb + 12) + '" font-size="8" fill="#94a3b8">años</text>');
+            partes.push('<text x="' + (W - mr) + '" y="' + (H - mb + 21) + '" font-size="8" fill="#94a3b8" text-anchor="end">' + cfg.xAxis + '</text>');
 
             // Curvas de percentiles
             const curvas = [
@@ -442,25 +474,25 @@
             ];
             curvas.forEach(c => {
                 let puntos = [];
-                for (let meses = 24; meses <= 240; meses += 6) {
-                    const lms = lmsEn(serie, meses);
+                for (let v = cfg.xMin; v <= cfg.xMax + 0.001; v += cfg.sampleStep) {
+                    const lms = lmsEn(serie, cfg.dataX(v));
                     if (!lms) continue;
                     const val = valorEnPercentil(lms, c.z);
-                    puntos.push(x(meses / 12).toFixed(1) + ',' + y(val).toFixed(1));
+                    puntos.push(x(v).toFixed(1) + ',' + y(val).toFixed(1));
                 }
                 partes.push('<polyline points="' + puntos.join(' ') + '" fill="none" stroke="' + c.color + '" stroke-width="1.6"/>');
-                const lmsFinal = lmsEn(serie, 240);
+                const lmsFinal = lmsEn(serie, cfg.dataX(cfg.xMax));
                 if (lmsFinal) {
                     const yFinal = y(valorEnPercentil(lmsFinal, c.z));
                     partes.push('<text x="' + (W - mr + 3) + '" y="' + (yFinal + 3).toFixed(1) + '" font-size="7" fill="#64748b">' + c.nombre + '</text>');
                 }
             });
 
-            // Punto del paciente (se anima al capturar talla o peso)
+            // Punto del paciente (se anima al capturar talla, peso o perímetro)
             let punto = null;
-            if (isFinite(edadMeses) && valor > 0 && edadMeses >= 24 && edadMeses <= 240) {
-                const px = x(edadMeses / 12), py = y(valor);
-                const zPunto = zScore(valor, lmsEn(serie, edadMeses));
+            if (isFinite(xPunto) && valor > 0 && xPunto >= cfg.xMin && xPunto <= cfg.xMax) {
+                const px = x(xPunto), py = y(valor);
+                const zPunto = zScore(valor, lmsEn(serie, cfg.dataX(xPunto)));
                 if (zPunto !== null && py > mt && py < H - mb) {
                     const p = Math.max(0.1, Math.min(99.9, normalCdf(zPunto) * 100));
                     punto = {
@@ -567,6 +599,30 @@
             if (cambio) animarResultado(el);
         }
 
+        function configGraficas(sexo, bebe) {
+            if (bebe) {
+                return {
+                    talla: { serie: DATOS_CDC.estaturaBebe[sexo], xMin: 0, xMax: 36, xStep: 3, sampleStep: 1.5, dataX: v => v, xAxis: 'meses', yMin: 40, yMax: 105 },
+                    peso: { serie: DATOS_CDC.pesoBebe[sexo], xMin: 0, xMax: 36, xStep: 3, sampleStep: 1.5, dataX: v => v, xAxis: 'meses', yMin: 0, yMax: 18 }
+                };
+            }
+            return {
+                talla: { serie: DATOS_CDC.estatura[sexo], xMin: 2, xMax: 20, xStep: 2, sampleStep: 0.5, dataX: v => v * 12, xAxis: 'años', yMin: 60, yMax: 200 },
+                peso: { serie: DATOS_CDC.peso[sexo], xMin: 2, xMax: 20, xStep: 2, sampleStep: 0.5, dataX: v => v * 12, xAxis: 'años', yMin: 0, yMax: 100 }
+            };
+        }
+
+        function mostrarTarjeta(id, visible) {
+            const el = document.getElementById(id);
+            if (el) el.style.display = visible ? '' : 'none';
+        }
+
+        function percentilDe(valor, lms) {
+            const z = zScore(valor, lms);
+            if (z === null || !isFinite(z)) return null;
+            return Math.max(0.1, Math.min(99.9, normalCdf(z) * 100));
+        }
+
         function actualizarPercentiles() {
             const panel = document.getElementById('panelPercentiles');
             if (!panel || !DATOS_CDC) return;
@@ -575,61 +631,113 @@
             const aviso = document.getElementById('avisoPercentiles');
             const resTalla = document.getElementById('resultadoTalla');
             const resPeso = document.getElementById('resultadoPeso');
-
-            if (!sexo || meses === null) {
-                aviso.textContent = 'Falta el sexo o la fecha de nacimiento del paciente.';
-                aviso.className = 'text-[11px] font-bold text-amber-700';
-                fijarResultado(resTalla, '--', 'text-xs font-bold text-slate-500');
-                fijarResultado(resPeso, '--', 'text-xs font-bold text-slate-500');
-                dibujarGrafica('graficaTalla', 'estatura', sexo || 1, null, 0, 60, 200);
-                dibujarGrafica('graficaPeso', 'peso', sexo || 1, null, 0, 0, 100);
-                return;
-            }
-            if (meses < 24 || meses > 240) {
-                aviso.textContent = 'Sin percentiles: las tablas aplican de 2 a 20 años de edad.';
-                aviso.className = 'text-[11px] font-bold text-amber-700 bg-amber-100 border border-amber-300 rounded px-2 py-0.5';
-                fijarResultado(resTalla, '--', 'text-xs font-bold text-slate-500');
-                fijarResultado(resPeso, '--', 'text-xs font-bold text-slate-500');
-                dibujarGrafica('graficaTalla', 'estatura', sexo, null, 0, 60, 200);
-                dibujarGrafica('graficaPeso', 'peso', sexo, null, 0, 0, 100);
-                return;
-            }
-            aviso.textContent = 'Edad: ' + Math.floor(meses / 12) + ' años ' + Math.round(meses % 12) + ' meses';
-            aviso.className = 'text-[11px] text-slate-500';
-
+            const resImc = document.getElementById('resultadoImc');
+            const resPerimetro = document.getElementById('resultadoPerimetro');
+            const resPesoTalla = document.getElementById('resultadoPesoTalla');
             const talla = parseFloat(document.getElementById('talla').value);
             const peso = parseFloat(document.getElementById('peso').value);
-            const lmsTalla = lmsEn(DATOS_CDC.estatura[sexo], meses);
-            const lmsPeso = lmsEn(DATOS_CDC.peso[sexo], meses);
+            const perimetro = parseFloat(document.getElementById('perimetroCefalico')?.value);
 
-            if (talla > 0) {
-                const z = zScore(talla, lmsTalla);
-                const p = Math.max(0.1, Math.min(99.9, normalCdf(z) * 100));
+            // Sin edad utilizable: se muestran las curvas de referencia sin punto.
+            if (!sexo || meses === null || meses < 0 || meses > 240) {
+                mostrarTarjeta('cardImc', false);
+                mostrarTarjeta('cardPerimetro', false);
+                mostrarTarjeta('cardPesoTalla', false);
+                aviso.textContent = meses !== null && meses > 240
+                    ? 'Sin percentiles: el panel aplica hasta los 20 años.'
+                    : 'Falta el sexo o la fecha de nacimiento del paciente.';
+                aviso.className = 'text-[11px] font-bold text-amber-700';
+                [resTalla, resPeso, resImc, resPerimetro, resPesoTalla].forEach(el => fijarResultado(el, '--', 'text-xs font-bold text-slate-500'));
+                const cfg = configGraficas(sexo || 1, false);
+                dibujarGrafica('graficaTalla', cfg.talla.serie, null, 0, cfg.talla);
+                dibujarGrafica('graficaPeso', cfg.peso.serie, null, 0, cfg.peso);
+                dibujarGrafica('graficaImc', DATOS_CDC.imc[sexo || 1], null, 0, { xMin: 2, xMax: 20, xStep: 2, sampleStep: 0.5, dataX: v => v * 12, xAxis: 'años', yMin: 10, yMax: 40 });
+                return;
+            }
+
+            const bebe = meses <= 36;
+            const nino = meses >= 24 && meses <= 240;
+            aviso.textContent = 'Edad: ' + Math.floor(meses / 12) + ' años ' + Math.round(meses % 12) + ' meses';
+            aviso.className = 'text-[11px] text-slate-500';
+            mostrarTarjeta('cardImc', nino);
+            mostrarTarjeta('cardPerimetro', bebe);
+            mostrarTarjeta('cardPesoTalla', bebe);
+
+            const cfg = configGraficas(sexo, bebe);
+            const xEdad = bebe ? meses : meses / 12;
+
+            // Estatura / longitud para la edad
+            const pTalla = talla > 0 ? percentilDe(talla, lmsEn(cfg.talla.serie, meses)) : null;
+            if (pTalla !== null) {
                 let etiqueta = 'Adecuada para la edad';
-                if (p < 3) etiqueta = 'Baja talla para la edad';
-                else if (p > 97) etiqueta = 'Talla alta para la edad';
-                fijarResultado(resTalla, 'P' + Math.round(p) + ' · ' + etiqueta,
-                    'text-xs font-bold ' + (p < 3 || p > 97 ? 'text-amber-700' : 'text-emerald-700'));
-                dibujarGrafica('graficaTalla', 'estatura', sexo, meses, talla, 60, 200);
+                if (pTalla < 3) etiqueta = 'Baja talla para la edad';
+                else if (pTalla > 97) etiqueta = 'Talla alta para la edad';
+                fijarResultado(resTalla, 'P' + Math.round(pTalla) + ' · ' + etiqueta,
+                    'text-xs font-bold ' + (pTalla < 3 || pTalla > 97 ? 'text-amber-700' : 'text-emerald-700'));
             } else {
                 fijarResultado(resTalla, '--', 'text-xs font-bold text-slate-500');
-                dibujarGrafica('graficaTalla', 'estatura', sexo, meses, 0, 60, 200);
             }
+            dibujarGrafica('graficaTalla', cfg.talla.serie, xEdad, talla, cfg.talla);
 
-            if (peso > 0) {
-                const z = zScore(peso, lmsPeso);
-                const p = Math.max(0.1, Math.min(99.9, normalCdf(z) * 100));
+            // Peso para la edad
+            const pPeso = peso > 0 ? percentilDe(peso, lmsEn(cfg.peso.serie, meses)) : null;
+            if (pPeso !== null) {
                 let etiqueta = 'Adecuado para la edad';
-                if (p < 3) etiqueta = 'Bajo peso para la edad';
-                else if (p > 97) etiqueta = 'Peso alto para la edad';
-                else if (p > 85) etiqueta = 'Peso elevado para la edad';
-                fijarResultado(resPeso, 'P' + Math.round(p) + ' · ' + etiqueta,
-                    'text-xs font-bold ' + (p < 3 || p > 85 ? 'text-amber-700' : 'text-emerald-700'));
-                dibujarGrafica('graficaPeso', 'peso', sexo, meses, peso, 0, 100);
+                if (pPeso < 3) etiqueta = 'Bajo peso para la edad';
+                else if (pPeso > 97) etiqueta = 'Peso alto para la edad';
+                else if (pPeso > 85) etiqueta = 'Peso elevado para la edad';
+                fijarResultado(resPeso, 'P' + Math.round(pPeso) + ' · ' + etiqueta,
+                    'text-xs font-bold ' + (pPeso < 3 || pPeso > 85 ? 'text-amber-700' : 'text-emerald-700'));
             } else {
                 fijarResultado(resPeso, '--', 'text-xs font-bold text-slate-500');
-                dibujarGrafica('graficaPeso', 'peso', sexo, meses, 0, 0, 100);
             }
+            dibujarGrafica('graficaPeso', cfg.peso.serie, xEdad, peso, cfg.peso);
+
+            // IMC para la edad (solo de 2 a 20 años)
+            const cfgImc = { xMin: 2, xMax: 20, xStep: 2, sampleStep: 0.5, dataX: v => v * 12, xAxis: 'años', yMin: 10, yMax: 40 };
+            const imc = talla > 0 && peso > 0 ? peso / Math.pow(talla / 100, 2) : null;
+            const pImc = nino && imc ? percentilDe(imc, lmsEn(DATOS_CDC.imc[sexo], meses)) : null;
+            if (pImc !== null) {
+                let etiqueta = 'Adecuado para la edad';
+                if (pImc < 5) etiqueta = 'Bajo IMC para la edad';
+                else if (pImc >= 95) etiqueta = 'Obesidad';
+                else if (pImc >= 85) etiqueta = 'Sobrepeso';
+                fijarResultado(resImc, 'P' + Math.round(pImc) + ' · ' + etiqueta,
+                    'text-xs font-bold ' + (pImc < 5 || pImc >= 85 ? 'text-amber-700' : 'text-emerald-700'));
+            } else {
+                fijarResultado(resImc, '--', 'text-xs font-bold text-slate-500');
+            }
+            dibujarGrafica('graficaImc', DATOS_CDC.imc[sexo], nino ? meses / 12 : null, imc || 0, cfgImc);
+
+            // Perímetro cefálico (solo de 0 a 36 meses)
+            const cfgPc = { xMin: 0, xMax: 36, xStep: 3, sampleStep: 1.5, dataX: v => v, xAxis: 'meses', yMin: 30, yMax: 55 };
+            const pPc = bebe && perimetro > 0 ? percentilDe(perimetro, lmsEn(DATOS_CDC.perimetroCefalico[sexo], meses)) : null;
+            if (pPc !== null) {
+                let etiqueta = 'Adecuado para la edad';
+                if (pPc < 3) etiqueta = 'Bajo para la edad';
+                else if (pPc > 97) etiqueta = 'Alto para la edad';
+                fijarResultado(resPerimetro, 'P' + Math.round(pPc) + ' · ' + etiqueta,
+                    'text-xs font-bold ' + (pPc < 3 || pPc > 97 ? 'text-amber-700' : 'text-emerald-700'));
+            } else {
+                fijarResultado(resPerimetro, '--', 'text-xs font-bold text-slate-500');
+            }
+            dibujarGrafica('graficaPerimetro', DATOS_CDC.perimetroCefalico[sexo], bebe ? meses : null, perimetro || 0, cfgPc);
+
+            // Peso para la talla / longitud (solo de 0 a 36 meses)
+            const cfgPt = { xMin: 45, xMax: 103, xStep: 5, sampleStep: 1.5, dataX: v => v, xAxis: 'cm', yMin: 0, yMax: 22 };
+            const tallaValida = talla >= 45 && talla <= 103;
+            const pPt = bebe && tallaValida && peso > 0 ? percentilDe(peso, lmsEn(DATOS_CDC.pesoLongitud[sexo], talla)) : null;
+            if (pPt !== null) {
+                let etiqueta = 'Adecuado para la talla';
+                if (pPt < 3) etiqueta = 'Bajo peso para la talla';
+                else if (pPt > 97) etiqueta = 'Peso alto para la talla';
+                else if (pPt > 85) etiqueta = 'Peso elevado para la talla';
+                fijarResultado(resPesoTalla, 'P' + Math.round(pPt) + ' · ' + etiqueta,
+                    'text-xs font-bold ' + (pPt < 3 || pPt > 85 ? 'text-amber-700' : 'text-emerald-700'));
+            } else {
+                fijarResultado(resPesoTalla, '--', 'text-xs font-bold text-slate-500');
+            }
+            dibujarGrafica('graficaPesoTalla', DATOS_CDC.pesoLongitud[sexo], bebe && tallaValida ? talla : null, peso || 0, cfgPt);
         }
 
         // ---------- Validación estricta anti texto basura ----------

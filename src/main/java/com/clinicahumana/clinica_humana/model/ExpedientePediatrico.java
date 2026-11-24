@@ -67,6 +67,12 @@ public class ExpedientePediatrico {
     @Column(name = "saturacion_oxigeno")
     private Integer saturacionOxigeno;
 
+    // Perímetro cefálico para las curvas de 0 a 36 meses (opcional en pacientes mayores)
+    @DecimalMin(value = "25.00", message = "El perímetro cefálico mínimo permitido es 25.00 cm")
+    @DecimalMax(value = "60.00", message = "El perímetro cefálico máximo permitido es 60.00 cm")
+    @Column(name = "perimetro_cefalico", precision = 4, scale = 2)
+    private BigDecimal perimetroCefalico;
+
     // Padecimiento actual referido por el tutor/paciente
     @Column(name = "padecimiento_actual", columnDefinition = "TEXT")
     private String padecimientoActual;
@@ -204,6 +210,14 @@ public class ExpedientePediatrico {
 
     public void setSaturacionOxigeno(Integer saturacionOxigeno) {
         this.saturacionOxigeno = saturacionOxigeno;
+    }
+
+    public BigDecimal getPerimetroCefalico() {
+        return perimetroCefalico;
+    }
+
+    public void setPerimetroCefalico(BigDecimal perimetroCefalico) {
+        this.perimetroCefalico = perimetroCefalico;
     }
 
     public String getPadecimientoActual() {
