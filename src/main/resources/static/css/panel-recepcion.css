@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Panel de Recepción (exclusivo de Odontología)
+   Misma base visual que el panel dental CISO: paleta azul del logotipo,
+   Times New Roman y barra lateral fija. Este archivo sólo ajusta la
+   identidad para que se distinga claramente que es Recepción y Caja.
+   ========================================================================== */
+
+.ciso-sidebar__brand--recepcion {
+    gap: 10px;
+    padding-top: 18px;
+    background-image:
+        linear-gradient(180deg, rgba(4, 20, 40, .82) 0%, rgba(8, 40, 78, .70) 70%, rgba(2, 12, 26, .90) 100%),
+        url("/img/sidebar-ciso.svg");
+}
+
+/* Nombre del panel debajo del logo */
+.ciso-sidebar__brand--recepcion .ciso-sidebar__doctor {
+    font-size: 15px;
+    letter-spacing: .07em !important;
+    color: #ffffff;
+}
+
+.ciso-sidebar__brand--recepcion .ciso-sidebar__role {
+    color: #8fe9ff;
+    letter-spacing: .18em !important;
+}
+
+/* Identidad de recepción en la barra azul superior */
+header.ciso-navbar .ciso-header__brand--recepcion {
+    justify-content: flex-start;
+    padding-left: 14px;
+    gap: 14px;
+}
+
+header.ciso-navbar .ciso-header__brand--recepcion > i {
+    font-size: 28px;
+}
+
+.ciso-header__brand--recepcion .ciso-header__brand-title {
+    font-size: 18px;
+}
+
+.ciso-header__brand-tag {
+    margin-left: 6px;
+    font: 700 10px/1 var(--ciso-serif, 'Times New Roman', serif);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: #04203a;
+    background: linear-gradient(135deg, #bff2ff 0%, #8fd8ff 100%);
+    border: 1px solid rgba(255, 255, 255, .65);
+    border-radius: 999px;
+    padding: 7px 12px 6px;
+    white-space: nowrap;
+    box-shadow: 0 8px 20px -12px rgba(0, 0, 0, .8);
+}
+
+/* Pie de la barra lateral: sesión de recepción */
+.ciso-sidebar__footer--recepcion {
+    border-top-color: rgba(151, 232, 255, .30);
+}
+
+.ciso-sidebar__footer--recepcion .ciso-sidebar__welcome-name {
+    font-size: 14px;
+    letter-spacing: .08em !important;
+}
+
+.ciso-sidebar__footer--recepcion .ciso-sidebar__welcome-role {
+    background: rgba(12, 68, 120, .82);
+    border-color: rgba(150, 225, 255, .55);
+    color: #e8f8ff;
+}
+
+/* En pantallas angostas la identidad vuelve a la barra de la clínica */
+@media (max-width: 1023px) {
+    header.ciso-navbar .ciso-header__brand--recepcion {
+        display: none !important;
+    }
+
+    .ciso-sidebar__footer--recepcion {
+        display: none !important;
+    }
+}
+
+@media print {
+    .ciso-sidebar__brand--recepcion,
+    .ciso-sidebar__footer--recepcion {
+        display: none !important;
+    }
+}

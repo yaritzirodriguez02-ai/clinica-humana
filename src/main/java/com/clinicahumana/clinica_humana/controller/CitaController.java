@@ -84,6 +84,14 @@ public class CitaController {
         model.addAttribute("filtroFecha", fecha);
         model.addAttribute("vistaFutura", fecha == null);
         model.addAttribute("esAdmin", "ADMIN".equals(rol));
+
+        // Recepción atiende las solicitudes en línea de Odontología que la doctora aún no recibió
+        if ("RECEPCIONISTA".equals(rol)) {
+            long solicitudesEnLinea = lista.stream()
+                    .filter(c -> "EN_LINEA".equals(c.getOrigen()) && !Boolean.TRUE.equals(c.getAceptada()))
+                    .count();
+            model.addAttribute("solicitudesEnLinea", solicitudesEnLinea);
+        }
         return "citas/agenda";
     }
 
@@ -271,7 +279,8 @@ public class CitaController {
         }
     }
 
-    // Aceptar una cita solicitada en línea (solo la especialista asignada o el administrador)
+    // Aceptar una cita solicitada en línea: la especialista asignada, recepción de
+    // Odontología (si la doctora aún no la ha recibido) o el administrador
     @PostMapping("/aceptar")
     public String aceptarCita(@RequestParam("idCita") Long idCita,
                               Principal principal,
@@ -287,9 +296,13 @@ public class CitaController {
         boolean esAdmin = usuarioActual != null && "ADMIN".equalsIgnoreCase(usuarioActual.getRol());
         boolean esAsignada = usuarioActual != null && cita.getMedico() != null
                 && usuarioActual.getIdUsuario().equals(cita.getMedico().getIdUsuario());
-        if (!esAdmin && !esAsignada) {
+        // Recepción sólo recibe solicitudes en línea de Odontología: nunca de Pediatría
+        boolean esRecepcionOdonto = usuarioActual != null
+                && "RECEPCIONISTA".equalsIgnoreCase(usuarioActual.getRol())
+                && "ODONTOLOGIA".equalsIgnoreCase(cita.getEspecialidad());
+        if (!esAdmin && !esAsignada && !esRecepcionOdonto) {
             redirectAttributes.addFlashAttribute("mensajeError",
-                    "Solo la especialista asignada a la cita (o el administrador) puede aceptarla.");
+                    "Solo la especialista asignada, recepción de Odontología (o el administrador) puede aceptarla.");
             return "redirect:/citas";
         }
 

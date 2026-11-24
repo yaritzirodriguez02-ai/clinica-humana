@@ -24,6 +24,27 @@
             <span th:text="${mensajeError}"></span>
         </div>
 
+        <!-- Identidad del Panel de Recepción (exclusivo de Odontología) -->
+        <div th:if="${usuarioActual != null and usuarioActual.rol == 'RECEPCIONISTA'}"
+             class="mb-6 rounded-xl bg-gradient-to-r from-blue-950 via-blue-800 to-sky-700 text-white p-5 shadow-lg border border-sky-300/30">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[.2em] text-sky-200">Panel de Recepción · Odontología</p>
+                    <p class="text-sm mt-1 text-blue-50">Agenda citas, recibe solicitudes en línea, gestiona pacientes y tutores, y maneja caja y cobros.</p>
+                    <p class="text-[11px] mt-1 text-sky-100/80">Historial clínico en modo lectura: sin recetas, sin informes y sin eliminar atenciones ni pagos.</p>
+                </div>
+                <a th:href="@{/citas/nueva}"
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/95 text-blue-900 text-xs font-bold uppercase tracking-wide hover:bg-white transition">
+                    <i class="fa-solid fa-calendar-plus"></i> Agendar cita
+                </a>
+            </div>
+            <p th:if="${solicitudesEnLinea != null and solicitudesEnLinea > 0}"
+               class="mt-3 inline-flex items-center gap-2 rounded-lg bg-amber-100 text-amber-900 border border-amber-300 px-3 py-1.5 text-xs font-bold uppercase tracking-wide">
+                <i class="fa-solid fa-globe"></i>
+                <span th:text="${solicitudesEnLinea + (solicitudesEnLinea == 1 ? ' solicitud en línea por aceptar' : ' solicitudes en línea por aceptar')}">Solicitudes en línea por aceptar</span>
+            </p>
+        </div>
+
         <!-- Encabezado adaptable según el rol del usuario conectado -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
@@ -41,7 +62,11 @@
                     </div>
                 </div>
                 <!-- Vista para Recepción / Admin -->
-                <div th:if="${usuarioActual != null and (usuarioActual.rol == 'RECEPCIONISTA' or usuarioActual.rol == 'ADMIN')}">
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'RECEPCIONISTA'}">
+                    <h2 class="text-2xl font-bold text-slate-900">Agenda de Odontología — Recepción</h2>
+                    <p class="text-sm text-slate-500">Solicitudes en línea, citas programadas y cobros del consultorio dental CISO.</p>
+                </div>
+                <div th:if="${usuarioActual != null and usuarioActual.rol == 'ADMIN'}">
                     <h2 class="text-2xl font-bold text-slate-900">Agenda General de Consultas y Recepción</h2>
                     <p class="text-sm text-slate-500">Coordinación de citas para especialistas, asignación de turnos y caja general.</p>
                 </div>
@@ -152,8 +177,8 @@
                                 <!-- Si la cita está PROGRAMADA: Acciones activas -->
                                 <div th:if="${c.estado == 'PROGRAMADA'}" class="inline-flex items-center gap-1.5 flex-wrap justify-center">
 
-                                    <!-- 0. Aceptar la solicitud en línea (especialista asignada o administrador) -->
-                                    <form th:if="${c.origen == 'EN_LINEA' and not c.aceptada and usuarioActual != null and (usuarioActual.rol == 'ADMIN' or (c.medico != null and c.medico.idUsuario != null and c.medico.idUsuario == usuarioActual.idUsuario))}"
+                                    <!-- 0. Aceptar la solicitud en línea (especialista asignada, recepción de Odontología o administrador) -->
+                                    <form th:if="${c.origen == 'EN_LINEA' and not c.aceptada and usuarioActual != null and (usuarioActual.rol == 'ADMIN' or (usuarioActual.rol == 'RECEPCIONISTA' and c.especialidad == 'ODONTOLOGIA') or (c.medico != null and c.medico.idUsuario != null and c.medico.idUsuario == usuarioActual.idUsuario))}"
                                           th:action="@{/citas/aceptar}" method="post" class="inline"
                                           onsubmit="return confirm('¿Aceptar esta cita solicitada en línea y confirmarla en la agenda?');">
                                         <input type="hidden" name="idCita" th:value="${c.idCita}">

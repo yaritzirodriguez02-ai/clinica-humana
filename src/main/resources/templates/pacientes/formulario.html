@@ -6,7 +6,8 @@
     <title>Registro / Edición de Paciente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" sec:authorize="hasRole('ODONTOLOGIA')" th:href="@{/css/panel-odontologia.css}">
+    <link rel="stylesheet" sec:authorize="hasAnyRole('ODONTOLOGIA', 'RECEPCIONISTA')" th:href="@{/css/panel-odontologia.css}">
+    <link rel="stylesheet" sec:authorize="hasRole('RECEPCIONISTA')" th:href="@{/css/panel-recepcion.css}">
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-12">
 
@@ -16,6 +17,8 @@
             <h1 class="text-lg font-bold flex items-center gap-2">
                 <i class="fa-solid fa-hospital-user text-indigo-200"></i>
                 <span th:text="${paciente.idPaciente == null ? ('Nuevo Paciente - ' + areaActual.etiqueta) : ('Modificar Datos de Paciente - ' + areaActual.etiqueta)}"></span>
+                <span sec:authorize="hasRole('RECEPCIONISTA')"
+                      class="ciso-header__brand-tag text-[9px]">Panel de Recepción</span>
             </h1>
             <a th:href="@{/pacientes(area=${areaActual.slug})}" class="text-sm bg-indigo-800 hover:bg-indigo-900 px-3 py-1.5 rounded-lg transition border border-indigo-500">
                 <i class="fa-solid fa-arrow-left"></i> Volver a la lista
